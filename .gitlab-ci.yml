@@ -3,7 +3,7 @@
 
 stages:
   - validate   # TypeScript check + build (on every push / MR)
-  - docs       # Auto-generate & commit docs (main branch only)
+  - docs       # Generate and verify docs (main branch only)
 
 # ── Shared npm cache ──────────────────────────────────────────────────────────
 .npm_cache: &npm_cache
@@ -27,7 +27,9 @@ validate-and-build:
   script:
     - npm ci
     - npm run lint                   # tsc --noEmit — TypeScript strict typecheck
-    - npm run docs:generate          # documentation verification
+    - npm run test:coverage         # Vitest with enforced 100% service coverage
+    - npm run docs:generate
+    - git diff --exit-code -- docs/MODULES_CATALOG.md
     - npm run build                  # production build
     - test -d dist
     - test -f dist/index.html
@@ -35,10 +37,11 @@ validate-and-build:
   artifacts:
     paths:
       - dist/
+      - coverage/
     expire_in: 1 hour
 
-# ── Job 2: Auto-generate & commit Technical Docs ──────────────────────────────
-update-docs:
+# ── Job 2: Verify generated Technical Docs ──────────────────────────────────
+verify-docs:
   stage: docs
   image: node:20-alpine
   <<: *npm_cache
@@ -49,22 +52,10 @@ update-docs:
       changes:
         - src/**/*
         - scripts/**/*
-    # Allow manual trigger from GitLab UI (replaces workflow_dispatch)
+    # Allow manual verification from GitLab UI
     - if: '$CI_PIPELINE_SOURCE == "web"'
       when: manual
-  before_script:
-    - git config --global user.name "gitlab-ci-bot"
-    - git config --global user.email "gitlab-ci-bot@noreply.gitlab.com"
-    # Use the CI job token to authenticate push access
-    - git remote set-url origin "https://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git"
   script:
     - npm ci
     - node scripts/generate-docs.mjs
-    - git add docs/
-    - |
-      if git diff --staged --quiet; then
-        echo "Documentation is already up-to-date."
-      else
-        git commit -m "docs(auto): synchronize technical documentation and module catalog [skip ci]"
-        git push origin HEAD:main
-      fi
+    - git diff --exit-code -- docs/MODULES_CATALOG.md

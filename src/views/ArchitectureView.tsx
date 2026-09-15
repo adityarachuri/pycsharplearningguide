@@ -1,14 +1,5 @@
 import React, { useState } from 'react';
-import {
-  Cpu,
-  Layers,
-  Lock,
-  Workflow,
-  ArrowRight,
-  CheckCircle2,
-  AlertTriangle,
-  Server
-} from 'lucide-react';
+import { Layers, Lock, Workflow, CheckCircle2, Server } from 'lucide-react';
 import {
   CLR_VS_CPYTHON,
   CPYTHON_VM_STEPS,
@@ -19,7 +10,6 @@ import { MermaidViewer } from '../components/MermaidViewer';
 import { ExecutionPipelineAnimator } from '../components/ExecutionPipelineAnimator';
 import { GilConcurrencyVisualizer } from '../components/GilConcurrencyVisualizer';
 import { MemoryPyObjectVisualizer } from '../components/MemoryPyObjectVisualizer';
-import { ZoomableDiagramWrapper } from '../components/ZoomableDiagramWrapper';
 
 export const ArchitectureView: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'runtime' | 'pipeline' | 'gil' | 'implementations'>('runtime');
@@ -119,7 +109,7 @@ export const ArchitectureView: React.FC = () => {
   return (
     <div className="space-y-8 animate-fadeIn">
       {/* Chapter Hero */}
-      <div className="rounded-2xl border border-slate-800 bg-gradient-to-b from-slate-900 via-slate-900/60 to-slate-950 p-6 md:p-8">
+      <div className="rounded-2xl border border-slate-800 bg-linear-to-b from-slate-900 via-slate-900/60 to-slate-950 p-6 md:p-8">
         <div className="flex flex-wrap items-center gap-2">
           <span className="rounded-md border border-amber-500/30 bg-amber-500/10 px-2.5 py-1 text-xs font-bold uppercase tracking-wider text-amber-400">
             Chapter 02
@@ -135,18 +125,18 @@ export const ArchitectureView: React.FC = () => {
 
         {/* Tab Controls */}
         <div className="mt-6 flex flex-wrap gap-2 border-t border-slate-800/80 pt-6">
-          {[
+          {([
             { id: 'runtime', label: '1. CPython vs CLR Matrix & Memory', icon: Layers },
             { id: 'pipeline', label: '2. Bytecode Pipeline & Execution', icon: Workflow },
             { id: 'gil', label: '3. The GIL & Concurrency Simulation', icon: Lock },
             { id: 'implementations', label: '4. Alternative Runtimes', icon: Server }
-          ].map(tab => {
+          ] as const).map(tab => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
             return (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
+                onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-2 rounded-xl px-4 py-2 text-xs md:text-sm font-semibold transition-all ${
                   isActive
                     ? 'bg-amber-500 text-slate-950 shadow-lg shadow-amber-500/20'
@@ -181,9 +171,7 @@ export const ArchitectureView: React.FC = () => {
           </div>
 
           {/* Interactive Memory Visualizer */}
-          <ZoomableDiagramWrapper title="Interactive Memory Visualizer">
-            <MemoryPyObjectVisualizer />
-          </ZoomableDiagramWrapper>
+          <MemoryPyObjectVisualizer />
 
           {/* Runtime Matrix Table */}
           <div className="space-y-4">
@@ -234,9 +222,7 @@ export const ArchitectureView: React.FC = () => {
       {activeTab === 'pipeline' && (
         <div className="space-y-8">
           {/* Interactive Execution Pipeline Animator */}
-          <ZoomableDiagramWrapper title="Execution Pipeline Animator">
-            <ExecutionPipelineAnimator />
-          </ZoomableDiagramWrapper>
+          <ExecutionPipelineAnimator />
 
           {/* Mermaid Pipeline Diagram */}
           <div className="space-y-3">
@@ -297,9 +283,7 @@ export const ArchitectureView: React.FC = () => {
       {activeTab === 'gil' && (
         <div className="space-y-8">
           {/* Interactive Concurrency Simulator */}
-          <ZoomableDiagramWrapper title="GIL Concurrency Simulator">
-            <GilConcurrencyVisualizer />
-          </ZoomableDiagramWrapper>
+          <GilConcurrencyVisualizer />
 
           {/* Mermaid Sequence Diagram */}
           <div className="space-y-3">

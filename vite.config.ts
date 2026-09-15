@@ -1,7 +1,7 @@
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
-import { spawn } from 'child_process';
+import { execFile, spawn } from 'child_process';
 import { defineConfig, Plugin } from 'vite';
 
 const SECURITY_HEADERS: Record<string, string> = {
@@ -13,8 +13,8 @@ const SECURITY_HEADERS: Record<string, string> = {
   'Referrer-Policy': 'strict-origin-when-cross-origin',
   // Permissions Policy: Restrict sensitive browser APIs
   'Permissions-Policy': 'camera=(), microphone=(), geolocation=(), payment=(), usb=(), screen-wake-lock=(), accelerometer=(), gyroscope=(), magnetometer=(), display-capture=(), browsing-topics=()',
-  // Content Security Policy: Authorize Google AI Studio iframe embedding and safe resources
-  'Content-Security-Policy': "default-src 'self' 'unsafe-inline' 'unsafe-eval' blob: data: https:; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https: wss:; worker-src 'self' blob:; frame-ancestors 'self' https://*.google.com https://*.run.app https://ai.studio https://*.aistudio.google.com; form-action 'self'; base-uri 'self';",
+  // Keep browser capabilities local to the app. The Python executor is server-side and opt-in.
+  'Content-Security-Policy': "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com; worker-src 'self' blob:; frame-ancestors 'self'; form-action 'self'; base-uri 'self'; object-src 'none';",
   // Modern XSS Protection Header
   'X-XSS-Protection': '1; mode=block',
   // Adobe Flash / PDF cross-domain policy restriction
@@ -23,12 +23,21 @@ const SECURITY_HEADERS: Record<string, string> = {
   'X-Download-Options': 'noopen',
 };
 
+const DEV_SECURITY_HEADERS: Record<string, string> = {
+  ...SECURITY_HEADERS,
+  // Vite's React plugin injects a development-only inline preamble before the app module.
+  'Content-Security-Policy': SECURITY_HEADERS['Content-Security-Policy'].replace(
+    "script-src 'self'",
+    "script-src 'self' 'unsafe-inline'"
+  )
+};
+
 function securityHeadersPlugin(): Plugin {
   return {
     name: 'security-headers',
     configureServer(server) {
       server.middlewares.use((req, res, next) => {
-        for (const [key, value] of Object.entries(SECURITY_HEADERS)) {
+        for (const [key, value] of Object.entries(DEV_SECURITY_HEADERS)) {
           res.setHeader(key, value);
         }
         res.removeHeader('X-Powered-By');
@@ -48,39 +57,73 @@ function securityHeadersPlugin(): Plugin {
 }
 
 function apiBackendPlugin(): Plugin {
+  const maxBodyBytes = 50_000;
+  const maxConcurrentExecutions = 2;
+  let activeExecutions = 0;
+
+  const sendJson = (res: any, statusCode: number, payload: unknown) => {
+    res.statusCode = statusCode;
+    res.setHeader('Content-Type', 'application/json');
+    res.end(JSON.stringify(payload));
+  };
+
   const handleApiRoutes = (req: any, res: any, next: () => void) => {
     // 1. Python Execution Sandbox Engine
     if (req.url === '/api/execute-python' && req.method === 'POST') {
+      if (process.env.ENABLE_PYTHON_EXECUTION !== 'true') {
+        sendJson(res, 503, { error: 'Python execution is disabled. Use an isolated execution service in deployment.' });
+        return;
+      }
+
+      if (req.headers['content-type'] !== 'application/json') {
+        sendJson(res, 415, { error: 'Content-Type must be application/json' });
+        return;
+      }
+
+      if (activeExecutions >= maxConcurrentExecutions) {
+        sendJson(res, 429, { error: 'Too many executions in progress' });
+        return;
+      }
+
       let body = '';
       req.on('data', (chunk: Buffer) => {
-        if (body.length < 50000) body += chunk.toString();
+        body += chunk.toString();
+        if (Buffer.byteLength(body) > maxBodyBytes) req.destroy();
       });
       req.on('end', () => {
         try {
-          const { code = '' } = JSON.parse(body || '{}');
-          if (!code.trim()) {
-            res.statusCode = 400;
-            res.setHeader('Content-Type', 'application/json');
-            res.end(JSON.stringify({ error: 'Code parameter cannot be empty' }));
+          const payload = JSON.parse(body || '{}');
+          const code = typeof payload.code === 'string' ? payload.code : '';
+          if (!code.trim() || Buffer.byteLength(code) > 40_000) {
+            sendJson(res, 400, { error: 'Code must be a non-empty string no larger than 40000 bytes' });
             return;
           }
 
+          activeExecutions += 1;
           const startTime = Date.now();
-          // Spawn real CPython interpreter in unbuffered mode with 4-second timeout limit
           const pythonCmd = /^win/.test(process.platform) ? 'python' : 'python3';
-          const proc = spawn(pythonCmd, ['-u', '-c', code]);
+          const proc = spawn(pythonCmd, ['-I', '-u', '-c', code], {
+            detached: process.platform !== 'win32',
+            env: { PATH: process.env.PATH, SystemRoot: process.env.SystemRoot, TEMP: process.env.TEMP, TMP: process.env.TMP }
+          });
           let stdout = '';
           let stderr = '';
           let finished = false;
+          const finish = () => {
+            if (finished) return false;
+            finished = true;
+            activeExecutions -= 1;
+            return true;
+          };
 
           const timer = setTimeout(() => {
-            if (finished) return;
-            finished = true;
-            proc.kill('SIGKILL');
-            res.statusCode = 200;
-            res.setHeader('Content-Type', 'application/json');
-            res.end(
-              JSON.stringify({
+            if (!finish()) return;
+            if (process.platform === 'win32' && proc.pid) {
+              execFile('taskkill', ['/pid', String(proc.pid), '/t', '/f']);
+            } else {
+              proc.kill('SIGKILL');
+            }
+            sendJson(res, 200, {
                 success: false,
                 stdout,
                 stderr: stderr + '\n[Execution timed out after 4000ms: CPU/infinite loop safeguard triggered]',
@@ -88,8 +131,7 @@ function apiBackendPlugin(): Plugin {
                 durationMs: Date.now() - startTime,
                 timedOut: true,
                 runtime: 'CPython 3.10 Linux'
-              })
-            );
+              });
           }, 4000);
 
           proc.stdout.on('data', (d: Buffer) => {
@@ -101,13 +143,9 @@ function apiBackendPlugin(): Plugin {
           });
 
           proc.on('close', (code: number | null) => {
-            if (finished) return;
-            finished = true;
+            if (!finish()) return;
             clearTimeout(timer);
-            res.statusCode = 200;
-            res.setHeader('Content-Type', 'application/json');
-            res.end(
-              JSON.stringify({
+            sendJson(res, 200, {
                 success: code === 0,
                 stdout,
                 stderr,
@@ -115,18 +153,13 @@ function apiBackendPlugin(): Plugin {
                 durationMs: Date.now() - startTime,
                 timedOut: false,
                 runtime: 'CPython 3.10 Linux'
-              })
-            );
+              });
           });
 
           proc.on('error', (err: Error) => {
-            if (finished) return;
-            finished = true;
+            if (!finish()) return;
             clearTimeout(timer);
-            res.statusCode = 500;
-            res.setHeader('Content-Type', 'application/json');
-            res.end(
-              JSON.stringify({
+            sendJson(res, 500, {
                 success: false,
                 stdout: '',
                 stderr: `Process spawn error: ${err.message}`,
@@ -134,13 +167,10 @@ function apiBackendPlugin(): Plugin {
                 durationMs: Date.now() - startTime,
                 timedOut: false,
                 runtime: 'CPython 3.10 Linux'
-              })
-            );
+              });
           });
         } catch (e: any) {
-          res.statusCode = 400;
-          res.setHeader('Content-Type', 'application/json');
-          res.end(JSON.stringify({ error: 'Invalid JSON payload', details: e?.message }));
+          sendJson(res, 400, { error: 'Invalid JSON payload' });
         }
       });
       return;
@@ -153,7 +183,7 @@ function apiBackendPlugin(): Plugin {
       res.end(
         JSON.stringify({
           status: 'ready',
-          driver: 'localStorage_with_cloud_sync_bridge',
+          driver: 'local_storage_cloud_sync',
           schemaVersion: 'v2.4.0',
           compatibleDatabases: ['firestore', 'postgresql_cloudsql', 'sqlite_embedded', 'rest_api'],
           storageStatus: {
@@ -174,25 +204,24 @@ function apiBackendPlugin(): Plugin {
       let body = '';
       req.on('data', (chunk: Buffer) => {
         body += chunk.toString();
+        if (Buffer.byteLength(body) > 25_000) req.destroy();
       });
       req.on('end', () => {
         try {
           const payload = JSON.parse(body || '{}');
-          res.statusCode = 200;
-          res.setHeader('Content-Type', 'application/json');
-          res.end(
-            JSON.stringify({
+          if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
+            sendJson(res, 400, { error: 'Sync payload must be a JSON object' });
+            return;
+          }
+          sendJson(res, 200, {
               success: true,
               message: 'State synchronized with backend repository layer',
               syncedAt: new Date().toISOString(),
               recordsReceived: Object.keys(payload).length,
               schemaVersion: 'v2.4.0'
-            })
-          );
+            });
         } catch {
-          res.statusCode = 400;
-          res.setHeader('Content-Type', 'application/json');
-          res.end(JSON.stringify({ error: 'Malformed sync payload' }));
+          sendJson(res, 400, { error: 'Malformed sync payload' });
         }
       });
       return;
@@ -224,10 +253,15 @@ export default defineConfig(() => {
     optimizeDeps: {
       include: ['react', 'react-dom'],
     },
+    build: {
+      // Mermaid's advanced diagram engines are lazy-loaded chapter assets, not initial app code.
+      chunkSizeWarningLimit: 750,
+    },
     server: {
       hmr: process.env.DISABLE_HMR !== 'true',
       watch: process.env.DISABLE_HMR === 'true' ? null : {},
-      headers: SECURITY_HEADERS,
+      host: '127.0.0.1',
+      headers: DEV_SECURITY_HEADERS,
     },
     preview: {
       headers: SECURITY_HEADERS,

@@ -1,19 +1,11 @@
 import React, { useState } from 'react';
-import {
-  Table,
-  BrainCircuit,
-  Filter,
-  Layers,
-  Sparkles,
-  BookOpen
-} from 'lucide-react';
+import { Table, BrainCircuit, Filter } from 'lucide-react';
 import {
   COMPARISON_MATRIX_ITEMS,
   COMPARISON_CATEGORIES
 } from '../data/comparisonMatrixData';
 import { CodeBlock } from '../components/CodeBlock';
 import { MindmapVisualizer } from '../components/MindmapVisualizer';
-import { ZoomableDiagramWrapper } from '../components/ZoomableDiagramWrapper';
 
 interface ComparisonMatrixViewProps {
   onOpenSandboxWithCode?: (code: string) => void;
@@ -33,7 +25,7 @@ export const ComparisonMatrixView: React.FC<ComparisonMatrixViewProps> = ({
   return (
     <div className="space-y-8 animate-fadeIn">
       {/* Chapter Hero */}
-      <div className="rounded-2xl border border-slate-800 bg-gradient-to-b from-slate-900 via-slate-900/60 to-slate-950 p-6 md:p-8">
+      <div className="rounded-2xl border border-slate-800 bg-linear-to-b from-slate-900 via-slate-900/60 to-slate-950 p-6 md:p-8">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex flex-wrap items-center gap-2">
             <span className="rounded-md border border-amber-500/30 bg-amber-500/10 px-2.5 py-1 text-xs font-bold uppercase tracking-wider text-amber-400">
@@ -108,9 +100,7 @@ export const ComparisonMatrixView: React.FC<ComparisonMatrixViewProps> = ({
           </div>
 
           {/* Embedded Mindmap Visualizer Component */}
-          <ZoomableDiagramWrapper title="Interactive Mindmap Explorer">
-            <MindmapVisualizer onLaunchSandbox={onOpenSandboxWithCode} />
-          </ZoomableDiagramWrapper>
+          <MindmapVisualizer onLaunchSandbox={onOpenSandboxWithCode} />
         </div>
       ) : (
         <div className="space-y-6">

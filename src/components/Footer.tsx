@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShieldCheck, BookOpen, ExternalLink, Cpu, Layers, Terminal, Sparkles, Database, Lock } from 'lucide-react';
+import { ShieldCheck, ExternalLink, Cpu, Terminal, Database, Lock } from 'lucide-react';
 import { NavSectionId } from '../types';
 import { SiteLogo } from './SiteLogo';
 

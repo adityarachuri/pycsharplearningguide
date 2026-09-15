@@ -5,13 +5,80 @@ html {
 }
 
 /* -------------------------------------------------------------------------- */
-/* Python IDLE High-Contrast Light Mode Theme Styles                         */
-/* Inspired by Guido van Rossum's classic Python IDLE interface              */
+/* Theme color tokens                                                         */
 /* -------------------------------------------------------------------------- */
+/* Tailwind v4 defines every default palette shade as a CSS custom property
+   (--color-<name>-<shade>) inside its own cascade layer, and every utility
+   that uses that shade — bg-*, text-*, border-*, ring-*, divide-*, from-*,
+   via-*, to-*, fill-*, stroke-*, placeholder-*, including /opacity variants
+   via color-mix() — reads from that one variable. Overriding these variables
+   here (as plain, unlayered CSS, which always wins over Tailwind's layered
+   theme values) re-themes every utility built on that shade in one place,
+   including ones added to components later, instead of hand-listing every
+   individual utility class combination as this file used to do. Two spots
+   in the app (the Navbar theme-toggle button and the App.tsx root container's
+   idle-mode classes) intentionally use literal hex arbitrary values instead
+   of these Tailwind color classes, specifically so their fixed appearance
+   isn't affected by this remap. */
 
 html.theme-idle,
 .theme-idle {
   color-scheme: light;
+  --color-slate-950: #ffffff;
+  --color-slate-900: #f1f5f9;
+  --color-slate-800: #e2e8f0;
+  --color-slate-700: #cbd5e1;
+  --color-slate-600: #94a3b8;
+  --color-slate-500: #64748b;
+  --color-slate-400: #475569;
+  --color-slate-300: #334155;
+  --color-slate-200: #1e293b;
+  --color-slate-100: #0f172a;
+  --color-amber-950: #fffbeb;
+  --color-amber-800: #b45309;
+  --color-amber-700: #b45309;
+  --color-amber-600: #b45309;
+  --color-amber-500: #b45309;
+  --color-amber-400: #b45309;
+  --color-amber-300: #9a3412;
+  --color-amber-200: #92400e;
+  --color-emerald-950: #ecfdf5;
+  --color-emerald-600: #047857;
+  --color-emerald-500: #047857;
+  --color-emerald-400: #15803d;
+  --color-emerald-300: #15803d;
+  --color-emerald-200: #065f46;
+  --color-purple-950: #faf5ff;
+  --color-purple-600: #7e22ce;
+  --color-purple-500: #7e22ce;
+  --color-purple-400: #7e22ce;
+  --color-purple-300: #6b21a8;
+  --color-purple-200: #6b21a8;
+  --color-blue-500: #1d4ed8;
+  --color-blue-400: #1d4ed8;
+  --color-blue-300: #1e40af;
+  --color-rose-950: #fff1f2;
+  --color-rose-600: #be123c;
+  --color-rose-500: #be123c;
+  --color-rose-400: #7c2d12;
+  --color-rose-300: #be123c;
+  --color-rose-200: #9f1239;
+  --color-sky-500: #0369a1;
+  --color-sky-400: #0033cc;
+  --color-sky-300: #0369a1;
+  --color-sky-200: #075985;
+  --color-teal-400: #0f766e;
+  --color-teal-300: #0f766e;
+  --color-cyan-500: #0e7490;
+  --color-cyan-400: #0e7490;
+  --color-cyan-300: #0e7490;
+  --color-orange-500: #c2410c;
+  --color-orange-400: #c2410c;
+  --color-pink-500: #be185d;
+  --color-pink-400: #be185d;
+  --color-pink-300: #be185d;
+  --color-yellow-500: #a16207;
+  --color-yellow-400: #a16207;
 }
 
 html.theme-idle body,
@@ -20,142 +87,14 @@ html.theme-idle body,
   color: #0f172a !important;
 }
 
-/* Base surface overrides */
-.theme-idle .bg-slate-950 {
-  background-color: #ffffff !important;
-}
-
-.theme-idle .bg-slate-900 {
-  background-color: #f1f5f9 !important;
-}
-
-.theme-idle .bg-slate-900\/90,
-.theme-idle .bg-slate-900\/80,
-.theme-idle .bg-slate-900\/70,
-.theme-idle .bg-slate-900\/60,
-.theme-idle .bg-slate-900\/50,
-.theme-idle .bg-slate-900\/40,
-.theme-idle .bg-slate-950\/90,
-.theme-idle .bg-slate-950\/80,
-.theme-idle .bg-slate-950\/70 {
-  background-color: #ffffff !important;
-}
-
-.theme-idle .bg-slate-800 {
-  background-color: #e2e8f0 !important;
-}
-
-.theme-idle .bg-slate-800\/80,
-.theme-idle .bg-slate-800\/60,
-.theme-idle .bg-slate-800\/40 {
-  background-color: #f1f5f9 !important;
-}
-
-/* Crisp high-contrast borders */
-.theme-idle .border-slate-900,
-.theme-idle .border-slate-850,
-.theme-idle .border-slate-800,
-.theme-idle .border-slate-800\/80,
-.theme-idle .border-slate-800\/90,
-.theme-idle .border-slate-700 {
-  border-color: #cbd5e1 !important;
-}
-
-/* High-contrast accessible text */
-.theme-idle .text-white,
-.theme-idle .text-slate-100 {
-  color: #0f172a !important;
-}
-
-.theme-idle .text-slate-200 {
-  color: #1e293b !important;
-}
-
-.theme-idle .text-slate-300 {
-  color: #334155 !important;
-}
-
-.theme-idle .text-slate-400 {
-  color: #475569 !important;
-}
-
-.theme-idle .text-slate-500 {
-  color: #64748b !important;
-}
-
-/* Hover background states */
-.theme-idle .hover\:bg-slate-900:hover,
-.theme-idle .hover\:bg-slate-800:hover {
-  background-color: #e2e8f0 !important;
-}
-
-.theme-idle .hover\:text-white:hover {
-  color: #0f172a !important;
-}
-
-/* Python IDLE CodeBlock Syntax Highlighting */
-.theme-idle .font-mono {
-  color: #0f172a;
-}
-
-.theme-idle .text-sky-400 {
-  color: #0033cc !important; /* Classic Python IDLE royal blue keyword */
-  font-weight: 600;
-}
-
-.theme-idle .text-emerald-300,
-.theme-idle .text-emerald-400 {
-  color: #15803d !important; /* Classic IDLE green for strings */
-}
-
-.theme-idle .text-slate-400.italic {
-  color: #b91c1c !important; /* Classic IDLE red for comments */
-}
-
-.theme-idle .text-amber-400 {
-  color: #b45309 !important; /* IDLE python gold/amber for decorators */
-}
-
-.theme-idle .text-amber-300 {
-  color: #9a3412 !important; /* IDLE number constants */
-}
-
-.theme-idle .text-rose-400 {
-  color: #7c2d12 !important;
-}
-
-.theme-idle .text-teal-300 {
-  color: #0f766e !important;
-}
-
-/* Gradient card resets */
-.theme-idle .from-slate-950,
-.theme-idle .from-slate-900 {
-  --tw-gradient-from: #ffffff !important;
-  --tw-gradient-to: #f1f5f9 !important;
-  --tw-gradient-stops: #ffffff, #f1f5f9 !important;
-}
-
-.theme-idle .via-slate-900,
-.theme-idle .via-slate-900\/60,
-.theme-idle .via-slate-900\/50 {
-  --tw-gradient-stops: #ffffff, #f8fafc, #f1f5f9 !important;
-}
-
-.theme-idle .to-slate-950,
-.theme-idle .to-slate-900 {
-  --tw-gradient-to: #f1f5f9 !important;
-}
-
-/* Badges and pills in IDLE Light Mode */
+/* Compound accent treatments that combine multiple properties into one
+   deliberate look (badge/pill styling, code-comment coloring) rather than
+   a straight color inversion — kept as explicit overrides since the token
+   remap above only recolors the single property each utility reads. */
 .theme-idle .bg-amber-500\/10 {
   background-color: #fef3c7 !important;
   color: #92400e !important;
   border-color: #fcd34d !important;
-}
-
-.theme-idle .text-amber-300 {
-  color: #92400e !important;
 }
 
 .theme-idle .bg-emerald-500\/10,
@@ -165,19 +104,11 @@ html.theme-idle body,
   border-color: #86efac !important;
 }
 
-.theme-idle .text-emerald-300 {
-  color: #166534 !important;
-}
-
 .theme-idle .bg-purple-500\/10,
 .theme-idle .bg-purple-500\/5 {
   background-color: #f3e8ff !important;
   color: #6b21a8 !important;
   border-color: #d8b4fe !important;
-}
-
-.theme-idle .text-purple-300 {
-  color: #6b21a8 !important;
 }
 
 .theme-idle .bg-blue-500\/10 {
@@ -186,8 +117,9 @@ html.theme-idle body,
   border-color: #93c5fd !important;
 }
 
-.theme-idle .text-blue-300 {
-  color: #1e40af !important;
+/* Python IDLE CodeBlock Syntax Highlighting: comments get the classic IDLE red */
+.theme-idle .text-slate-400.italic {
+  color: #b91c1c !important;
 }
 
 /* Form inputs & textareas in IDLE */
@@ -236,7 +168,6 @@ html.theme-idle body,
   fill: #475569 !important;
 }
 
-/* Tooltip in Recharts */
 .theme-idle .recharts-default-tooltip {
   background-color: #ffffff !important;
   border: 1px solid #cbd5e1 !important;
@@ -291,111 +222,67 @@ html.theme-idle body,
 html.theme-reading,
 .theme-reading {
   color-scheme: light;
+  --color-slate-950: #fdf6e3;
+  --color-slate-900: #f4e8d1;
+  --color-slate-800: #ebd5b3;
+  --color-slate-700: #d6bba0;
+  --color-slate-600: #c2a483;
+  --color-slate-500: #8a735c;
+  --color-slate-400: #66513d;
+  --color-slate-300: #453322;
+  --color-slate-200: #302418;
+  --color-slate-100: #302418;
+  --color-amber-950: #fffbeb;
+  --color-amber-800: #b45309;
+  --color-amber-700: #b45309;
+  --color-amber-600: #b45309;
+  --color-amber-500: #b45309;
+  --color-amber-400: #b85900;
+  --color-amber-300: #b85900;
+  --color-amber-200: #92400e;
+  --color-emerald-950: #ecfdf5;
+  --color-emerald-600: #047857;
+  --color-emerald-500: #047857;
+  --color-emerald-400: #1e7040;
+  --color-emerald-300: #1e7040;
+  --color-emerald-200: #065f46;
+  --color-purple-950: #faf5ff;
+  --color-purple-600: #7e22ce;
+  --color-purple-500: #7e22ce;
+  --color-purple-400: #7b439c;
+  --color-purple-300: #7b439c;
+  --color-purple-200: #6b21a8;
+  --color-blue-500: #1d4ed8;
+  --color-blue-400: #1d4ed8;
+  --color-blue-300: #205b99;
+  --color-rose-950: #fff1f2;
+  --color-rose-600: #be123c;
+  --color-rose-500: #be123c;
+  --color-rose-400: #b33939;
+  --color-rose-300: #b33939;
+  --color-rose-200: #9f1239;
+  --color-sky-500: #0369a1;
+  --color-sky-400: #205b99;
+  --color-sky-300: #0369a1;
+  --color-sky-200: #075985;
+  --color-teal-400: #0f766e;
+  --color-teal-300: #0f766e;
+  --color-cyan-500: #0e7490;
+  --color-cyan-400: #0e7490;
+  --color-cyan-300: #0e7490;
+  --color-orange-500: #c2410c;
+  --color-orange-400: #c2410c;
+  --color-pink-500: #be185d;
+  --color-pink-400: #be185d;
+  --color-pink-300: #be185d;
+  --color-yellow-500: #a16207;
+  --color-yellow-400: #a16207;
 }
 
 html.theme-reading body,
 .theme-reading {
-  background-color: #fdf6e3 !important; /* Base warm background */
-  color: #302418 !important; /* Deep brown/slate text */
-}
-
-/* Base surface overrides */
-.theme-reading .bg-slate-950 {
   background-color: #fdf6e3 !important;
-}
-
-.theme-reading .bg-slate-900 {
-  background-color: #f4e8d1 !important;
-}
-
-.theme-reading .bg-slate-900\/90,
-.theme-reading .bg-slate-900\/80,
-.theme-reading .bg-slate-900\/70,
-.theme-reading .bg-slate-900\/60,
-.theme-reading .bg-slate-900\/50,
-.theme-reading .bg-slate-900\/40,
-.theme-reading .bg-slate-950\/90,
-.theme-reading .bg-slate-950\/80,
-.theme-reading .bg-slate-950\/70 {
-  background-color: #fdf6e3 !important;
-}
-
-.theme-reading .bg-slate-800 {
-  background-color: #ebd5b3 !important;
-}
-
-.theme-reading .bg-slate-800\/80,
-.theme-reading .bg-slate-800\/60,
-.theme-reading .bg-slate-800\/40 {
-  background-color: #f4e8d1 !important;
-}
-
-/* Borders */
-.theme-reading .border-slate-900,
-.theme-reading .border-slate-850,
-.theme-reading .border-slate-800,
-.theme-reading .border-slate-800\/80,
-.theme-reading .border-slate-800\/90,
-.theme-reading .border-slate-700 {
-  border-color: #d6bba0 !important;
-}
-
-/* Text */
-.theme-reading .text-white,
-.theme-reading .text-slate-100 {
   color: #302418 !important;
-}
-
-.theme-reading .text-slate-200 {
-  color: #302418 !important;
-}
-
-.theme-reading .text-slate-300 {
-  color: #453322 !important;
-}
-
-.theme-reading .text-slate-400 {
-  color: #66513d !important;
-}
-
-.theme-reading .text-slate-500 {
-  color: #8a735c !important;
-}
-
-/* Hover states */
-.theme-reading .hover\:bg-slate-900:hover,
-.theme-reading .hover\:bg-slate-800:hover {
-  background-color: #ebd5b3 !important;
-}
-
-.theme-reading .hover\:text-white:hover {
-  color: #302418 !important;
-}
-
-/* Accents (Muted warm tones for reading mode) */
-.theme-reading .text-amber-400,
-.theme-reading .text-amber-300 {
-  color: #b85900 !important; /* Burnt orange */
-}
-
-.theme-reading .text-emerald-400,
-.theme-reading .text-emerald-300 {
-  color: #1e7040 !important; /* Muted green */
-}
-
-.theme-reading .text-sky-400,
-.theme-reading .text-blue-300 {
-  color: #205b99 !important; /* Muted blue */
-}
-
-.theme-reading .text-purple-400,
-.theme-reading .text-purple-300 {
-  color: #7b439c !important; /* Muted purple */
-}
-
-.theme-reading .text-rose-400,
-.theme-reading .text-rose-300 {
-  color: #b33939 !important; /* Muted red */
 }
 
 /* Codeblock overrides */
@@ -441,32 +328,9 @@ html.theme-reading body,
   color: #302418 !important;
 }
 
-/* Background Gradients */
-.theme-reading .from-slate-950,
-.theme-reading .from-slate-900 {
-  --tw-gradient-from: #fdf6e3 !important;
-  --tw-gradient-to: #f4e8d1 !important;
-  --tw-gradient-stops: #fdf6e3, #f4e8d1 !important;
-}
-
-.theme-reading .via-slate-900,
-.theme-reading .via-slate-900\/60,
-.theme-reading .via-slate-900\/50 {
-  --tw-gradient-stops: #fdf6e3, #faf2e1, #f4e8d1 !important;
-}
-
-.theme-reading .to-slate-950,
-.theme-reading .to-slate-900 {
-  --tw-gradient-to: #f4e8d1 !important;
-}
-
 /* Lightboxes / Overlays */
 .theme-reading .bg-black\/70,
 .theme-reading .bg-black\/75,
-.theme-reading .bg-black\/60,
-.theme-reading .bg-slate-950\/95,
-.theme-reading .bg-slate-950\/90,
-.theme-reading .bg-slate-950\/80 {
+.theme-reading .bg-black\/60 {
   background-color: rgba(253, 246, 227, 0.95) !important;
 }
-

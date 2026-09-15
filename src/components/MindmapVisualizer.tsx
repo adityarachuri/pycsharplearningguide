@@ -12,7 +12,6 @@ import {
   Copy,
   Check,
   Play,
-  Info,
   X,
   Layers,
   Cpu,
@@ -20,15 +19,9 @@ import {
   Boxes,
   Zap,
   Terminal,
-  Filter,
-  Eye
+  Filter
 } from 'lucide-react';
-import {
-  MINDMAP_DOMAINS,
-  MINDMAP_NODES,
-  MindmapDomain,
-  MindmapNode
-} from '../data/mindmapData';
+import { MINDMAP_DOMAINS, MINDMAP_NODES } from '../data/mindmapData';
 
 interface MindmapVisualizerProps {
   onLaunchSandbox?: (code: string) => void;
@@ -36,6 +29,11 @@ interface MindmapVisualizerProps {
 }
 
 type ViewMode = 'graph' | 'bridge';
+
+const MIN_ZOOM_LEVEL = 0.7;
+const MAX_ZOOM_LEVEL = 1.5;
+const ZOOM_STEP = 0.1;
+const COPY_RESET_MS = 2000;
 
 export const MindmapVisualizer: React.FC<MindmapVisualizerProps> = ({
   onLaunchSandbox,
@@ -83,11 +81,11 @@ export const MindmapVisualizer: React.FC<MindmapVisualizerProps> = ({
   const handleCopy = (code: string, id: string) => {
     navigator.clipboard.writeText(code);
     setCopiedCode(id);
-    setTimeout(() => setCopiedCode(null), 2000);
+    setTimeout(() => setCopiedCode(null), COPY_RESET_MS);
   };
 
   const handleZoom = (delta: number) => {
-    setZoomLevel(prev => Math.min(Math.max(prev + delta, 0.7), 1.5));
+    setZoomLevel(prev => Math.min(Math.max(prev + delta, MIN_ZOOM_LEVEL), MAX_ZOOM_LEVEL));
   };
 
   const handleResetZoom = () => {
@@ -241,12 +239,14 @@ export const MindmapVisualizer: React.FC<MindmapVisualizerProps> = ({
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
                 placeholder="Search concepts, LINQ, GIL..."
+                aria-label="Search mindmap concepts"
                 className="w-44 sm:w-56 rounded-xl border border-slate-800 bg-slate-950 py-1.5 pl-8 pr-3 text-xs text-slate-200 placeholder-slate-500 focus:border-amber-400 focus:outline-hidden"
               />
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
                   className="absolute right-2.5 top-2.5 text-slate-500 hover:text-slate-300"
+                  aria-label="Clear search"
                 >
                   <X className="h-3.5 w-3.5" />
                 </button>
@@ -297,19 +297,19 @@ export const MindmapVisualizer: React.FC<MindmapVisualizerProps> = ({
       {/* Main Canvas & Inspection Workspace */}
       <div className="grid grid-cols-1 xl:grid-cols-12">
         {/* Left/Top Interactive Graph / Bridge Canvas */}
-        <div className="xl:col-span-7 border-b xl:border-b-0 xl:border-r border-slate-800 bg-slate-950/40 relative flex flex-col min-h-[480px] lg:min-h-[580px]">
+        <div className="xl:col-span-7 border-b xl:border-b-0 xl:border-r border-slate-800 bg-slate-950/40 relative flex flex-col min-h-120 lg:min-h-145">
           {/* Canvas Floating Controls */}
           {viewMode === 'graph' && (
             <div className="absolute top-3 right-3 z-10 flex items-center gap-1 bg-slate-900/90 p-1 rounded-xl border border-slate-800 backdrop-blur-md">
               <button
-                onClick={() => handleZoom(0.1)}
+                onClick={() => handleZoom(ZOOM_STEP)}
                 className="p-1.5 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
                 title="Zoom In"
               >
                 <ZoomIn className="h-4 w-4" />
               </button>
               <button
-                onClick={() => handleZoom(-0.1)}
+                onClick={() => handleZoom(-ZOOM_STEP)}
                 className="p-1.5 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
                 title="Zoom Out"
               >
@@ -342,7 +342,7 @@ export const MindmapVisualizer: React.FC<MindmapVisualizerProps> = ({
           {viewMode === 'graph' ? (
             <div
               ref={svgContainerRef}
-              className="flex-1 w-full h-full overflow-auto flex items-center justify-center p-4 select-none min-h-[500px]"
+              className="flex-1 w-full h-full overflow-auto flex items-center justify-center p-4 select-none min-h-125"
             >
               <div
                 style={{
@@ -350,7 +350,7 @@ export const MindmapVisualizer: React.FC<MindmapVisualizerProps> = ({
                   transformOrigin: 'center center',
                   transition: 'transform 0.15s ease-out'
                 }}
-                className="w-[1050px] h-[720px] relative shrink-0"
+                className="w-262.5 h-180 relative shrink-0"
               >
                 <svg
                   width={graphLayout.width}
@@ -555,7 +555,7 @@ export const MindmapVisualizer: React.FC<MindmapVisualizerProps> = ({
             </div>
           ) : (
             /* MODE 2: DUAL-COLUMN COGNITIVE RELAY BRIDGE VIEW */
-            <div className="flex-1 overflow-y-auto p-4 space-y-3 max-h-[600px]">
+            <div className="flex-1 overflow-y-auto p-4 space-y-3 max-h-150">
               <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-3 text-xs text-slate-400 flex items-center justify-between">
                 <span className="flex items-center gap-2">
                   <span className="h-2 w-2 rounded-full bg-purple-400" />
@@ -695,7 +695,7 @@ export const MindmapVisualizer: React.FC<MindmapVisualizerProps> = ({
             </div>
 
             {/* The Cognitive Shift / Mental Model Callout */}
-            <div className="rounded-xl border border-amber-500/30 bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent p-3.5 space-y-1">
+            <div className="rounded-xl border border-amber-500/30 bg-linear-to-r from-amber-500/10 via-amber-500/5 to-transparent p-3.5 space-y-1">
               <div className="flex items-center gap-1.5 text-xs font-bold text-amber-300 uppercase tracking-wider">
                 <Sparkles className="h-3.5 w-3.5 text-amber-400" />
                 The Mental Rewiring (Cognitive Shift)
@@ -773,7 +773,7 @@ export const MindmapVisualizer: React.FC<MindmapVisualizerProps> = ({
             <div className="pt-3 border-t border-slate-800/80">
               <button
                 onClick={() => onLaunchSandbox(selectedNode.sandboxCode!)}
-                className="w-full flex items-center justify-center gap-2 rounded-xl border border-amber-500/40 bg-gradient-to-r from-amber-500 to-amber-600 px-4 py-2.5 text-xs font-bold text-slate-950 hover:from-amber-400 hover:to-amber-500 shadow-lg shadow-amber-500/20 transition-all cursor-pointer"
+                className="w-full flex items-center justify-center gap-2 rounded-xl border border-amber-500/40 bg-linear-to-r from-amber-500 to-amber-600 px-4 py-2.5 text-xs font-bold text-slate-950 hover:from-amber-400 hover:to-amber-500 shadow-lg shadow-amber-500/20 transition-all cursor-pointer"
               >
                 <Play className="h-3.5 w-3.5 fill-slate-950" />
                 <span>Execute &amp; Experiment in Python Sandbox</span>

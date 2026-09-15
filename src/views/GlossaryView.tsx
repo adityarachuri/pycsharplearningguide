@@ -1,13 +1,5 @@
 import React, { useState } from 'react';
-import {
-  HelpCircle,
-  Search,
-  BookOpen,
-  Layers,
-  Filter,
-  Code2,
-  ExternalLink
-} from 'lucide-react';
+import { Search } from 'lucide-react';
 import { GLOSSARY_TERMS } from '../data/glossaryData';
 import { CodeBlock } from '../components/CodeBlock';
 
@@ -29,7 +21,7 @@ export const GlossaryView: React.FC = () => {
   return (
     <div className="space-y-8 animate-fadeIn">
       {/* Chapter Hero */}
-      <div className="rounded-2xl border border-slate-800 bg-gradient-to-b from-slate-900 via-slate-900/60 to-slate-950 p-6 md:p-8">
+      <div className="rounded-2xl border border-slate-800 bg-linear-to-b from-slate-900 via-slate-900/60 to-slate-950 p-6 md:p-8">
         <div className="flex flex-wrap items-center gap-2">
           <span className="rounded-md border border-amber-500/30 bg-amber-500/10 px-2.5 py-1 text-xs font-bold uppercase tracking-wider text-amber-400">
             Chapter 07
@@ -52,6 +44,7 @@ export const GlossaryView: React.FC = () => {
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
               placeholder="Filter terms (e.g. Dunder, EAFP, MRO, GIL, Walrus)..."
+              aria-label="Filter glossary terms"
               className="w-full rounded-xl border border-slate-700 bg-slate-950 py-2 pl-9 pr-4 text-xs text-slate-200 placeholder-slate-500 focus:border-amber-500 focus:outline-none"
             />
           </div>

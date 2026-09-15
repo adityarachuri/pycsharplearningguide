@@ -1,5 +1,5 @@
 # PyCSharp - Automated Modules Catalog
-*Generated automatically by `scripts/generate-docs.mjs` on 2026-09-15T05:58:17.185Z*
+*Generated automatically by `scripts/generate-docs.mjs`*
 
 ## 📚 Curriculum Views (18 Modules)
 | View Component | Source File | Category |
@@ -76,4 +76,4 @@
 
 ---
 **Code Owner:** Aditya Rachuri (adityarachuri@outlook.com)  
-**Repository:** https://github.com/adityarachuri/pycsharp
+**Repository:** https://gitlab.com/adityarachuri/pycsharp

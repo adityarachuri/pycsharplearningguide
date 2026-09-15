@@ -5,18 +5,21 @@ import {
   X,
   CheckCircle2,
   Lock,
-  Radio,
   ExternalLink,
   Database,
   Download,
   Upload,
   Server,
   Cloud,
-  Check,
-  AlertCircle
+  Check
 } from 'lucide-react';
 import { OFFICIAL_AUTHENTIC_FEEDS } from '../data/feedUpdatesData';
 import { dbService, DatabaseStatusInfo } from '../services/dbIntegrationService';
+
+const BACKUP_COPIED_RESET_MS = 2500;
+const RESTORE_MESSAGE_RESET_MS = 3500;
+const SYNC_LOG_INTERVAL_MS = 25000;
+const MAX_SYNC_LOG_ENTRIES = 15;
 
 interface BackgroundSyncDrawerProps {
   isOpen: boolean;
@@ -71,7 +74,7 @@ export const BackgroundSyncDrawer: React.FC<BackgroundSyncDrawerProps> = ({
     a.click();
     URL.revokeObjectURL(url);
     setBackupCopied(true);
-    setTimeout(() => setBackupCopied(false), 2500);
+    setTimeout(() => setBackupCopied(false), BACKUP_COPIED_RESET_MS);
   };
 
   const handleImportFile = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -84,10 +87,10 @@ export const BackgroundSyncDrawer: React.FC<BackgroundSyncDrawerProps> = ({
       const success = dbService.restoreFromBackup(content);
       if (success) {
         setRestoreMessage('Database successfully restored from backup file!');
-        setTimeout(() => setRestoreMessage(null), 3500);
+        setTimeout(() => setRestoreMessage(null), RESTORE_MESSAGE_RESET_MS);
       } else {
         setRestoreMessage('Failed to parse or restore backup: Invalid JSON schema');
-        setTimeout(() => setRestoreMessage(null), 3500);
+        setTimeout(() => setRestoreMessage(null), RESTORE_MESSAGE_RESET_MS);
       }
     };
     reader.readAsText(file);
@@ -106,9 +109,9 @@ export const BackgroundSyncDrawer: React.FC<BackgroundSyncDrawerProps> = ({
       const randomSource = sources[Math.floor(Math.random() * sources.length)];
       setSyncLogs(prev => [
         `[${now}] Periodic worker check: ${randomSource}`,
-        ...prev.slice(0, 15)
+        ...prev.slice(0, MAX_SYNC_LOG_ENTRIES)
       ]);
-    }, 25000);
+    }, SYNC_LOG_INTERVAL_MS);
     return () => clearInterval(interval);
   }, [autoSyncEnabled]);
 
@@ -136,6 +139,7 @@ export const BackgroundSyncDrawer: React.FC<BackgroundSyncDrawerProps> = ({
           <button
             onClick={onClose}
             className="rounded-lg p-1 text-slate-400 hover:bg-slate-800 hover:text-white transition-colors"
+            aria-label="Close sync drawer"
           >
             <X className="h-5 w-5" />
           </button>
@@ -194,7 +198,7 @@ export const BackgroundSyncDrawer: React.FC<BackgroundSyncDrawerProps> = ({
                   <div className="flex items-center justify-between">
                     <span className="text-slate-400">Storage Driver:</span>
                     <span className="font-mono text-emerald-400 font-bold">
-                      {dbStatus?.driver || 'localStorage_with_cloud_sync_bridge'}
+                      {dbStatus?.driver || 'local_storage_cloud_sync'}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">

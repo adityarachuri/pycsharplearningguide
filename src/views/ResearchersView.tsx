@@ -1,14 +1,5 @@
 import React, { useState } from 'react';
-import {
-  FileText,
-  ExternalLink,
-  BookOpen,
-  Award,
-  Sparkles,
-  Users,
-  Search,
-  Filter
-} from 'lucide-react';
+import { ExternalLink, Users, Search } from 'lucide-react';
 import { RESEARCH_PAPERS } from '../data/researcherData';
 
 export const ResearchersView: React.FC = () => {
@@ -29,7 +20,7 @@ export const ResearchersView: React.FC = () => {
   return (
     <div className="space-y-8 animate-fadeIn">
       {/* Chapter Hero */}
-      <div className="rounded-2xl border border-slate-800 bg-gradient-to-b from-slate-900 via-slate-900/60 to-slate-950 p-6 md:p-8">
+      <div className="rounded-2xl border border-slate-800 bg-linear-to-b from-slate-900 via-slate-900/60 to-slate-950 p-6 md:p-8">
         <div className="flex flex-wrap items-center gap-2">
           <span className="rounded-md border border-amber-500/30 bg-amber-500/10 px-2.5 py-1 text-xs font-bold uppercase tracking-wider text-amber-400">
             Chapter 10
@@ -52,6 +43,7 @@ export const ResearchersView: React.FC = () => {
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
               placeholder="Search paper title, author (Guido, Travis, Wes, Norvig), or keyword..."
+              aria-label="Search research papers"
               className="w-full rounded-xl border border-slate-700 bg-slate-950 py-2 pl-9 pr-4 text-xs text-slate-200 placeholder-slate-500 focus:border-amber-500 focus:outline-none"
             />
           </div>

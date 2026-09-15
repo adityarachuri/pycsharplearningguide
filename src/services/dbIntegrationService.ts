@@ -15,15 +15,7 @@ export interface UserProgressRecord {
   schemaVersion: string;
 }
 
-export interface ChapterNoteRecord {
-  userId: string;
-  chapterId: string;
-  content: string;
-  characterCount: number;
-  lastUpdated: string;
-}
-
-export interface UserPreferencesRecord {
+interface UserPreferencesRecord {
   userId: string;
   theme: 'slate' | 'idle';
   autoRunSandbox: boolean;
@@ -111,7 +103,7 @@ export class DbIntegrationService {
     }
 
     // Trigger async background sync to server
-    this.syncStateWithBackend().catch(() => {});
+    void this.syncStateWithBackend();
     return record;
   }
 
@@ -135,7 +127,7 @@ export class DbIntegrationService {
       const notes = this.getNotes();
       notes[chapterId] = noteContent;
       localStorage.setItem(STORAGE_KEYS.NOTES, JSON.stringify(notes));
-      this.syncStateWithBackend().catch(() => {});
+      void this.syncStateWithBackend();
     } catch (err) {
       console.warn('LocalStorage save note error:', err);
     }
@@ -236,7 +228,7 @@ export class DbIntegrationService {
       if (data.preferences && data.preferences.theme) {
         localStorage.setItem(STORAGE_KEYS.THEME, data.preferences.theme);
       }
-      this.syncStateWithBackend().catch(() => {});
+      void this.syncStateWithBackend();
       return true;
     } catch (e) {
       console.error('Backup restoration failed:', e);

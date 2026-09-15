@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Terminal, Maximize2, ShieldCheck } from 'lucide-react';
+import { X, Terminal } from 'lucide-react';
 import { InteractiveSandbox } from './InteractiveSandbox';
 
 interface InteractiveSandboxModalProps {

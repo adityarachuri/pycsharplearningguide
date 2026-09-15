@@ -8,9 +8,14 @@ import {
   Move,
   Download,
   Check,
-  Sparkles,
   X
 } from 'lucide-react';
+
+const ZOOM_STEP = 0.2;
+const WHEEL_ZOOM_STEP = 0.15;
+const DOUBLE_CLICK_ZOOM_THRESHOLD = 1.1;
+const DOUBLE_CLICK_SCALE = 1.6;
+const DOWNLOAD_RESET_MS = 2000;
 
 interface ZoomableDiagramWrapperProps {
   children: React.ReactNode;
@@ -22,6 +27,7 @@ interface ZoomableDiagramWrapperProps {
   enablePan?: boolean;
   className?: string;
   allowDownloadSvg?: boolean;
+  zoomTargetSelector?: string;
 }
 
 export const ZoomableDiagramWrapper: React.FC<ZoomableDiagramWrapperProps> = ({
@@ -33,7 +39,8 @@ export const ZoomableDiagramWrapper: React.FC<ZoomableDiagramWrapperProps> = ({
   maxScale = 3.0,
   enablePan = true,
   className = '',
-  allowDownloadSvg = true
+  allowDownloadSvg = true,
+  zoomTargetSelector = '[data-zoom-target]'
 }) => {
   const [scale, setScale] = useState<number>(initialScale);
   const [position, setPosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
@@ -44,14 +51,30 @@ export const ZoomableDiagramWrapper: React.FC<ZoomableDiagramWrapperProps> = ({
 
   const containerRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
+  const fullscreenContentRef = useRef<HTMLDivElement>(null);
+  const fullscreenWheelZoneRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const applyTransform = (root: HTMLDivElement | null, multiplier = 1) => {
+      const target = root?.querySelector<HTMLElement>(zoomTargetSelector);
+      if (!target) return;
+
+      target.style.transform = `translate(${position.x}px, ${position.y}px) scale(${scale * multiplier})`;
+      target.style.transformOrigin = 'center center';
+      target.style.transition = isDragging ? 'none' : 'transform 0.15s ease-out';
+    };
+
+    applyTransform(contentRef.current);
+    applyTransform(fullscreenContentRef.current, 1.25);
+  }, [isDragging, position.x, position.y, scale, zoomTargetSelector]);
 
   // Zoom helpers
   const handleZoomIn = () => {
-    setScale(prev => Math.min(maxScale, Number((prev + 0.2).toFixed(1))));
+    setScale(prev => Math.min(maxScale, Number((prev + ZOOM_STEP).toFixed(1))));
   };
 
   const handleZoomOut = () => {
-    setScale(prev => Math.max(minScale, Number((prev - 0.2).toFixed(1))));
+    setScale(prev => Math.max(minScale, Number((prev - ZOOM_STEP).toFixed(1))));
   };
 
   const handleReset = () => {
@@ -59,15 +82,36 @@ export const ZoomableDiagramWrapper: React.FC<ZoomableDiagramWrapperProps> = ({
     setPosition({ x: 0, y: 0 });
   };
 
-  // Mouse wheel zoom when hovering
-  const handleWheel = (e: React.WheelEvent) => {
-    e.preventDefault();
-    const delta = e.deltaY < 0 ? 0.15 : -0.15;
-    setScale(prev => {
-      const next = Number(Math.min(maxScale, Math.max(minScale, prev + delta)).toFixed(2));
-      return next;
-    });
+  // Mouse wheel zoom when hovering. Attached as a native, non-passive listener (below)
+  // because React delegates wheel/touch events as passive by default, which silently
+  // ignores preventDefault() and lets the page scroll underneath the diagram while it zooms.
+  const applyWheelZoom = (deltaY: number) => {
+    const delta = deltaY < 0 ? WHEEL_ZOOM_STEP : -WHEEL_ZOOM_STEP;
+    setScale(prev => Number(Math.min(maxScale, Math.max(minScale, prev + delta)).toFixed(2)));
   };
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const onNativeWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      applyWheelZoom(e.deltaY);
+    };
+    el.addEventListener('wheel', onNativeWheel, { passive: false });
+    return () => el.removeEventListener('wheel', onNativeWheel);
+  }, [maxScale, minScale]);
+
+  useEffect(() => {
+    if (!isFullscreen) return;
+    const el = fullscreenWheelZoneRef.current;
+    if (!el) return;
+    const onNativeWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      applyWheelZoom(e.deltaY);
+    };
+    el.addEventListener('wheel', onNativeWheel, { passive: false });
+    return () => el.removeEventListener('wheel', onNativeWheel);
+  }, [isFullscreen, maxScale, minScale]);
 
   // Drag / Pan handlers
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -140,10 +184,10 @@ export const ZoomableDiagramWrapper: React.FC<ZoomableDiagramWrapperProps> = ({
 
   // Double click to toggle zoom
   const handleDoubleClick = () => {
-    if (scale > 1.1) {
+    if (scale > DOUBLE_CLICK_ZOOM_THRESHOLD) {
       handleReset();
     } else {
-      setScale(1.6);
+      setScale(DOUBLE_CLICK_SCALE);
     }
   };
 
@@ -182,7 +226,7 @@ export const ZoomableDiagramWrapper: React.FC<ZoomableDiagramWrapperProps> = ({
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      setTimeout(() => setCopied(false), DOWNLOAD_RESET_MS);
     }
   };
 
@@ -279,7 +323,6 @@ export const ZoomableDiagramWrapper: React.FC<ZoomableDiagramWrapperProps> = ({
         {/* Zoomable & Pannable Viewport */}
         <div
           ref={containerRef}
-          onWheel={handleWheel}
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
@@ -288,7 +331,7 @@ export const ZoomableDiagramWrapper: React.FC<ZoomableDiagramWrapperProps> = ({
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
           onDoubleClick={handleDoubleClick}
-          className={`relative min-h-[180px] w-full overflow-hidden p-4 md:p-6 select-none ${
+          className={`relative min-h-45 w-full overflow-hidden p-4 md:p-6 select-none ${
             isDragging ? 'cursor-grabbing' : scale > 1 ? 'cursor-grab' : 'cursor-default'
           }`}
           style={{ touchAction: 'none' }}
@@ -304,11 +347,7 @@ export const ZoomableDiagramWrapper: React.FC<ZoomableDiagramWrapperProps> = ({
           {/* Scalable & Translatable Inner Container */}
           <div
             ref={contentRef}
-            className="w-full flex items-center justify-center transition-transform duration-75 origin-center"
-            style={{
-              transform: `translate(${position.x}px, ${position.y}px) scale(${scale})`,
-              transition: isDragging ? 'none' : 'transform 0.15s ease-out'
-            }}
+            className="w-full flex items-center justify-center"
           >
             {children}
           </div>
@@ -359,7 +398,7 @@ export const ZoomableDiagramWrapper: React.FC<ZoomableDiagramWrapperProps> = ({
 
           {/* Lightbox Interactive Canvas */}
           <div
-            onWheel={handleWheel}
+            ref={fullscreenWheelZoneRef}
             onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
@@ -373,11 +412,8 @@ export const ZoomableDiagramWrapper: React.FC<ZoomableDiagramWrapperProps> = ({
             style={{ touchAction: 'none' }}
           >
             <div
+              ref={fullscreenContentRef}
               className="w-full h-full flex items-center justify-center origin-center"
-              style={{
-                transform: `translate(${position.x}px, ${position.y}px) scale(${scale * 1.25})`,
-                transition: isDragging ? 'none' : 'transform 0.15s ease-out'
-              }}
             >
               {children}
             </div>

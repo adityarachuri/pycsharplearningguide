@@ -24,6 +24,12 @@ interface MermaidViewerProps {
   id?: string;
 }
 
+const MIN_SCALE = 0.5;
+const MAX_SCALE = 3.0;
+const ZOOM_STEP = 0.2;
+const WHEEL_ZOOM_STEP = 0.15;
+const COPY_RESET_MS = 2000;
+
 let isMermaidInitialized = false;
 
 function ensureMermaidConfigured() {
@@ -66,6 +72,8 @@ export const MermaidViewer: React.FC<MermaidViewerProps> = ({
   id
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const wheelZoneRef = useRef<HTMLDivElement>(null);
+  const fullscreenWheelZoneRef = useRef<HTMLDivElement>(null);
   const [svgContent, setSvgContent] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
@@ -113,6 +121,10 @@ export const MermaidViewer: React.FC<MermaidViewerProps> = ({
         const { svg, bindFunctions } = await mermaid.render(renderId, cleanChart);
 
         if (isMounted) {
+          // mermaid's securityLevel: 'strict' (see ensureMermaidConfigured above) already
+          // sanitizes this SVG internally via DOMPurify with a config tuned to what mermaid
+          // emits (foreignObject HTML labels, its injected <style> block, etc.) — an extra
+          // generic sanitize pass here strips that <style> block and breaks text/node colors.
           setSvgContent(svg);
           setError(null);
           setIsRendering(false);
@@ -123,10 +135,11 @@ export const MermaidViewer: React.FC<MermaidViewerProps> = ({
             }
           }, 50);
         }
-      } catch (err: any) {
+      } catch (err) {
         if (isMounted) {
           console.warn('Mermaid render error for diagram:', baseId, err);
-          setError(err?.message || 'Failed to parse or render diagram');
+          const message = err instanceof Error ? err.message : 'Failed to parse or render diagram';
+          setError(message);
           setIsRendering(false);
         }
       } finally {
@@ -144,7 +157,7 @@ export const MermaidViewer: React.FC<MermaidViewerProps> = ({
   const copyCode = () => {
     navigator.clipboard.writeText(chart);
     setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    setTimeout(() => setCopied(false), COPY_RESET_MS);
   };
 
   const retryRender = () => {
@@ -152,19 +165,43 @@ export const MermaidViewer: React.FC<MermaidViewerProps> = ({
   };
 
   // Zoom controls
-  const handleZoomIn = () => setScale(prev => Math.min(3.0, Number((prev + 0.2).toFixed(1))));
-  const handleZoomOut = () => setScale(prev => Math.max(0.5, Number((prev - 0.2).toFixed(1))));
+  const handleZoomIn = () => setScale(prev => Math.min(MAX_SCALE, Number((prev + ZOOM_STEP).toFixed(1))));
+  const handleZoomOut = () => setScale(prev => Math.max(MIN_SCALE, Number((prev - ZOOM_STEP).toFixed(1))));
   const handleResetZoom = () => {
     setScale(1);
     setPosition({ x: 0, y: 0 });
   };
 
-  // Mouse wheel zoom
-  const handleWheel = (e: React.WheelEvent) => {
-    e.preventDefault();
-    const delta = e.deltaY < 0 ? 0.15 : -0.15;
-    setScale(prev => Math.min(3.0, Math.max(0.5, Number((prev + delta).toFixed(2)))));
+  // Mouse wheel zoom. Attached as a native, non-passive listener (below) because React
+  // delegates wheel/touch events as passive by default, which silently ignores preventDefault()
+  // and lets the page scroll underneath the diagram at the same time it zooms.
+  const applyWheelZoom = (deltaY: number) => {
+    const delta = deltaY < 0 ? WHEEL_ZOOM_STEP : -WHEEL_ZOOM_STEP;
+    setScale(prev => Math.min(MAX_SCALE, Math.max(MIN_SCALE, Number((prev + delta).toFixed(2)))));
   };
+
+  useEffect(() => {
+    const el = wheelZoneRef.current;
+    if (!el) return;
+    const onNativeWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      applyWheelZoom(e.deltaY);
+    };
+    el.addEventListener('wheel', onNativeWheel, { passive: false });
+    return () => el.removeEventListener('wheel', onNativeWheel);
+  }, []);
+
+  useEffect(() => {
+    if (!isFullscreen) return;
+    const el = fullscreenWheelZoneRef.current;
+    if (!el) return;
+    const onNativeWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      applyWheelZoom(e.deltaY);
+    };
+    el.addEventListener('wheel', onNativeWheel, { passive: false });
+    return () => el.removeEventListener('wheel', onNativeWheel);
+  }, [isFullscreen]);
 
   // Drag / Pan
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -205,7 +242,7 @@ export const MermaidViewer: React.FC<MermaidViewerProps> = ({
         e.touches[0].clientY - e.touches[1].clientY
       );
       const ratio = dist / touchStateRef.current.initialDist;
-      setScale(Math.min(3.0, Math.max(0.5, Number((touchStateRef.current.initialScale * ratio).toFixed(2)))));
+      setScale(Math.min(MAX_SCALE, Math.max(MIN_SCALE, Number((touchStateRef.current.initialScale * ratio).toFixed(2)))));
     }
   };
 
@@ -227,7 +264,7 @@ export const MermaidViewer: React.FC<MermaidViewerProps> = ({
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
     setDownloadSuccess(true);
-    setTimeout(() => setDownloadSuccess(false), 2000);
+    setTimeout(() => setDownloadSuccess(false), COPY_RESET_MS);
   };
 
   // Fullscreen keyboard listener
@@ -247,7 +284,7 @@ export const MermaidViewer: React.FC<MermaidViewerProps> = ({
     <div className={`flex items-center gap-1 rounded-xl border border-slate-700/80 bg-slate-900/90 p-1 backdrop-blur-md ${inModal ? 'scale-105' : ''}`}>
       <button
         onClick={handleZoomOut}
-        disabled={scale <= 0.5}
+        disabled={scale <= MIN_SCALE}
         className="rounded-lg p-1.5 text-slate-300 hover:bg-slate-800 hover:text-white disabled:opacity-30 transition-colors"
         title="Zoom Out (-)"
         aria-label="Zoom Out"
@@ -264,7 +301,7 @@ export const MermaidViewer: React.FC<MermaidViewerProps> = ({
       </button>
       <button
         onClick={handleZoomIn}
-        disabled={scale >= 3.0}
+        disabled={scale >= MAX_SCALE}
         className="rounded-lg p-1.5 text-slate-300 hover:bg-slate-800 hover:text-white disabled:opacity-30 transition-colors"
         title="Zoom In (+)"
         aria-label="Zoom In"
@@ -352,7 +389,7 @@ export const MermaidViewer: React.FC<MermaidViewerProps> = ({
 
         {/* Diagram Canvas or Source Code */}
         <div
-          onWheel={handleWheel}
+          ref={wheelZoneRef}
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
@@ -361,7 +398,7 @@ export const MermaidViewer: React.FC<MermaidViewerProps> = ({
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
           onDoubleClick={() => setScale(scale > 1.1 ? 1 : 1.6)}
-          className={`relative p-4 md:p-6 overflow-hidden min-h-[180px] flex items-center justify-center select-none ${
+          className={`relative p-4 md:p-6 overflow-hidden min-h-45 flex items-center justify-center select-none ${
             isDragging ? 'cursor-grabbing' : scale > 1 ? 'cursor-grab' : 'cursor-default'
           }`}
           style={{ touchAction: 'none' }}
@@ -465,7 +502,7 @@ export const MermaidViewer: React.FC<MermaidViewerProps> = ({
 
           {/* Interactive Fullscreen Canvas */}
           <div
-            onWheel={handleWheel}
+            ref={fullscreenWheelZoneRef}
             onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}

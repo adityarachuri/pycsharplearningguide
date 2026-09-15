@@ -1,17 +1,5 @@
 import React, { useState } from 'react';
-import {
-  Award,
-  CheckCircle2,
-  Sparkles,
-  Quote,
-  ShieldCheck,
-  Download,
-  Share2,
-  Code2,
-  Printer,
-  Activity,
-  BarChart3
-} from 'lucide-react';
+import { Award, CheckCircle2, Quote, Code2, Printer, Activity } from 'lucide-react';
 import { CONCLUSION_DATA } from '../data/conclusionData';
 import { ProgressDashboard } from '../components/ProgressDashboard';
 
@@ -42,7 +30,7 @@ export const ConclusionView: React.FC<ConclusionViewProps> = ({
   return (
     <div className="space-y-8 animate-fadeIn">
       {/* Chapter Hero */}
-      <div className="rounded-2xl border border-slate-800 bg-gradient-to-b from-slate-900 via-slate-900/60 to-slate-950 p-6 md:p-8">
+      <div className="rounded-2xl border border-slate-800 bg-linear-to-b from-slate-900 via-slate-900/60 to-slate-950 p-6 md:p-8">
         <div className="flex flex-wrap items-center gap-2">
           <span className="rounded-md border border-amber-500/30 bg-amber-500/10 px-2.5 py-1 text-xs font-bold uppercase tracking-wider text-amber-400">
             Chapter 13
@@ -63,7 +51,7 @@ export const ConclusionView: React.FC<ConclusionViewProps> = ({
       {/* Learning Analytics Card Container */}
       <section
         id="learning-analytics-card-container"
-        className="rounded-3xl border border-slate-800/90 bg-gradient-to-b from-slate-900/90 via-slate-900/50 to-slate-950 p-6 md:p-8 space-y-6 shadow-2xl shadow-black/40"
+        className="rounded-3xl border border-slate-800/90 bg-linear-to-b from-slate-900/90 via-slate-900/50 to-slate-950 p-6 md:p-8 space-y-6 shadow-2xl shadow-black/40"
       >
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800/80 pb-5">
           <div className="flex items-center gap-3">
@@ -166,6 +154,7 @@ export const ConclusionView: React.FC<ConclusionViewProps> = ({
               value={candidateName}
               onChange={e => setCandidateName(e.target.value)}
               placeholder="Your Full Name / Title"
+              aria-label="Your full name or title"
               className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:border-amber-500 focus:outline-none"
             />
             <button
@@ -178,7 +167,7 @@ export const ConclusionView: React.FC<ConclusionViewProps> = ({
         </div>
 
         {/* Certificate Card */}
-        <div className="relative overflow-hidden rounded-2xl border-2 border-amber-500/40 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 p-8 text-center space-y-6 shadow-2xl">
+        <div className="relative overflow-hidden rounded-2xl border-2 border-amber-500/40 bg-linear-to-b from-slate-950 via-slate-900 to-slate-950 p-8 text-center space-y-6 shadow-2xl">
           <div className="absolute -right-12 -top-12 h-36 w-36 rounded-full bg-amber-500/10 blur-2xl pointer-events-none" />
           <div className="absolute -left-12 -bottom-12 h-36 w-36 rounded-full bg-purple-500/10 blur-2xl pointer-events-none" />
 

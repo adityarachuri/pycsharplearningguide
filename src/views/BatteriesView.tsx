@@ -19,7 +19,7 @@ import {
   CheckSquare,
   Square
 } from 'lucide-react';
-import { PYTHON_BATTERIES, BatteryModule } from '../data/batteriesData';
+import { PYTHON_BATTERIES } from '../data/batteriesData';
 import { DualCodeView } from '../components/CodeBlock';
 
 interface BatteriesViewProps {
@@ -110,7 +110,7 @@ export const BatteriesView: React.FC<BatteriesViewProps> = ({ initialBatteryId }
   return (
     <div className="space-y-8 animate-fadeIn" id="batteries-view-root">
       {/* Hero Header */}
-      <div className="rounded-2xl border border-slate-800 bg-gradient-to-b from-slate-900 via-slate-900/60 to-slate-950 p-6 md:p-8">
+      <div className="rounded-2xl border border-slate-800 bg-linear-to-b from-slate-900 via-slate-900/60 to-slate-950 p-6 md:p-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex flex-wrap items-center gap-2">
             <span className="rounded-md border border-amber-500/30 bg-amber-500/10 px-2.5 py-1 text-xs font-bold uppercase tracking-wider text-amber-400">
@@ -129,7 +129,7 @@ export const BatteriesView: React.FC<BatteriesViewProps> = ({ initialBatteryId }
             </span>
             <div className="h-2 w-16 overflow-hidden rounded-full bg-slate-800">
               <div
-                className="h-full bg-gradient-to-r from-amber-500 to-emerald-500 transition-all duration-300"
+                className="h-full bg-linear-to-r from-amber-500 to-emerald-500 transition-all duration-300"
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
@@ -592,6 +592,7 @@ export const BatteriesView: React.FC<BatteriesViewProps> = ({ initialBatteryId }
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
               placeholder="Filter by library or C# analogy..."
+              aria-label="Filter by library or C# analogy"
               className="w-full rounded-xl border border-slate-800 bg-slate-950 py-2 pl-9 pr-4 text-xs text-slate-200 placeholder-slate-500 focus:border-amber-500/50 focus:outline-none focus:ring-1 focus:ring-amber-500/50 transition-all"
             />
           </div>

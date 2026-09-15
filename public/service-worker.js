@@ -9,7 +9,6 @@ const PRECACHE_URLS = [
   '/',
   '/index.html',
   '/manifest.json',
-  '/site.webmanifest',
   '/favicon.svg',
   '/pwa-192x192.png',
   '/pwa-512x512.png',
@@ -23,7 +22,6 @@ self.addEventListener('install', (event) => {
   self.skipWaiting();
   event.waitUntil(
     caches.open(PRECACHE_NAME).then((cache) => {
-      console.log('[PWA ServiceWorker] Precaching Application Shell for offline capability');
       return cache.addAll(PRECACHE_URLS).catch((err) => {
         console.warn('[PWA ServiceWorker] Precache partial error (non-fatal):', err);
       });
@@ -38,7 +36,6 @@ self.addEventListener('activate', (event) => {
       return Promise.all(
         cacheNames.map((cacheName) => {
           if (cacheName !== PRECACHE_NAME && cacheName !== RUNTIME_CACHE_NAME) {
-            console.log('[PWA ServiceWorker] Removing old cache version:', cacheName);
             return caches.delete(cacheName);
           }
         })
@@ -57,6 +54,11 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // Never cache API responses or error payloads as application assets.
+  if (url.origin === self.location.origin && url.pathname.startsWith('/api/')) {
+    return;
+  }
+
   // Handle SPA HTML navigations: Network-first with Cache fallback to /index.html
   if (request.mode === 'navigate') {
     event.respondWith(
@@ -66,7 +68,7 @@ self.addEventListener('fetch', (event) => {
             const responseClone = response.clone();
             caches.open(RUNTIME_CACHE_NAME).then((cache) => {
               cache.put(request, responseClone);
-            });
+            }).catch(() => {/* offline, suppress cache write error */});
           }
           return response;
         })
@@ -84,8 +86,8 @@ self.addEventListener('fetch', (event) => {
   // Handle Static Assets (JS, CSS, SVGs, Fonts, Images): Cache-First with Stale-While-Revalidate
   const isStaticAsset =
     url.origin === self.location.origin ||
-    url.hostname.includes('fonts.googleapis.com') ||
-    url.hostname.includes('fonts.gstatic.com');
+    url.hostname === 'fonts.googleapis.com' ||
+    url.hostname === 'fonts.gstatic.com';
 
   if (isStaticAsset) {
     event.respondWith(
@@ -97,7 +99,7 @@ self.addEventListener('fetch', (event) => {
               if (networkResponse && networkResponse.status === 200) {
                 caches.open(RUNTIME_CACHE_NAME).then((cache) => {
                   cache.put(request, networkResponse);
-                });
+                }).catch(() => {/* offline, suppress cache write error */});
               }
             })
             .catch(() => {/* offline, suppress network error */});
@@ -111,7 +113,7 @@ self.addEventListener('fetch', (event) => {
               const responseToCache = networkResponse.clone();
               caches.open(RUNTIME_CACHE_NAME).then((cache) => {
                 cache.put(request, responseToCache);
-              });
+              }).catch(() => {/* offline, suppress cache write error */});
             }
             return networkResponse;
           })

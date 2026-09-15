@@ -1,5 +1,0 @@
-# RFC 9116 Security Contact Information
-Contact: mailto:adityarachuri@outlook.com
-Expires: 2027-12-31T23:59:59.000Z
-Preferred-Languages: en
-Canonical: https://ais-dev-wlljr2gglbabk65rggnigg-325037169721.asia-southeast1.run.app/.well-known/security.txt

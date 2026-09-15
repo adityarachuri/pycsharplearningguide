@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { Sparkles, X, CheckCircle2, BookOpen, Lightbulb, ChevronRight, Check } from 'lucide-react';
+import { Sparkles, X, BookOpen, Lightbulb, Check } from 'lucide-react';
 import { DAILY_CHALLENGES } from '../data/dailyChallengesData';
 import { CodeBlock } from './CodeBlock';
+
+const NOTE_SAVED_RESET_MS = 2000;
 
 interface DailyTeacherModalProps {
   isOpen: boolean;
@@ -33,7 +35,7 @@ export const DailyTeacherModal: React.FC<DailyTeacherModalProps> = ({
   const handleSaveCurrentNote = () => {
     onSaveNote(activeChapterId, currentNote);
     setNoteSaved(true);
-    setTimeout(() => setNoteSaved(false), 2000);
+    setTimeout(() => setNoteSaved(false), NOTE_SAVED_RESET_MS);
   };
 
   if (!isOpen) return null;
@@ -59,6 +61,7 @@ export const DailyTeacherModal: React.FC<DailyTeacherModalProps> = ({
           <button
             onClick={onClose}
             className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-800 hover:text-white transition-colors"
+            aria-label="Close daily teacher modal"
           >
             <X className="h-5 w-5" />
           </button>
@@ -249,7 +252,7 @@ export const DailyTeacherModal: React.FC<DailyTeacherModalProps> = ({
                               : 'border-slate-700 bg-slate-950'
                           }`}
                         >
-                          {isDone && <Check className="h-3 w-3 stroke-[3]" />}
+                          {isDone && <Check className="h-3 w-3 stroke-3" />}
                         </div>
                       </button>
                     );

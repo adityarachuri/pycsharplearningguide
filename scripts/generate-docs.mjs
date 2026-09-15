@@ -27,10 +27,8 @@ const dataFiles = fs.readdirSync(dataDir).filter(f => f.endsWith('.ts'));
 
 console.log(`Discovered ${views.length} Curriculum Views, ${components.length} Components, ${dataFiles.length} Data modules.`);
 
-const now = new Date().toISOString();
-
 const catalogContent = `# PyCSharp - Automated Modules Catalog
-*Generated automatically by \`scripts/generate-docs.mjs\` on ${now}*
+*Generated automatically by \`scripts/generate-docs.mjs\`*
 
 ## 📚 Curriculum Views (${views.length} Modules)
 | View Component | Source File | Category |
@@ -49,7 +47,7 @@ ${dataFiles.map(d => `| \`${d.replace('.ts', '')}\` | \`src/data/${d}\` | Techni
 
 ---
 **Code Owner:** Aditya Rachuri (adityarachuri@outlook.com)  
-**Repository:** https://github.com/adityarachuri/pycsharp
+**Repository:** https://gitlab.com/adityarachuri/pycsharp
 `;
 
 fs.writeFileSync(path.join(docsDir, 'MODULES_CATALOG.md'), catalogContent, 'utf-8');

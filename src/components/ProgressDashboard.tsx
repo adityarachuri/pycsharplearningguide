@@ -21,11 +21,9 @@ import {
   Plus,
   BarChart3,
   Layers,
-  Sparkles,
   TrendingUp,
   RotateCcw,
-  Check,
-  ChevronRight
+  Check
 } from 'lucide-react';
 import {
   getInitialStudyLogs,
@@ -35,6 +33,9 @@ import {
   CURRICULUM_DOMAINS,
   WeekHeatmapDay
 } from '../data/studyHoursData';
+
+const LOG_NOTIFICATION_RESET_MS = 3500;
+const RESET_NOTIFICATION_MS = 3000;
 
 interface ProgressDashboardProps {
   completedChapters: string[];
@@ -137,7 +138,7 @@ export const ProgressDashboard: React.FC<ProgressDashboardProps> = ({
     saveStudyHoursToStorage(newLogs);
 
     setLogNotification(`Logged +${hoursToAdd}h for ${dateKey} (Total: ${updated}h)`);
-    setTimeout(() => setLogNotification(null), 3500);
+    setTimeout(() => setLogNotification(null), LOG_NOTIFICATION_RESET_MS);
   };
 
   const handleManualSubmit = (e: React.FormEvent) => {
@@ -155,7 +156,7 @@ export const ProgressDashboard: React.FC<ProgressDashboardProps> = ({
       const reset = getInitialStudyLogs();
       setStudyLogs(reset);
       setLogNotification('Study logs reset to default trajectory');
-      setTimeout(() => setLogNotification(null), 3000);
+      setTimeout(() => setLogNotification(null), RESET_NOTIFICATION_MS);
     }
   };
 
@@ -194,7 +195,7 @@ export const ProgressDashboard: React.FC<ProgressDashboardProps> = ({
           <button
             id="quick-log-2h-btn"
             onClick={() => handleAddHours(2.0)}
-            className="flex items-center gap-1 rounded-lg border border-slate-800 bg-slate-900 px-2.5 py-1.5 text-xs font-semibold text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 border-amber-500/30 transition-colors"
+            className="flex items-center gap-1 rounded-lg border border-amber-500/30 bg-amber-500/10 px-2.5 py-1.5 text-xs font-semibold text-amber-300 hover:bg-amber-500/20 transition-colors"
             title="Add 2 hours study time for today"
           >
             <Plus className="h-3 w-3" />
@@ -237,7 +238,7 @@ export const ProgressDashboard: React.FC<ProgressDashboardProps> = ({
           </div>
           <div className="w-full bg-slate-950 h-2 rounded-full overflow-hidden mt-2 border border-slate-800">
             <div
-              className="bg-gradient-to-r from-emerald-500 to-teal-400 h-full rounded-full transition-all duration-500"
+              className="bg-linear-to-r from-emerald-500 to-teal-400 h-full rounded-full transition-all duration-500"
               style={{ width: `${completionPercentage}%` }}
             />
           </div>
@@ -504,7 +505,7 @@ export const ProgressDashboard: React.FC<ProgressDashboardProps> = ({
 
         {/* Heatmap Grid Visualizer */}
         <div className="overflow-x-auto pb-2">
-          <div className="min-w-[640px] space-y-2">
+          <div className="min-w-160 space-y-2">
             {/* Month & Week column headers */}
             <div className="grid grid-cols-10 text-[10px] font-mono text-slate-400 pl-8">
               {heatmapWeeks.map((week, wIdx) => (
@@ -728,7 +729,7 @@ export const ProgressDashboard: React.FC<ProgressDashboardProps> = ({
             </p>
 
             {/* Scrollable module checklist */}
-            <div className="max-h-[285px] overflow-y-auto pr-1 space-y-2">
+            <div className="max-h-71.25 overflow-y-auto pr-1 space-y-2">
               {(allSections.length > 0
                 ? allSections
                 : [
@@ -768,7 +769,7 @@ export const ProgressDashboard: React.FC<ProgressDashboardProps> = ({
                           : 'border-slate-700 bg-slate-900'
                       }`}
                     >
-                      {isCompleted && <Check className="h-3 w-3 stroke-[3]" />}
+                      {isCompleted && <Check className="h-3 w-3 stroke-3" />}
                     </div>
                   </button>
                 );
@@ -797,10 +798,11 @@ export const ProgressDashboard: React.FC<ProgressDashboardProps> = ({
 
             <form onSubmit={handleManualSubmit} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">
+                <label htmlFor="study-log-date" className="block text-xs font-semibold text-slate-300 mb-1">
                   Session Date
                 </label>
                 <input
+                  id="study-log-date"
                   type="date"
                   value={manualDate}
                   onChange={e => setManualDate(e.target.value)}
@@ -811,10 +813,11 @@ export const ProgressDashboard: React.FC<ProgressDashboardProps> = ({
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">
+                <label htmlFor="study-log-hours" className="block text-xs font-semibold text-slate-300 mb-1">
                   Hours Spent (e.g. 1.5, 2.0, 3.5)
                 </label>
                 <input
+                  id="study-log-hours"
                   type="number"
                   step="0.25"
                   min="0.25"

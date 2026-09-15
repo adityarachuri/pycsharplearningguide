@@ -7,15 +7,11 @@ import {
   Cpu,
   Layers,
   Sparkles,
-  Zap,
-  ArrowRight,
   Database,
-  CheckCircle2,
   ZoomIn,
   ZoomOut,
   Maximize2,
-  Minimize2,
-  X
+  Minimize2
 } from 'lucide-react';
 
 interface Step {
@@ -236,6 +232,10 @@ return retval; // Result: 85`,
   }
 ];
 
+const MIN_SCALE = 0.75;
+const MAX_SCALE = 1.6;
+const ZOOM_STEP = 0.15;
+
 export const ExecutionPipelineAnimator: React.FC = () => {
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -243,12 +243,12 @@ export const ExecutionPipelineAnimator: React.FC = () => {
   const [scale, setScale] = useState<number>(1);
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
 
-  const handleZoomIn = () => setScale(prev => Math.min(1.6, Number((prev + 0.15).toFixed(2))));
-  const handleZoomOut = () => setScale(prev => Math.max(0.75, Number((prev - 0.15).toFixed(2))));
+  const handleZoomIn = () => setScale(prev => Math.min(MAX_SCALE, Number((prev + ZOOM_STEP).toFixed(2))));
+  const handleZoomOut = () => setScale(prev => Math.max(MIN_SCALE, Number((prev - ZOOM_STEP).toFixed(2))));
   const handleResetZoom = () => setScale(1);
 
   useEffect(() => {
-    let timer: any;
+    let timer: ReturnType<typeof setInterval> | undefined;
     if (isPlaying) {
       timer = setInterval(() => {
         setCurrentStepIndex(prev => {
@@ -289,7 +289,7 @@ export const ExecutionPipelineAnimator: React.FC = () => {
           <div className="flex items-center gap-1 rounded-xl border border-slate-800 bg-slate-900 p-1">
             <button
               onClick={handleZoomOut}
-              disabled={scale <= 0.75}
+              disabled={scale <= MIN_SCALE}
               className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-800 hover:text-white disabled:opacity-30 transition-colors"
               title="Zoom Out (-)"
             >
@@ -304,7 +304,7 @@ export const ExecutionPipelineAnimator: React.FC = () => {
             </button>
             <button
               onClick={handleZoomIn}
-              disabled={scale >= 1.6}
+              disabled={scale >= MAX_SCALE}
               className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-800 hover:text-white disabled:opacity-30 transition-colors"
               title="Zoom In (+)"
             >
@@ -365,7 +365,7 @@ export const ExecutionPipelineAnimator: React.FC = () => {
 
       {/* Pipeline Progress Breadcrumb Tracker */}
       <div className="overflow-x-auto pb-2">
-        <div className="flex items-center gap-1.5 min-w-[700px]">
+        <div className="flex items-center gap-1.5 min-w-175">
           {EXECUTION_STEPS.map((s, idx) => {
             const isActive = idx === currentStepIndex;
             const isPassed = idx < currentStepIndex;
@@ -485,7 +485,7 @@ export const ExecutionPipelineAnimator: React.FC = () => {
 
         {/* Right: Live CPython Value Stack & Fastlocals Visualizer (5 cols) */}
         <div className="lg:col-span-5 space-y-4">
-          <div className="rounded-2xl border border-slate-800 bg-gradient-to-b from-slate-900 to-slate-950 p-5 space-y-5">
+          <div className="rounded-2xl border border-slate-800 bg-linear-to-b from-slate-900 to-slate-950 p-5 space-y-5">
             <div className="flex items-center justify-between border-b border-slate-800 pb-3">
               <div className="flex items-center gap-2">
                 <Database className="h-4 w-4 text-amber-400" />
@@ -499,7 +499,7 @@ export const ExecutionPipelineAnimator: React.FC = () => {
             </div>
 
             {/* Visual Stack Chamber */}
-            <div className="relative flex flex-col-reverse justify-start min-h-[160px] rounded-xl border-2 border-dashed border-slate-800 bg-slate-950/60 p-3 gap-2">
+            <div className="relative flex flex-col-reverse justify-start min-h-40 rounded-xl border-2 border-dashed border-slate-800 bg-slate-950/60 p-3 gap-2">
               {step.stackState.length === 0 ? (
                 <div className="my-auto flex flex-col items-center justify-center text-center text-xs text-slate-500 space-y-1">
                   <span className="font-mono text-[11px]">[ Empty Stack ]</span>
@@ -509,7 +509,7 @@ export const ExecutionPipelineAnimator: React.FC = () => {
                 step.stackState.map((val, idx) => (
                   <div
                     key={idx}
-                    className="flex items-center justify-between rounded-lg border border-amber-500/50 bg-gradient-to-r from-amber-500/20 via-amber-500/10 to-slate-900 px-3 py-2 text-xs font-mono font-bold text-amber-300 shadow-md animate-pulse"
+                    className="flex items-center justify-between rounded-lg border border-amber-500/50 bg-linear-to-r from-amber-500/20 via-amber-500/10 to-slate-900 px-3 py-2 text-xs font-mono font-bold text-amber-300 shadow-md animate-pulse"
                   >
                     <div className="flex items-center gap-2">
                       <span className="text-[10px] text-slate-400">TOP[{idx}]:</span>

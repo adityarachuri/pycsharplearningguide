@@ -1,30 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, type ReactElement } from 'react';
 import {
   Server,
-  Database,
   Layers,
   Terminal,
   FileCode2,
   Copy,
   Check,
-  ExternalLink,
   ShieldCheck,
-  Zap,
-  Cpu,
   CheckCircle2,
-  AlertCircle,
-  Clock,
-  Play,
-  ArrowRight,
-  BookOpen,
-  Sparkles
+  Play
 } from 'lucide-react';
 import { WorkstationVideoPlayer } from '../components/WorkstationVideoPlayer';
 import { InteractiveSwaggerTester } from '../components/InteractiveSwaggerTester';
 import { CodeBlock } from '../components/CodeBlock';
 import { WEB_APP_STEPS, WEB_APP_ALL_FILES } from '../data/webAppProjectData';
 
-export function WebAppProjectView() {
+export function WebAppProjectView(): ReactElement {
   const [activeSceneId, setActiveSceneId] = useState<number>(1);
   const [selectedFileIdx, setSelectedFileIdx] = useState<number>(0);
   const [copiedScript, setCopiedScript] = useState<boolean>(false);

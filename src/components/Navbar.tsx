@@ -6,7 +6,6 @@ import {
   ShieldCheck,
   Menu,
   CheckCircle2,
-  Share2,
   Sun,
   Moon,
   BrainCircuit,
@@ -247,7 +246,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           onClick={onToggleTheme}
           className={`flex items-center gap-1.5 sm:gap-2 rounded-xl border px-2.5 sm:px-3 py-1.5 text-xs font-semibold transition-all select-none ${
             theme === 'idle'
-              ? 'border-blue-500/50 bg-blue-50 text-blue-950 shadow-xs hover:bg-blue-100 hover:border-blue-600'
+              ? 'border-blue-500/50 bg-[#eff6ff] text-[#172554] shadow-xs hover:bg-[#dbeafe] hover:border-[#2563eb]'
               : theme === 'reading'
               ? 'border-[#d6bba0] bg-[#f4e8d1] text-[#302418] shadow-xs hover:bg-[#ebd5b3] hover:border-[#c5a687]'
               : 'border-slate-700 bg-slate-900/90 text-slate-200 hover:border-amber-500/50 hover:bg-slate-800 hover:text-amber-300'
@@ -264,10 +263,10 @@ export const Navbar: React.FC<NavbarProps> = ({
           {theme === 'idle' ? (
             <>
               <Sun className="h-3.5 w-3.5 text-amber-600 fill-amber-500" />
-              <span className="hidden sm:inline font-mono font-bold tracking-tight text-blue-900 text-xs">
+              <span className="hidden sm:inline font-mono font-bold tracking-tight text-[#1e3a8a] text-xs">
                 Python IDLE
               </span>
-              <span className="rounded bg-blue-200/90 px-1 py-0.2 text-[9px] font-extrabold uppercase tracking-wider text-blue-800 hidden md:inline-block">
+              <span className="rounded bg-[#bfdbfe]/90 px-1 py-0.2 text-[9px] font-extrabold uppercase tracking-wider text-[#1e40af] hidden md:inline-block">
                 Light
               </span>
             </>

@@ -1,15 +1,15 @@
 # PyCSharp
+
 > **Polyglot Systems & Technical Rosetta Stone**  
 > *Learning Python from a C# developer's perspective.*
 
-[![CI & Quality Gates](https://github.com/adityarachuri/pycsharp/actions/workflows/ci.yml/badge.svg)](https://github.com/adityarachuri/pycsharp/actions/workflows/ci.yml)
-[![Automated Docs](https://github.com/adityarachuri/pycsharp/actions/workflows/documentation.yml/badge.svg)](https://github.com/adityarachuri/pycsharp/actions/workflows/documentation.yml)
+[![CI & Quality Gates](https://gitlab.com/adityarachuri/pycsharp/badges/main/pipeline.svg)](https://gitlab.com/adityarachuri/pycsharp/-/pipelines)
 [![License: MIT](https://img.shields.io/badge/License-MIT-amber.svg)](LICENSE)
 [![React 19](https://img.shields.io/badge/React-19.0.1-61dafb.svg)](https://react.dev)
 [![TypeScript Strict](https://img.shields.io/badge/TypeScript-5.x_Strict-3178c6.svg)](https://www.typescriptlang.org)
 [![Tailwind CSS v4](https://img.shields.io/badge/Tailwind-v4.1-38bdf8.svg)](https://tailwindcss.com)
 [![PWA Ready](https://img.shields.io/badge/PWA-Offline_First-10b981.svg)](public/manifest.json)
-[![Code Owner](https://img.shields.io/badge/Code_Owner-adityarachuri%40outlook.com-blue.svg)](.github/CODEOWNERS)
+[![Code Owner](https://img.shields.io/badge/Code_Owner-adityarachuri%40outlook.com-blue.svg)](CODEOWNERS)
 
 ---
 
@@ -36,7 +36,7 @@ Rather than treating Python as a beginner scripting language, PyCSharp deconstru
 
 ## 📚 Curriculum & Architectural Modules
 
-The platform is structured into **16 comprehensive, production-grade chapters**:
+The platform is structured into **18 comprehensive, production-grade views**:
 
 1. **Foundations, History & Creator's Ethos**: Guido van Rossum's origins at CWI, ABC language heritage, PEP 20 Zen of Python, and philosophical differences from Anders Hejlsberg's C# designs.
 2. **CPython vs. CLR Runtime Internals**: Deep dive into the stack evaluation loop, frame evaluation (`PyEval_EvalFrameDefault`), bytecode disassembly (`dis`), and opcode dispatch.
@@ -65,7 +65,7 @@ PyCSharp includes custom interactive simulations engineered with high visual pre
 - **PyObject Memory Anatomy Inspector**: Interactive memory struct explorer exposing `PyObject_HEAD`, 64-bit reference counter, type pointers, cyclic GC dual-linked list (`PyGC_Head`), memory addresses, and zoom/pan controls.
 - **Execution Pipeline Animator**: Step-by-step visualizer tracing Python code through Lexical Tokenizer, AST Parser, Bytecode Assembler (`ceval.c`), and execution outcomes.
 - **Relational C# to Python Mindmap**: Interactive graph visualizer mapping .NET mental paradigms to Python constructs with touch gestures, panning, zoom in/out, and SVG exports.
-- **In-Browser Python REPL Sandbox**: Built-in interactive sandbox for testing syntax, exploring built-in functions, and verifying mental models in real time.
+- **Local Python Execution Sandbox**: Optional local development endpoint for testing syntax and exploring built-in functions. It is disabled by default and must never be exposed directly in production.
 
 ---
 
@@ -73,7 +73,7 @@ PyCSharp includes custom interactive simulations engineered with high visual pre
 
 - **Runtime & Framework**: React 19, TypeScript 5.x (Strict Type Safety), Vite 6
 - **Styling & Design System**: Tailwind CSS v4, Lucide Icons, Space Grotesk & Plus Jakarta Sans typography
-- **Visualizations & Charts**: Motion, Recharts, Mermaid 12, D3-inspired SVG engines
+- **Visualizations & Charts**: Recharts, Mermaid, D3-inspired SVG engines
 - **Offline & PWA**: Service Worker with Stale-While-Revalidate caching, Web App Manifest, offline readiness
 - **Security**: Content Security Policy (CSP), HTTP Strict Transport Security (HSTS), RFC 9116 security contact
 
@@ -82,6 +82,7 @@ PyCSharp includes custom interactive simulations engineered with high visual pre
 ## 🚀 Getting Started
 
 ### Prerequisites
+
 - Node.js 20.x or higher
 - npm 10.x or higher
 
@@ -95,9 +96,35 @@ cd pycsharp
 # Install dependencies
 npm install
 
-# Start local development server (binds to http://localhost:3000)
+# Start local development server (binds to http://127.0.0.1:3000)
+npm run dev
+
+# Enable the optional local Python executor in a separate PowerShell session
+$env:ENABLE_PYTHON_EXECUTION = "true"
 npm run dev
 ```
+
+---
+
+## Usage
+
+Once `npm run dev` is running, open `http://127.0.0.1:3000` and use the sidebar to jump between the 18 curriculum modules. Each module is a standalone React view — chapter completion, notes, and theme preference persist to `localStorage` via `src/services/dbIntegrationService.ts`. Press `Ctrl+K` / `Cmd+K` to open the searchable command palette, or use the floating action button to open the Interactive Python Sandbox.
+
+---
+
+## API
+
+The Vite dev/preview server exposes a small set of local-only endpoints (see `vite.config.ts`), used by the in-app sandbox and sync drawer:
+
+| Endpoint | Method | Description |
+| :--- | :--- | :--- |
+| `/api/execute-python` | `POST` | Runs a short Python snippet in a sandboxed subprocess. Disabled unless `ENABLE_PYTHON_EXECUTION=true` is set; never enable in a shared/production deployment. |
+| `/api/db/status` | `GET` | Returns a simulated backend-database handshake payload (driver, schema version, compatible adapters). |
+| `/api/db/sync` | `POST` | Accepts a JSON payload and echoes back a simulated sync acknowledgement; no data leaves the browser. |
+
+These endpoints only exist in local dev/preview via Vite middleware — there is no deployed backend.
+
+---
 
 ### Production Build & Verification
 
@@ -105,8 +132,14 @@ npm run dev
 # Typecheck & Linting
 npm run lint
 
-# Generate & Verify Automated Module Documentation
+# Generate Automated Module Documentation
 npm run docs:generate
+
+# Run the complete local quality gate
+npm test
+
+# Run tests with enforced 100% coverage for the persistence service
+npm run test:coverage
 
 # Build for Production
 npm run build
@@ -114,6 +147,8 @@ npm run build
 # Preview Production Build locally
 npm run preview
 ```
+
+The coverage gate currently enforces 100% statements, branches, functions, and lines for `src/services/dbIntegrationService.ts`. Browser-heavy visualizers, lazy-loaded views, Vite middleware, and service-worker behavior still require browser or integration test suites before a whole-application 100% claim is possible.
 
 ---
 
@@ -125,15 +160,26 @@ npm run preview
 
 ---
 
+## Contributing
+
+This is primarily a personal learning-content project, but fixes and clarifications are welcome:
+
+1. Fork the repository and create a feature branch.
+2. Run `npm run lint` (TypeScript strict check) and `npm test` before opening a PR.
+3. Keep new content consistent with the existing C#-vs-Python comparison format used across chapters.
+4. Open a pull request describing the change and the reasoning behind it.
+
+---
+
 ## 👤 Code Owner & Maintainer
 
 - **Author & Maintainer**: Aditya Rachuri  
 - **Email**: [adityarachuri@outlook.com](mailto:adityarachuri@outlook.com)  
 - **GitHub**: [@adityarachuri](https://github.com/adityarachuri)  
-- **Repository**: [https://github.com/adityarachuri/pycsharp](https://github.com/adityarachuri/pycsharp)
+- **Repository**: [https://gitlab.com/adityarachuri/pycsharp](https://gitlab.com/adityarachuri/pycsharp)
 
 ---
 
-## 📄 License
+## License 📄
 
 This project is open-source software licensed under the [MIT License](LICENSE).

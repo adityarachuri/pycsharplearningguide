@@ -24,7 +24,7 @@ export const SiteLogo: React.FC<SiteLogoProps> = ({
     <div className={`${className} inline-flex items-center gap-2.5 select-none`}>
       {/* Unique Polyglot Vector Emblem */}
       <div
-        className={`relative flex ${currentSize.box} items-center justify-center rounded-xl bg-gradient-to-br from-slate-900 via-slate-950 to-amber-950/40 p-1 border border-amber-500/30 shadow-lg shadow-amber-500/15 group-hover:border-amber-400/60 transition-all duration-300`}
+        className={`relative flex ${currentSize.box} items-center justify-center rounded-xl bg-linear-to-br from-slate-900 via-slate-950 to-amber-950/40 p-1 border border-amber-500/30 shadow-lg shadow-amber-500/15 group-hover:border-amber-400/60 transition-all duration-300`}
       >
         <svg
           viewBox="0 0 48 48"

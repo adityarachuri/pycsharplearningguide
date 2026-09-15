@@ -1,22 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, type ReactElement } from 'react';
 import {
   BrainCircuit,
-  Cpu,
   Layers,
   Terminal,
   FileCode2,
   Copy,
   Check,
-  ExternalLink,
   ShieldCheck,
-  Zap,
   CheckCircle2,
-  AlertCircle,
-  Play,
-  ArrowRight,
-  Sparkles,
-  Database,
-  Radio
+  Play
 } from 'lucide-react';
 import { WorkstationVideoPlayer } from '../components/WorkstationVideoPlayer';
 import { InteractiveRagTester } from '../components/InteractiveRagTester';
@@ -24,7 +16,7 @@ import { CodeBlock } from '../components/CodeBlock';
 import { ZoomableDiagramWrapper } from '../components/ZoomableDiagramWrapper';
 import { AIML_STEPS, AIML_ALL_FILES } from '../data/aimlProjectData';
 
-export function AimlProjectView() {
+export function AimlProjectView(): ReactElement {
   const [activeSceneId, setActiveSceneId] = useState<number>(1);
   const [selectedFileIdx, setSelectedFileIdx] = useState<number>(0);
   const [copiedScript, setCopiedScript] = useState<boolean>(false);

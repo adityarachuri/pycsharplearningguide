@@ -12,17 +12,11 @@ import {
   Maximize2,
   Minimize2,
   Sparkles,
-  ArrowRight,
-  Layers,
-  Cpu,
-  Clock,
-  Radio,
-  ExternalLink,
-  BookOpen
+  Clock
 } from 'lucide-react';
 import { CodeBlock } from './CodeBlock';
 
-export interface WorkflowScene {
+interface WorkflowScene {
   id: number;
   title: string;
   duration: string;
@@ -55,6 +49,9 @@ interface WorkstationVideoPlayerProps {
   accentColor?: 'amber' | 'emerald' | 'blue' | 'purple';
 }
 
+const SCENE_DURATION_MS = 6000;
+const COPY_RESET_MS = 2000;
+
 export function WorkstationVideoPlayer({
   projectName,
   projectBadge,
@@ -62,7 +59,7 @@ export function WorkstationVideoPlayer({
   activeSceneId,
   onSelectScene,
   accentColor = 'amber'
-}: WorkstationVideoPlayerProps) {
+}: WorkstationVideoPlayerProps): React.ReactElement {
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [playbackSpeed, setPlaybackSpeed] = useState<number>(1);
   const [activeTab, setActiveTab] = useState<'terminal' | 'editor' | 'split'>('split');
@@ -77,7 +74,7 @@ export function WorkstationVideoPlayer({
   useEffect(() => {
     let timer: NodeJS.Timeout | null = null;
     if (isPlaying) {
-      const intervalMs = (6000 / playbackSpeed);
+      const intervalMs = (SCENE_DURATION_MS / playbackSpeed);
       timer = setInterval(() => {
         onSelectScene(
           activeSceneId < scenes.length ? activeSceneId + 1 : 1
@@ -105,7 +102,7 @@ export function WorkstationVideoPlayer({
   const handleCopyCode = () => {
     navigator.clipboard.writeText(currentScene.fileContent);
     setCopiedFile(true);
-    setTimeout(() => setCopiedFile(false), 2000);
+    setTimeout(() => setCopiedFile(false), COPY_RESET_MS);
   };
 
   const colorClasses = {
@@ -269,7 +266,7 @@ export function WorkstationVideoPlayer({
       </div>
 
       {/* Main Workstation Stage Canvas */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 min-h-[420px] bg-slate-950 divide-y lg:divide-y-0 lg:divide-x divide-slate-800/80">
+      <div className="grid grid-cols-1 lg:grid-cols-12 min-h-105 bg-slate-950 divide-y lg:divide-y-0 lg:divide-x divide-slate-800/80">
         {/* Left / Top Panel: Interactive Animated Terminal */}
         {(activeTab === 'split' || activeTab === 'terminal') && (
           <div className={`${activeTab === 'split' ? 'lg:col-span-6' : 'lg:col-span-12'} flex flex-col`}>
@@ -287,7 +284,7 @@ export function WorkstationVideoPlayer({
             </div>
 
             {/* Terminal Viewport */}
-            <div className="p-4 font-mono text-xs text-slate-300 space-y-4 overflow-y-auto max-h-[400px] flex-1">
+            <div className="p-4 font-mono text-xs text-slate-300 space-y-4 overflow-y-auto max-h-100 flex-1">
               {currentScene.terminalCommands.map((tc, idx) => (
                 <div key={idx} className="space-y-1.5 animate-fadeIn">
                   <div className="flex items-center gap-2 text-slate-100">
@@ -344,7 +341,7 @@ export function WorkstationVideoPlayer({
             </div>
 
             {/* Code Content */}
-            <div className="p-2 overflow-y-auto max-h-[400px] flex-1">
+            <div className="p-2 overflow-y-auto max-h-100 flex-1">
               <CodeBlock code={currentScene.fileContent} language={currentScene.language} />
             </div>
           </div>
@@ -387,7 +384,7 @@ export function WorkstationVideoPlayer({
                 <button
                   key={s.id}
                   onClick={() => onSelectScene(s.id)}
-                  className={`group text-left p-2 rounded-xl border transition-all relative overflow-hidden flex flex-col justify-between min-h-[70px] ${
+                  className={`group text-left p-2 rounded-xl border transition-all relative overflow-hidden flex flex-col justify-between min-h-17.5 ${
                     isActive
                       ? `${colorClasses.activeBorder} ${colorClasses.activeBg}`
                       : isPast

@@ -1,12 +1,5 @@
 // Study Hours and Progress Data Engine for C# -> Python Transition
 
-export interface DailyStudyLog {
-  date: string; // YYYY-MM-DD
-  hours: number;
-  chapterId?: string;
-  notes?: string;
-}
-
 export interface WeekHeatmapDay {
   date: string;
   dayName: string;
@@ -85,7 +78,7 @@ export function saveStudyHoursToStorage(data: Record<string, number>): void {
 }
 
 // Helper to determine intensity level 0 to 4
-export function getHourIntensityLevel(hours: number): 0 | 1 | 2 | 3 | 4 {
+function getHourIntensityLevel(hours: number): 0 | 1 | 2 | 3 | 4 {
   if (!hours || hours <= 0) return 0;
   if (hours <= 1.0) return 1;
   if (hours <= 2.0) return 2;
@@ -156,7 +149,14 @@ export function generateHeatmapGrid(studyLogs: Record<string, number>): WeekHeat
 }
 
 // Compute study metrics
-export function computeStudyMetrics(studyLogs: Record<string, number>) {
+export interface StudyMetrics {
+  totalHours: number;
+  activeDays: number;
+  currentStreak: number;
+  avgPerActiveDay: string;
+}
+
+export function computeStudyMetrics(studyLogs: Record<string, number>): StudyMetrics {
   const dates = Object.keys(studyLogs).sort();
   let totalHours = 0;
   let activeDays = 0;

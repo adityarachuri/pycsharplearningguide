@@ -1,23 +1,5 @@
 import React, { useState } from 'react';
-import {
-  Binary,
-  Layers,
-  Cpu,
-  Table,
-  Zap,
-  CheckCircle2,
-  Copy,
-  Check,
-  Play,
-  ArrowRight,
-  GitBranch,
-  Search,
-  Clock,
-  HardDrive,
-  Code2,
-  Terminal,
-  Info
-} from 'lucide-react';
+import { Binary, Cpu, Table, Zap, CheckCircle2, Play, Info } from 'lucide-react';
 import { MermaidViewer } from '../components/MermaidViewer';
 
 interface DsaPythonViewProps {
@@ -47,7 +29,7 @@ export const DsaPythonView: React.FC<DsaPythonViewProps> = ({
   return (
     <div className="space-y-12">
       {/* Hero Header */}
-      <section className="relative overflow-hidden rounded-3xl border border-slate-800 bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900 p-8 lg:p-12 shadow-2xl">
+      <section className="relative overflow-hidden rounded-3xl border border-slate-800 bg-linear-to-br from-slate-900 via-slate-950 to-slate-900 p-8 lg:p-12 shadow-2xl">
         <div className="absolute right-0 top-0 -mt-8 -mr-8 h-80 w-80 rounded-full bg-amber-500/10 blur-3xl pointer-events-none" />
         <div className="relative z-10 max-w-4xl">
           <div className="inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-xs font-semibold text-amber-400 mb-4">

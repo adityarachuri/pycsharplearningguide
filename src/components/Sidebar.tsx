@@ -6,7 +6,6 @@ import {
   Box,
   Binary,
   Terminal,
-  Table,
   GraduationCap,
   Briefcase,
   HelpCircle,
@@ -211,73 +210,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {/* Mobile Header */}
         <div className="flex items-center justify-between border-b border-slate-800 px-6 py-4 lg:hidden">
           <span className="text-sm font-bold text-white">Course Navigation</span>
-          <button onClick={onClose} className="text-slate-400 hover:text-white">
+          <button onClick={onClose} className="text-slate-400 hover:text-white" aria-label="Close sidebar">
             <X className="h-5 w-5" />
           </button>
         </div>
 
         {/* Navigation List */}
         <div className="flex-1 overflow-y-auto px-4 py-6 space-y-6">
-          {/* Top Quick Access Spotlight: Hands-On Project Blueprints (Zero Scroll Required) */}
-          <div className="rounded-2xl border border-amber-500/40 bg-linear-to-br from-amber-500/15 via-purple-500/10 to-slate-900/90 p-3 shadow-md shadow-amber-500/5">
-            <div className="flex items-center justify-between gap-1 mb-2">
-              <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-amber-300 font-mono">
-                <Sparkles className="h-3.5 w-3.5 text-amber-400 animate-pulse" />
-                <span>Hands-On Blueprints</span>
-              </div>
-              <span className="rounded-full bg-amber-500/20 border border-amber-500/40 px-2 py-0.5 text-[9px] font-mono font-bold text-amber-300">
-                2 PROJECTS
-              </span>
-            </div>
-            <div className="grid grid-cols-1 gap-1.5">
-              <button
-                onClick={() => {
-                  onSelectSection('web-app-project');
-                  onClose();
-                }}
-                className={`flex items-center justify-between rounded-xl p-2 text-left transition-all ${
-                  activeSection === 'web-app-project'
-                    ? 'bg-amber-500/25 border border-amber-500/60 text-amber-200 font-semibold shadow-xs'
-                    : 'bg-slate-950/80 hover:bg-slate-900 border border-slate-800/80 text-slate-300 hover:text-white'
-                }`}
-              >
-                <div className="flex items-center gap-2">
-                  <Globe className="h-3.5 w-3.5 text-amber-400 shrink-0" />
-                  <div>
-                    <div className="text-xs font-bold leading-tight text-white">9. Full-Stack Web App</div>
-                    <div className="text-[10px] text-slate-400 font-mono">FastAPI &bull; Async SQL &bull; Docker</div>
-                  </div>
-                </div>
-                <span className="text-[9px] px-1.5 py-0.5 rounded bg-amber-400/20 text-amber-300 font-mono font-bold">
-                  LIVE
-                </span>
-              </button>
-
-              <button
-                onClick={() => {
-                  onSelectSection('aiml-project');
-                  onClose();
-                }}
-                className={`flex items-center justify-between rounded-xl p-2 text-left transition-all ${
-                  activeSection === 'aiml-project'
-                    ? 'bg-purple-500/25 border border-purple-500/60 text-purple-200 font-semibold shadow-xs'
-                    : 'bg-slate-950/80 hover:bg-slate-900 border border-slate-800/80 text-slate-300 hover:text-white'
-                }`}
-              >
-                <div className="flex items-center gap-2">
-                  <Sparkles className="h-3.5 w-3.5 text-purple-400 shrink-0" />
-                  <div>
-                    <div className="text-xs font-bold leading-tight text-white">10. Production AI/ML App</div>
-                    <div className="text-[10px] text-slate-400 font-mono">PyTorch &bull; ChromaDB &bull; RAG</div>
-                  </div>
-                </div>
-                <span className="text-[9px] px-1.5 py-0.5 rounded bg-purple-400/20 text-purple-300 font-mono font-bold">
-                  STUDIO
-                </span>
-              </button>
-            </div>
-          </div>
-
           {NAV_GROUPS.map((group, groupIdx) => {
             const isProjectsGroup = group.label.includes('Hands-On');
 
@@ -372,7 +311,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </div>
           <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-800">
             <div
-              className="h-full bg-gradient-to-r from-amber-500 to-emerald-400 transition-all duration-500"
+              className="h-full bg-linear-to-r from-amber-500 to-emerald-400 transition-all duration-500"
               style={{
                 width: `${(completedChapters.length / 13) * 100}%`
               }}

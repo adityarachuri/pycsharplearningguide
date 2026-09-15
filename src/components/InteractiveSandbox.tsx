@@ -3,19 +3,15 @@ import {
   Play,
   RotateCcw,
   Terminal,
-  Sparkles,
-  CheckCircle2,
   ChevronDown,
   Copy,
   Check,
   Clock,
-  AlertCircle,
-  Cpu,
   Trash2,
   Maximize2
 } from 'lucide-react';
 
-export interface PresetSnippet {
+interface PresetSnippet {
   id: string;
   name: string;
   category: string;
@@ -23,7 +19,7 @@ export interface PresetSnippet {
   description: string;
 }
 
-export const PRESET_SNIPPETS: PresetSnippet[] = [
+const PRESET_SNIPPETS: PresetSnippet[] = [
   {
     id: 'comprehension',
     name: '1. LINQ to List Comprehension',
@@ -205,6 +201,9 @@ print("Pair combinations of 3 services:", list(itertools.combinations(["API", "D
   }
 ];
 
+const CLIENT_FALLBACK_DELAY_MS = 180;
+const COPY_RESET_MS = 2000;
+
 interface ExecutionResult {
   stdout: string;
   stderr: string;
@@ -309,8 +308,9 @@ export const InteractiveSandbox: React.FC<{
         } else {
           simulatedOut = `(Executed successfully with exit code 0)\nReturn: None`;
         }
-      } catch (err: any) {
-        simulatedErr = `SyntaxError: ${err?.message || 'invalid token'}`;
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'invalid token';
+        simulatedErr = `SyntaxError: ${message}`;
       }
 
       setResult({
@@ -322,7 +322,7 @@ export const InteractiveSandbox: React.FC<{
         isFallback: true
       });
       setIsRunning(false);
-    }, 180);
+    }, CLIENT_FALLBACK_DELAY_MS);
   };
 
   const handleReset = () => {
@@ -333,7 +333,7 @@ export const InteractiveSandbox: React.FC<{
   const handleCopyCode = () => {
     navigator.clipboard.writeText(code);
     setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    setTimeout(() => setCopied(false), COPY_RESET_MS);
   };
 
   const handleClearTerminal = () => {
@@ -422,12 +422,12 @@ export const InteractiveSandbox: React.FC<{
           <button
             onClick={handleRunCode}
             disabled={isRunning}
-            className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 px-4 py-1.5 text-xs font-bold text-slate-950 hover:from-amber-400 hover:to-yellow-400 shadow-md shadow-amber-500/20 disabled:opacity-50 transition-all cursor-pointer"
+            className="flex items-center gap-1.5 rounded-xl bg-linear-to-r from-amber-500 to-yellow-500 px-4 py-1.5 text-xs font-bold text-slate-950 hover:from-amber-400 hover:to-yellow-400 shadow-md shadow-amber-500/20 disabled:opacity-50 transition-all cursor-pointer"
             title="Execute Code (⌘+Enter / Ctrl+Enter)"
           >
             <Play className={`h-3.5 w-3.5 fill-current ${isRunning ? 'animate-spin' : ''}`} />
             <span>{isRunning ? 'Executing...' : 'Run Code'}</span>
-            <kbd className="hidden sm:inline-block rounded bg-amber-600/30 px-1 py-0.2 text-[10px] text-amber-950 font-mono font-bold">
+            <kbd className="hidden sm:inline-block rounded bg-amber-600/30 px-1 py-0.2 text-[10px] text-amber-900 font-mono font-bold">
               ⌘↵
             </kbd>
           </button>
@@ -454,7 +454,7 @@ export const InteractiveSandbox: React.FC<{
             onChange={e => setCode(e.target.value)}
             onKeyDown={handleKeyDown}
             spellCheck={false}
-            className="w-full flex-1 min-h-[260px] p-4 bg-transparent font-mono text-xs text-amber-200/90 leading-relaxed resize-none focus:outline-hidden"
+            className="w-full flex-1 min-h-65 p-4 bg-transparent font-mono text-xs text-amber-200/90 leading-relaxed resize-none focus:outline-hidden"
             placeholder="# Write Python 3 code here..."
           />
         </div>
@@ -495,7 +495,7 @@ export const InteractiveSandbox: React.FC<{
             </div>
           </div>
 
-          <div className="flex-1 min-h-[260px] p-4 font-mono text-xs overflow-y-auto leading-relaxed">
+          <div className="flex-1 min-h-65 p-4 font-mono text-xs overflow-y-auto leading-relaxed">
             {isRunning ? (
               <div className="flex items-center gap-2 text-amber-400 py-6">
                 <span className="h-3 w-3 rounded-full border-2 border-amber-400 border-t-transparent animate-spin" />

@@ -3,22 +3,15 @@ import {
   Terminal,
   Cpu,
   Layers,
-  CheckCircle2,
   Copy,
   Check,
   Code,
   Laptop,
   FolderTree,
   ShieldCheck,
-  Zap,
   Play,
   Settings,
-  HelpCircle,
-  ExternalLink,
-  ChevronRight,
-  Workflow,
-  Sparkles,
-  AlertTriangle
+  Workflow
 } from 'lucide-react';
 import {
   TOOLCHAIN_ROSETTA,
@@ -391,7 +384,7 @@ trim_trailing_whitespace = false
   return (
     <div className="space-y-8 animate-fadeIn">
       {/* Chapter Hero */}
-      <div className="rounded-2xl border border-slate-800 bg-gradient-to-b from-slate-900 via-slate-900/60 to-slate-950 p-6 md:p-8">
+      <div className="rounded-2xl border border-slate-800 bg-linear-to-b from-slate-900 via-slate-900/60 to-slate-950 p-6 md:p-8">
         <div className="flex flex-wrap items-center gap-2">
           <span className="rounded-md border border-cyan-500/30 bg-cyan-500/10 px-2.5 py-1 text-xs font-bold uppercase tracking-wider text-cyan-400">
             Workstation Engineering
@@ -407,19 +400,19 @@ trim_trailing_whitespace = false
 
         {/* Tab Controls */}
         <div className="mt-6 flex flex-wrap gap-2 border-t border-slate-800/80 pt-6">
-          {[
+          {([
             { id: 'overview', label: '1. Toolchain Architecture', icon: Workflow },
             { id: 'rosetta', label: '2. .NET vs Python Tooling Matrix', icon: Layers },
             { id: 'config-generator', label: '3. Production Config Files Generator', icon: Code },
             { id: 'os-setup', label: '4. OS Foundations (WSL2 / Mac / Linux)', icon: Laptop },
             { id: 'audit', label: '5. Workstation Readiness Audit', icon: ShieldCheck }
-          ].map(tab => {
+          ] as const).map(tab => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
             return (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
+                onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-2 rounded-xl px-4 py-2 text-xs md:text-sm font-semibold transition-all ${
                   isActive
                     ? 'bg-cyan-500 text-slate-950 shadow-lg shadow-cyan-500/20'
@@ -598,17 +591,17 @@ trim_trailing_whitespace = false
 
           {/* Subtabs for configs */}
           <div className="flex flex-wrap gap-2 border-b border-slate-800 pb-3">
-            {[
+            {([
               { id: 'pyproject', label: 'pyproject.toml', icon: Code },
               { id: 'settings', label: '.vscode/settings.json', icon: Settings },
               { id: 'launch', label: '.vscode/launch.json', icon: Play },
               { id: 'precommit', label: '.pre-commit-config.yaml', icon: ShieldCheck },
               { id: 'docker', label: 'Dockerfile (Multi-Stage)', icon: Cpu },
               { id: 'editorconfig', label: '.editorconfig', icon: FolderTree }
-            ].map(tab => (
+            ] as const).map(tab => (
               <button
                 key={tab.id}
-                onClick={() => setActiveConfigTab(tab.id as any)}
+                onClick={() => setActiveConfigTab(tab.id)}
                 className={`flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-semibold transition-all ${
                   activeConfigTab === tab.id
                     ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-sm'
@@ -645,7 +638,7 @@ trim_trailing_whitespace = false
               </button>
             </div>
 
-            <pre className="p-4 md:p-6 text-xs font-mono text-slate-200 overflow-x-auto leading-relaxed max-h-[500px]">
+            <pre className="p-4 md:p-6 text-xs font-mono text-slate-200 overflow-x-auto leading-relaxed max-h-125">
               {CONFIGS[activeConfigTab]}
             </pre>
           </div>
@@ -664,16 +657,16 @@ trim_trailing_whitespace = false
 
           {/* OS Selector */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            {[
+            {([
               { id: 'wsl2', title: 'Windows 11 (WSL2)', badge: 'Recommended for C# Devs' },
               { id: 'macos', title: 'macOS (Apple Silicon)', badge: 'Metal MPS Support' },
               { id: 'linux', title: 'Linux (Ubuntu/Debian)', badge: 'Cloud Native Standard' }
-            ].map(os => {
+            ] as const).map(os => {
               const isSelected = selectedOS === os.id;
               return (
                 <button
                   key={os.id}
-                  onClick={() => setSelectedOS(os.id as any)}
+                  onClick={() => setSelectedOS(os.id)}
                   className={`p-4 rounded-xl border text-left transition-all ${
                     isSelected
                       ? 'border-cyan-500 bg-cyan-500/10 shadow-lg shadow-cyan-500/10'
@@ -757,7 +750,7 @@ trim_trailing_whitespace = false
             {/* Progress Bar */}
             <div className="h-3 w-full bg-slate-800 rounded-full overflow-hidden">
               <div
-                className="h-full bg-gradient-to-r from-cyan-500 to-emerald-400 transition-all duration-500"
+                className="h-full bg-linear-to-r from-cyan-500 to-emerald-400 transition-all duration-500"
                 style={{ width: `${auditPercent}%` }}
               />
             </div>
@@ -823,7 +816,7 @@ trim_trailing_whitespace = false
                       checked ? 'bg-emerald-500 text-slate-950' : 'border border-slate-700 bg-slate-800'
                     }`}
                   >
-                    {checked && <Check className="h-3.5 w-3.5 stroke-[3]" />}
+                    {checked && <Check className="h-3.5 w-3.5 stroke-3" />}
                   </div>
                   <div className="space-y-0.5">
                     <div className="text-xs font-bold text-white">{item.title}</div>

@@ -1,4 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import { lazy, Suspense, useState, useEffect, type ReactElement } from 'react';
+import {
+  CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
+  Sparkles
+} from 'lucide-react';
 import { NavSectionId, AppTheme } from './types';
 import { Navbar } from './components/Navbar';
 import { Sidebar } from './components/Sidebar';
@@ -8,33 +14,26 @@ import { BackgroundSyncDrawer } from './components/BackgroundSyncDrawer';
 import { InteractiveSandbox } from './components/InteractiveSandbox';
 import { InteractiveSandboxModal } from './components/InteractiveSandboxModal';
 import { Footer } from './components/Footer';
-import { FundamentalsView } from './views/FundamentalsView';
-import { ArchitectureView } from './views/ArchitectureView';
-import { DeepDivesView } from './views/DeepDivesView';
-import { BatteriesView } from './views/BatteriesView';
-import { DsaPythonView } from './views/DsaPythonView';
-import { WorkstationSetupView } from './views/WorkstationSetupView';
-import { ComparisonMatrixView } from './views/ComparisonMatrixView';
-import { AdvancedConceptsView } from './views/AdvancedConceptsView';
-import { WebAppProjectView } from './views/WebAppProjectView';
-import { AimlProjectView } from './views/AimlProjectView';
-import { UseCasesView } from './views/UseCasesView';
-import { GlossaryView } from './views/GlossaryView';
-import { AimlView } from './views/AimlView';
-import { TransitionView } from './views/TransitionView';
-import { ResearchersView } from './views/ResearchersView';
-import { FutureView } from './views/FutureView';
-import { CareerView } from './views/CareerView';
-import { ConclusionView } from './views/ConclusionView';
 import { dbService } from './services/dbIntegrationService';
-import {
-  CheckCircle2,
-  ChevronLeft,
-  ChevronRight,
-  Terminal,
-  Sparkles,
-  BookOpen
-} from 'lucide-react';
+
+const FundamentalsView = lazy(() => import('./views/FundamentalsView').then(module => ({ default: module.FundamentalsView })));
+const ArchitectureView = lazy(() => import('./views/ArchitectureView').then(module => ({ default: module.ArchitectureView })));
+const DeepDivesView = lazy(() => import('./views/DeepDivesView').then(module => ({ default: module.DeepDivesView })));
+const BatteriesView = lazy(() => import('./views/BatteriesView').then(module => ({ default: module.BatteriesView })));
+const DsaPythonView = lazy(() => import('./views/DsaPythonView').then(module => ({ default: module.DsaPythonView })));
+const WorkstationSetupView = lazy(() => import('./views/WorkstationSetupView').then(module => ({ default: module.WorkstationSetupView })));
+const ComparisonMatrixView = lazy(() => import('./views/ComparisonMatrixView').then(module => ({ default: module.ComparisonMatrixView })));
+const AdvancedConceptsView = lazy(() => import('./views/AdvancedConceptsView').then(module => ({ default: module.AdvancedConceptsView })));
+const WebAppProjectView = lazy(() => import('./views/WebAppProjectView').then(module => ({ default: module.WebAppProjectView })));
+const AimlProjectView = lazy(() => import('./views/AimlProjectView').then(module => ({ default: module.AimlProjectView })));
+const UseCasesView = lazy(() => import('./views/UseCasesView').then(module => ({ default: module.UseCasesView })));
+const GlossaryView = lazy(() => import('./views/GlossaryView').then(module => ({ default: module.GlossaryView })));
+const AimlView = lazy(() => import('./views/AimlView').then(module => ({ default: module.AimlView })));
+const TransitionView = lazy(() => import('./views/TransitionView').then(module => ({ default: module.TransitionView })));
+const ResearchersView = lazy(() => import('./views/ResearchersView').then(module => ({ default: module.ResearchersView })));
+const FutureView = lazy(() => import('./views/FutureView').then(module => ({ default: module.FutureView })));
+const CareerView = lazy(() => import('./views/CareerView').then(module => ({ default: module.CareerView })));
+const ConclusionView = lazy(() => import('./views/ConclusionView').then(module => ({ default: module.ConclusionView })));
 
 const SECTIONS_ORDER: { id: NavSectionId; name: string }[] = [
   { id: 'fundamentals', name: '1. Fundamentals & Creator' },
@@ -57,7 +56,7 @@ const SECTIONS_ORDER: { id: NavSectionId; name: string }[] = [
   { id: 'conclusion', name: '18. Synthesis & Certification' }
 ];
 
-export default function App() {
+export default function App(): ReactElement {
   const [activeSection, setActiveSection] = useState<NavSectionId>('fundamentals');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -137,12 +136,13 @@ export default function App() {
 
   // Register background service worker
   useEffect(() => {
-    if ('serviceWorker' in navigator) {
+    // Only register in production builds. Vite's dev server serves modules from the same
+    // origin the service worker cache-first-caches as "static assets" — registering it in
+    // dev causes it to serve stale cached JS chunks across dev-server restarts/HMR updates,
+    // which shows up as bizarre "Invalid hook call" / null-React errors as modules go stale.
+    if (import.meta.env.PROD && 'serviceWorker' in navigator) {
       navigator.serviceWorker
         .register('/service-worker.js')
-        .then(reg => {
-          console.log('[App] Background ServiceWorker registered with scope:', reg.scope);
-        })
         .catch(err => {
           console.warn('[App] ServiceWorker registration skipped:', err);
         });
@@ -190,10 +190,15 @@ export default function App() {
 
   const handleTriggerSync = () => {
     setIsSyncing(true);
-    dbService.syncStateWithBackend().finally(() => {
-      setIsSyncing(false);
-      setLastSyncTime(new Date().toLocaleTimeString());
-    });
+    dbService
+      .syncStateWithBackend()
+      .catch(err => {
+        console.warn('[App] Background sync failed:', err);
+      })
+      .finally(() => {
+        setIsSyncing(false);
+        setLastSyncTime(new Date().toLocaleTimeString());
+      });
   };
 
   // Previous & Next Chapter navigation
@@ -202,6 +207,15 @@ export default function App() {
   const nextSection = currentIndex < SECTIONS_ORDER.length - 1 ? SECTIONS_ORDER[currentIndex + 1] : null;
 
   const isCurrentChapterCompleted = completedChapters.includes(activeSection);
+
+  const viewLoadingState = (
+    <div className="flex min-h-72 items-center justify-center rounded-2xl border border-slate-800 bg-slate-900/50 p-8">
+      <div className="flex items-center gap-3 text-sm text-slate-400" role="status" aria-live="polite">
+        <span className="h-4 w-4 animate-spin rounded-full border-2 border-amber-400 border-t-transparent" />
+        Loading curriculum module...
+      </div>
+    </div>
+  );
 
   // Render current chapter view
   const renderView = () => {
@@ -280,7 +294,7 @@ export default function App() {
       id="app-root-container"
       className={`min-h-screen flex flex-col font-sans transition-colors duration-200 ${
         theme === 'idle'
-          ? 'theme-idle bg-slate-50 text-slate-900 selection:bg-amber-200 selection:text-amber-900'
+          ? 'theme-idle bg-[#f8fafc] text-[#0f172a] selection:bg-[#fde68a] selection:text-[#78350f]'
           : theme === 'reading'
           ? 'theme-reading bg-[#fdf6e3] text-[#302418] selection:bg-[#e6d5b8] selection:text-[#302418]'
           : 'bg-slate-950 text-slate-100 selection:bg-amber-500 selection:text-slate-950'
@@ -372,7 +386,7 @@ export default function App() {
           </div>
 
           {/* Active Chapter View */}
-          {renderView()}
+          <Suspense fallback={viewLoadingState}>{renderView()}</Suspense>
 
           {/* Interactive Sandbox Embedded Section */}
           <div className="mt-12">

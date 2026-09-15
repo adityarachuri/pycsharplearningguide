@@ -1,4 +1,4 @@
-export type PageId =
+type PageId =
   | 'overview'
   | 'fundamentals'
   | 'architecture'
@@ -20,16 +20,6 @@ export type PageId =
   | 'conclusion';
 
 export type NavSectionId = PageId;
-
-export interface NavItem {
-  id: PageId;
-  label: string;
-  category: 'core' | 'technical' | 'career' | 'synthesis';
-  icon: string;
-  badge?: string;
-  readingTime: string;
-  description: string;
-}
 
 export interface ComparisonItem {
   id: string;

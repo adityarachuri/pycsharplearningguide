@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Play, CheckCircle2, AlertCircle, RefreshCw, Send, Database, ShieldCheck, ArrowRight, Code } from 'lucide-react';
+import { RefreshCw, Send } from 'lucide-react';
 
 interface TaskRecord {
   id: number;
@@ -9,6 +9,32 @@ interface TaskRecord {
   priority: 'LOW' | 'MEDIUM' | 'HIGH';
   created_at: string;
 }
+
+interface HealthResponse {
+  status: string;
+  version: string;
+  environment: string;
+  engine: string;
+  database_connected: boolean;
+}
+
+interface ValidationErrorResponse {
+  detail: Array<{
+    type: string;
+    loc: string[];
+    msg: string;
+    input: string;
+    ctx: { min_length: number };
+  }>;
+}
+
+interface NotFoundResponse {
+  detail: string;
+}
+
+type ApiResponseBody = TaskRecord | TaskRecord[] | HealthResponse | ValidationErrorResponse | NotFoundResponse;
+
+const SIMULATED_LATENCY_MS = 250;
 
 const INITIAL_TASKS: TaskRecord[] = [
   {
@@ -37,7 +63,7 @@ const INITIAL_TASKS: TaskRecord[] = [
   }
 ];
 
-export function InteractiveSwaggerTester() {
+export function InteractiveSwaggerTester(): React.ReactElement {
   const [tasks, setTasks] = useState<TaskRecord[]>(INITIAL_TASKS);
   const [activeEndpoint, setActiveEndpoint] = useState<'GET_ALL' | 'POST_TASK' | 'GET_BY_ID' | 'HEALTH'>('POST_TASK');
   const [taskTitle, setTaskTitle] = useState<string>('Deploy UV Docker Container');
@@ -53,7 +79,7 @@ export function InteractiveSwaggerTester() {
     'server': 'uvicorn / fastapi',
     'x-process-time': '1.84ms'
   });
-  const [responseBody, setResponseBody] = useState<any>({
+  const [responseBody, setResponseBody] = useState<ApiResponseBody>({
     id: 4,
     title: 'Deploy UV Docker Container',
     description: 'Multi-stage build with non-root security context',
@@ -133,7 +159,7 @@ export function InteractiveSwaggerTester() {
         setResponseStatus(201);
         setResponseBody(newTask);
       }
-    }, 250);
+    }, SIMULATED_LATENCY_MS);
   };
 
   return (
@@ -233,10 +259,11 @@ export function InteractiveSwaggerTester() {
           {activeEndpoint === 'POST_TASK' && (
             <div className="space-y-3">
               <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1">
+                <label htmlFor="swagger-task-title" className="block text-xs font-medium text-slate-300 mb-1">
                   title <span className="text-rose-400">*</span> <span className="text-slate-500 text-[11px]">(min: 1 char)</span>
                 </label>
                 <input
+                  id="swagger-task-title"
                   type="text"
                   value={taskTitle}
                   onChange={e => setTaskTitle(e.target.value)}
@@ -266,7 +293,7 @@ export function InteractiveSwaggerTester() {
                 </label>
                 <select
                   value={taskPriority}
-                  onChange={e => setTaskPriority(e.target.value as any)}
+                  onChange={e => setTaskPriority(e.target.value as 'LOW' | 'MEDIUM' | 'HIGH')}
                   className="w-full rounded-lg border border-slate-800 bg-slate-900 px-3 py-2 text-xs text-white focus:border-amber-400 focus:outline-hidden"
                 >
                   <option value="LOW">LOW</option>
@@ -303,10 +330,11 @@ export function InteractiveSwaggerTester() {
           {activeEndpoint === 'GET_BY_ID' && (
             <div className="space-y-3">
               <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1">
+                <label htmlFor="swagger-task-id" className="block text-xs font-medium text-slate-300 mb-1">
                   task_id <span className="text-rose-400">*</span> <span className="text-slate-500 text-[11px]">(Path parameter)</span>
                 </label>
                 <input
+                  id="swagger-task-id"
                   type="number"
                   value={taskIdInput}
                   onChange={e => setTaskIdInput(parseInt(e.target.value) || 1)}
@@ -357,7 +385,7 @@ export function InteractiveSwaggerTester() {
             </div>
 
             {/* Response JSON */}
-            <div className="rounded-lg bg-slate-900 p-3 font-mono text-xs text-slate-200 overflow-x-auto max-h-[220px]">
+            <div className="rounded-lg bg-slate-900 p-3 font-mono text-xs text-slate-200 overflow-x-auto max-h-55">
               <pre>{JSON.stringify(responseBody, null, 2)}</pre>
             </div>
           </div>

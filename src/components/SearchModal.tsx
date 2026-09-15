@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, X, ChevronRight, BookOpen, Hash, ArrowRight } from 'lucide-react';
+import { Search, X, ArrowRight } from 'lucide-react';
 import { GLOSSARY_TERMS } from '../data/glossaryData';
 import { DEEP_DIVE_FEATURES } from '../data/deepDivesData';
 import { ADVANCED_CONCEPT_LECTURES } from '../data/advancedConceptsData';
@@ -11,6 +11,9 @@ interface SearchModalProps {
   onClose: () => void;
   onNavigate: (sectionId: NavSectionId) => void;
 }
+
+const MAX_FILTERED_RESULTS = 8;
+const MAX_DEFAULT_RESULTS = 6;
 
 interface SearchResult {
   id: string;
@@ -81,8 +84,8 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose, onNav
           item.title.toLowerCase().includes(query.toLowerCase()) ||
           item.snippet.toLowerCase().includes(query.toLowerCase()) ||
           item.category.toLowerCase().includes(query.toLowerCase())
-      ).slice(0, 8)
-    : allSearchItems.slice(0, 6);
+      ).slice(0, MAX_FILTERED_RESULTS)
+    : allSearchItems.slice(0, MAX_DEFAULT_RESULTS);
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/70 p-4 pt-20 backdrop-blur-sm">
@@ -95,11 +98,16 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose, onNav
             value={query}
             onChange={e => setQuery(e.target.value)}
             placeholder="Search syntax, concepts, C# mappings, PEPs, glossary..."
+            aria-label="Search site content"
             autoFocus
             className="flex-1 bg-transparent text-sm text-white placeholder-slate-500 focus:outline-none"
           />
           {query && (
-            <button onClick={() => setQuery('')} className="p-1 text-slate-400 hover:text-white">
+            <button
+              onClick={() => setQuery('')}
+              className="p-1 text-slate-400 hover:text-white"
+              aria-label="Clear search"
+            >
               <X className="h-4 w-4" />
             </button>
           )}
@@ -137,7 +145,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose, onNav
                     {item.snippet}
                   </p>
                 </div>
-                <ArrowRight className="h-4 w-4 text-slate-600 group-hover:text-amber-400 mt-1 transition-colors flex-shrink-0" />
+                <ArrowRight className="h-4 w-4 text-slate-600 group-hover:text-amber-400 mt-1 transition-colors shrink-0" />
               </button>
             ))
           )}

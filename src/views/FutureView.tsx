@@ -1,23 +1,11 @@
-import React, { useState } from 'react';
-import {
-  Rocket,
-  Cpu,
-  Layers,
-  Sparkles,
-  Zap,
-  Globe,
-  Lock,
-  ArrowRight,
-  ShieldCheck,
-  CheckCircle2
-} from 'lucide-react';
+import React from 'react';
 import { FUTURE_TRENDS } from '../data/futureData';
 
 export const FutureView: React.FC = () => {
   return (
     <div className="space-y-8 animate-fadeIn">
       {/* Chapter Hero */}
-      <div className="rounded-2xl border border-slate-800 bg-gradient-to-b from-slate-900 via-slate-900/60 to-slate-950 p-6 md:p-8">
+      <div className="rounded-2xl border border-slate-800 bg-linear-to-b from-slate-900 via-slate-900/60 to-slate-950 p-6 md:p-8">
         <div className="flex flex-wrap items-center gap-2">
           <span className="rounded-md border border-amber-500/30 bg-amber-500/10 px-2.5 py-1 text-xs font-bold uppercase tracking-wider text-amber-400">
             Chapter 11

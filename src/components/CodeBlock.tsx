@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { Check, Copy, Code2 } from 'lucide-react';
 
+const COPY_RESET_MS = 2000;
+
 interface CodeBlockProps {
-  language: 'python' | 'csharp' | 'text';
+  language: string;
   code: string;
   title?: string;
   showLineNumbers?: boolean;
@@ -20,7 +22,7 @@ export const CodeBlock: React.FC<CodeBlockProps> = ({
     try {
       await navigator.clipboard.writeText(code);
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      setTimeout(() => setCopied(false), COPY_RESET_MS);
     } catch {
       // Fallback
     }
@@ -34,16 +36,21 @@ export const CodeBlock: React.FC<CodeBlockProps> = ({
       // Check for full-line comments
       if (line.trim().startsWith('#') || line.trim().startsWith('//')) {
         return (
-          <span key={lineIndex} className="text-slate-400 italic">
-            {line}
-          </span>
+          <div key={lineIndex} className="table-row">
+            {showLineNumbers && (
+              <span className="table-cell pr-4 text-right select-none text-slate-600 text-xs font-mono">
+                {lineIndex + 1}
+              </span>
+            )}
+            <span className="table-cell whitespace-pre text-slate-400 italic">{line}</span>
+          </div>
         );
       }
 
       // Tokenize line using regex
       // Matches strings, keywords, numbers, decorators/attributes, and plain words
       const tokenRegex =
-        /("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|#.*|\/\/.*|@[a-zA-Z0-9_.]+|\b(?:def|class|return|import|from|as|if|elif|else|for|while|in|not|and|or|is|None|True|False|try|except|finally|raise|with|yield|lambda|async|await|match|case|pass|break|continue)\b|\b(?:public|private|protected|internal|class|interface|record|struct|enum|static|readonly|void|int|string|bool|float|double|decimal|var|new|return|using|if|else|switch|case|default|for|foreach|while|in|throw|try|catch|finally|async|await|Task|IEnumerable|List|Dictionary|Func|Action|null|true|false)\b|\b\d+(?:\.\d+)?\b)/g;
+        /("[^"\\]*(?:\\.[^"\\]*)*"|'[^'\\]*(?:\\.[^'\\]*)*'|#.*|\/\/.*|@[a-zA-Z0-9_.]+|\b(?:def|class|return|import|from|as|if|elif|else|for|while|in|not|and|or|is|None|True|False|try|except|finally|raise|with|yield|lambda|async|await|match|case|pass|break|continue)\b|\b(?:public|private|protected|internal|class|interface|record|struct|enum|static|readonly|void|int|string|bool|float|double|decimal|var|new|return|using|if|else|switch|case|default|for|foreach|while|in|throw|try|catch|finally|async|await|Task|IEnumerable|List|Dictionary|Func|Action|null|true|false)\b|\b\d+(?:\.\d+)?\b)/g;
 
       const parts = [];
       let lastIndex = 0;

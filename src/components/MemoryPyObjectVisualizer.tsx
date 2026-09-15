@@ -1,17 +1,19 @@
 import React, { useState } from 'react';
 import {
-  Database,
   Layers,
   Trash2,
   Plus,
   RefreshCw,
   AlertCircle,
   CheckCircle2,
-  Cpu,
   ZoomIn,
   ZoomOut,
   RotateCcw
 } from 'lucide-react';
+
+const MIN_ZOOM_SCALE = 0.75;
+const MAX_ZOOM_SCALE = 1.5;
+const ZOOM_STEP = 0.15;
 
 export const MemoryPyObjectVisualizer: React.FC = () => {
   const [refCount, setRefCount] = useState<number>(2);
@@ -75,7 +77,7 @@ export const MemoryPyObjectVisualizer: React.FC = () => {
           {/* Zoom controls */}
           <div className="flex items-center gap-1 rounded-xl border border-slate-800 bg-slate-900 p-1">
             <button
-              onClick={() => setZoomScale(prev => Math.max(0.75, Number((prev - 0.15).toFixed(2))))}
+              onClick={() => setZoomScale(prev => Math.max(MIN_ZOOM_SCALE, Number((prev - ZOOM_STEP).toFixed(2))))}
               className="rounded-lg p-1 text-slate-400 hover:bg-slate-800 hover:text-white transition-colors"
               title="Zoom Out"
               aria-label="Zoom Out"
@@ -91,7 +93,7 @@ export const MemoryPyObjectVisualizer: React.FC = () => {
               {Math.round(zoomScale * 100)}%
             </button>
             <button
-              onClick={() => setZoomScale(prev => Math.min(1.5, Number((prev + 0.15).toFixed(2))))}
+              onClick={() => setZoomScale(prev => Math.min(MAX_ZOOM_SCALE, Number((prev + ZOOM_STEP).toFixed(2))))}
               className="rounded-lg p-1 text-slate-400 hover:bg-slate-800 hover:text-white transition-colors"
               title="Zoom In"
               aria-label="Zoom In"

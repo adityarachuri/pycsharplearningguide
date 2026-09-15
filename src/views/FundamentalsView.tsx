@@ -1,17 +1,5 @@
 import React, { useState } from 'react';
-import {
-  Calendar,
-  User,
-  Quote,
-  Layers,
-  Sparkles,
-  ChevronRight,
-  CheckCircle2,
-  BookOpen,
-  Globe,
-  ArrowRight,
-  Play
-} from 'lucide-react';
+import { Calendar, User, Quote, Layers, Sparkles, Globe, ArrowRight } from 'lucide-react';
 import {
   PROGRAMMING_TIMELINE,
   CREATOR_PROFILE,
@@ -32,7 +20,7 @@ export const FundamentalsView: React.FC<FundamentalsViewProps> = ({ onNavigate }
     <div className="space-y-8 animate-fadeIn">
       {/* Featured Projects Callout Banner: Section III */}
       {onNavigate && (
-        <div className="rounded-3xl border border-amber-500/40 bg-gradient-to-r from-amber-500/15 via-purple-500/10 to-slate-900 p-5 shadow-lg">
+        <div className="rounded-3xl border border-amber-500/40 bg-linear-to-r from-amber-500/15 via-purple-500/10 to-slate-900 p-5 shadow-lg">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="space-y-1 max-w-2xl">
               <div className="inline-flex items-center gap-2 rounded-full border border-amber-500/40 bg-amber-500/20 px-3 py-0.5 text-xs font-mono font-bold text-amber-300">
@@ -71,7 +59,7 @@ export const FundamentalsView: React.FC<FundamentalsViewProps> = ({ onNavigate }
       )}
 
       {/* Chapter Hero */}
-      <div className="rounded-2xl border border-slate-800 bg-gradient-to-b from-slate-900 via-slate-900/60 to-slate-950 p-6 md:p-8">
+      <div className="rounded-2xl border border-slate-800 bg-linear-to-b from-slate-900 via-slate-900/60 to-slate-950 p-6 md:p-8">
         <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
           <div className="flex flex-wrap items-center gap-2">
             <span className="rounded-md border border-amber-500/30 bg-amber-500/10 px-2.5 py-1 text-xs font-extrabold uppercase tracking-wider text-amber-400 font-mono">
@@ -100,18 +88,18 @@ export const FundamentalsView: React.FC<FundamentalsViewProps> = ({ onNavigate }
 
         {/* Tab Navigation */}
         <div className="mt-6 flex flex-wrap gap-2 border-t border-slate-800/80 pt-6">
-          {[
+          {([
             { id: 'timeline', label: 'History & Timeline', icon: Calendar },
             { id: 'creator', label: 'Guido van Rossum (Creator)', icon: User },
             { id: 'principles', label: 'Language Fundamentals for C# Devs', icon: Layers },
             { id: 'zen', label: 'The Zen of Python (PEP 20)', icon: Quote }
-          ].map(tab => {
+          ] as const).map(tab => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
             return (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
+                onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-2 rounded-xl px-4 py-2 text-xs md:text-sm font-semibold transition-all ${
                   isActive
                     ? 'bg-amber-500 text-slate-950 shadow-lg shadow-amber-500/20'

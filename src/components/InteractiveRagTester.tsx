@@ -3,14 +3,6 @@ import {
   Sparkles,
   BrainCircuit,
   Search,
-  Play,
-  RefreshCw,
-  Send,
-  CheckCircle2,
-  ArrowRight,
-  Layers,
-  Cpu,
-  ShieldCheck,
   Target,
   Zap,
   Info
@@ -26,6 +18,9 @@ interface DocumentNode {
   category: 'gil' | 'jit' | 'memory' | 'typing';
   labelOffset?: { dx: number; dy: number };
 }
+
+const TOKEN_STREAM_INTERVAL_MS = 35;
+const RETRIEVAL_DEBOUNCE_MS = 350;
 
 const DOCUMENT_CORPUS: DocumentNode[] = [
   {
@@ -90,13 +85,18 @@ const DOCUMENT_CORPUS: DocumentNode[] = [
   }
 ];
 
-export function InteractiveRagTester() {
+interface RetrievedDoc extends DocumentNode {
+  distance: number;
+  similarity: number;
+}
+
+export function InteractiveRagTester(): React.ReactElement {
   const [selectedQuery, setSelectedQuery] = useState<string>(
     'How does CPython GIL multithreading differ from .NET CLR threading?'
   );
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [streamedText, setStreamedText] = useState<string>('');
-  const [retrievedDocs, setRetrievedDocs] = useState<any[]>([]);
+  const [retrievedDocs, setRetrievedDocs] = useState<RetrievedDoc[]>([]);
   const [queryPoint, setQueryPoint] = useState<{ x: number; y: number }>({ x: 260, y: 140 });
   const [hoveredDoc, setHoveredDoc] = useState<DocumentNode | null>(null);
   const [selectedDocDetail, setSelectedDocDetail] = useState<DocumentNode | null>(null);
@@ -215,8 +215,8 @@ export function InteractiveRagTester() {
           }
           setIsProcessing(false);
         }
-      }, 35);
-    }, 350);
+      }, TOKEN_STREAM_INTERVAL_MS);
+    }, RETRIEVAL_DEBOUNCE_MS);
   };
 
   useEffect(() => {
@@ -322,7 +322,7 @@ export function InteractiveRagTester() {
           </div>
 
           {/* SVG Vector Plotting Stage */}
-          <div className="relative w-full h-[300px] sm:h-[320px] bg-slate-950 rounded-xl border border-slate-800 overflow-hidden shadow-inner cursor-crosshair">
+          <div data-zoom-target className="relative w-full h-75 sm:h-80 bg-slate-950 rounded-xl border border-slate-800 overflow-hidden shadow-inner cursor-crosshair">
             <svg
               className="w-full h-full select-none"
               viewBox="0 0 720 380"
@@ -599,7 +599,7 @@ export function InteractiveRagTester() {
             </div>
 
             {/* Retrieved Context Cards */}
-            <div className="space-y-2 max-h-[150px] overflow-y-auto pr-1">
+            <div className="space-y-2 max-h-37.5 overflow-y-auto pr-1">
               {retrievedDocs.map((doc, idx) => (
                 <div
                   key={doc.id}
@@ -611,7 +611,7 @@ export function InteractiveRagTester() {
                   }`}
                 >
                   <div className="flex items-center justify-between text-[11px] font-mono">
-                    <span className="text-purple-300 font-bold truncate max-w-[200px]">
+                    <span className="text-purple-300 font-bold truncate max-w-50">
                       [Source {idx + 1}]: {doc.title}
                     </span>
                     <span className="text-emerald-400 bg-emerald-950/50 px-1.5 py-0.5 rounded border border-emerald-500/30 font-mono text-[10px]">
@@ -640,7 +640,7 @@ export function InteractiveRagTester() {
                 )}
               </div>
 
-              <div className="rounded-xl bg-slate-950 border border-slate-800/80 p-3 min-h-[110px] text-xs text-slate-200 leading-relaxed font-sans shadow-inner">
+              <div className="rounded-xl bg-slate-950 border border-slate-800/80 p-3 min-h-27.5 text-xs text-slate-200 leading-relaxed font-sans shadow-inner">
                 {streamedText}
                 {isProcessing && (
                   <span className="inline-block w-1.5 h-3.5 bg-amber-400 ml-1 animate-pulse align-middle" />

@@ -50,9 +50,3 @@ export const OFFICIAL_AUTHENTIC_FEEDS: AuthorizedFeedItem[] = [
     status: 'synced'
   }
 ];
-
-export const PERIODIC_UPDATE_CYCLES = [
-  { id: 'cycle-1', intervalSeconds: 30, description: 'Query official Python PEP repository for approved PEP draft status' },
-  { id: 'cycle-2', intervalSeconds: 60, description: 'Verify Python Software Foundation CVE security bulletins against SHA-256 signatures' },
-  { id: 'cycle-3', intervalSeconds: 120, description: 'Sync CPython release tag changelogs from official GitHub python/cpython releases' }
-];

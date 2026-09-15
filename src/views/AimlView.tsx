@@ -1,15 +1,5 @@
 import React, { useState } from 'react';
-import {
-  BrainCircuit,
-  Cpu,
-  Layers,
-  Sparkles,
-  Zap,
-  HardDrive,
-  Network,
-  Activity,
-  CheckCircle2
-} from 'lucide-react';
+import { BrainCircuit, Cpu, Layers } from 'lucide-react';
 import {
   AIML_STACK_LAYERS,
   CSHARP_VS_PYTHON_AIML,
@@ -23,7 +13,7 @@ export const AimlView: React.FC = () => {
   return (
     <div className="space-y-8 animate-fadeIn">
       {/* Chapter Hero */}
-      <div className="rounded-2xl border border-slate-800 bg-gradient-to-b from-slate-900 via-slate-900/60 to-slate-950 p-6 md:p-8">
+      <div className="rounded-2xl border border-slate-800 bg-linear-to-b from-slate-900 via-slate-900/60 to-slate-950 p-6 md:p-8">
         <div className="flex flex-wrap items-center gap-2">
           <span className="rounded-md border border-amber-500/30 bg-amber-500/10 px-2.5 py-1 text-xs font-bold uppercase tracking-wider text-amber-400">
             Chapter 08
@@ -39,17 +29,17 @@ export const AimlView: React.FC = () => {
 
         {/* Tab Selection */}
         <div className="mt-6 flex flex-wrap gap-2 border-t border-slate-800/80 pt-6">
-          {[
+          {([
             { id: 'stack', label: 'The 6-Layer AI Stack', icon: Layers },
             { id: 'comparison', label: 'C# vs Python AI Reality', icon: BrainCircuit },
             { id: 'code', label: 'Hands-On Tensor & RAG Code', icon: Cpu }
-          ].map(tab => {
+          ] as const).map(tab => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
             return (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
+                onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-2 rounded-xl px-4 py-2 text-xs md:text-sm font-semibold transition-all ${
                   isActive
                     ? 'bg-amber-500 text-slate-950 font-bold shadow-lg shadow-amber-500/20'

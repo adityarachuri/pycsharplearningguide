@@ -15,8 +15,10 @@ import {
   ZoomOut
 } from 'lucide-react';
 
+type GilMode = 'gil_cpu' | 'gil_io' | 'pep703_nogil' | 'dotnet_clr';
+
 export const GilConcurrencyVisualizer: React.FC = () => {
-  const [mode, setMode] = useState<'gil_cpu' | 'gil_io' | 'pep703_nogil' | 'dotnet_clr'>('gil_cpu');
+  const [mode, setMode] = useState<GilMode>('gil_cpu');
   const [isRunning, setIsRunning] = useState(true);
   const [activeThread, setActiveThread] = useState<1 | 2>(1);
   const [coreLoads, setCoreLoads] = useState<number[]>([98, 4, 2, 3]);
@@ -24,7 +26,7 @@ export const GilConcurrencyVisualizer: React.FC = () => {
   const [zoomScale, setZoomScale] = useState<number>(1);
 
   useEffect(() => {
-    let interval: any;
+    let interval: ReturnType<typeof setInterval> | undefined;
     if (isRunning) {
       interval = setInterval(() => {
         if (mode === 'gil_cpu') {
@@ -165,7 +167,7 @@ export const GilConcurrencyVisualizer: React.FC = () => {
           return (
             <button
               key={m.id}
-              onClick={() => setMode(m.id as any)}
+              onClick={() => setMode(m.id as GilMode)}
               className={`p-3.5 rounded-xl border text-left transition-all ${
                 isSelected
                   ? 'border-amber-500 bg-amber-500/10 shadow-lg shadow-amber-500/10 ring-1 ring-amber-500/30'
@@ -341,7 +343,7 @@ export const GilConcurrencyVisualizer: React.FC = () => {
                   <div
                     className={`w-full transition-all duration-500 ${
                       load > 80
-                        ? 'bg-gradient-to-t from-emerald-500 to-amber-400'
+                        ? 'bg-linear-to-t from-emerald-500 to-amber-400'
                         : 'bg-slate-700'
                     }`}
                     style={{ height: `${load}%` }}

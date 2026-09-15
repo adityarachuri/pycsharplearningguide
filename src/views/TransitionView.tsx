@@ -1,14 +1,5 @@
 import React, { useState } from 'react';
-import {
-  Compass,
-  Calendar,
-  Layers,
-  AlertTriangle,
-  ChevronRight,
-  Sparkles,
-  CheckCircle2,
-  BookOpen
-} from 'lucide-react';
+import { Calendar, Layers, AlertTriangle, CheckCircle2, BookOpen } from 'lucide-react';
 import {
   TRANSITION_ROADMAP,
   TOOLING_TRANSLATION_MATRIX,
@@ -21,7 +12,7 @@ export const TransitionView: React.FC = () => {
   return (
     <div className="space-y-8 animate-fadeIn">
       {/* Chapter Hero */}
-      <div className="rounded-2xl border border-slate-800 bg-gradient-to-b from-slate-900 via-slate-900/60 to-slate-950 p-6 md:p-8">
+      <div className="rounded-2xl border border-slate-800 bg-linear-to-b from-slate-900 via-slate-900/60 to-slate-950 p-6 md:p-8">
         <div className="flex flex-wrap items-center gap-2">
           <span className="rounded-md border border-amber-500/30 bg-amber-500/10 px-2.5 py-1 text-xs font-bold uppercase tracking-wider text-amber-400">
             Chapter 09
@@ -37,17 +28,17 @@ export const TransitionView: React.FC = () => {
 
         {/* Tab Controls */}
         <div className="mt-6 flex flex-wrap gap-2 border-t border-slate-800/80 pt-6">
-          {[
+          {([
             { id: 'roadmap', label: '6-Phase 60-Day Roadmap', icon: Calendar },
             { id: 'tooling', label: 'Tooling Translation Matrix', icon: Layers },
             { id: 'pitfalls', label: '10 Unforgivable Pitfalls', icon: AlertTriangle }
-          ].map(tab => {
+          ] as const).map(tab => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
             return (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
+                onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-2 rounded-xl px-4 py-2 text-xs md:text-sm font-semibold transition-all ${
                   isActive
                     ? 'bg-amber-500 text-slate-950 font-bold shadow-lg shadow-amber-500/20'
