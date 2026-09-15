@@ -1,0 +1,8 @@
+{
+  "name": "PyCSharpLearningGuide",
+  "description": "Learning Python from a C# developer's perspective. Interactive Rosetta Stone and architecture guide covering CPython vs .NET CLR, GIL mechanics, and modern AI/ML systems.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

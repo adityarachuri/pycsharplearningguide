@@ -1,0 +1,70 @@
+# PyCSharp — GitLab CI/CD Pipeline
+# Replaces: .github/workflows/ci.yml + .github/workflows/documentation.yml
+
+stages:
+  - validate   # TypeScript check + build (on every push / MR)
+  - docs       # Auto-generate & commit docs (main branch only)
+
+# ── Shared npm cache ──────────────────────────────────────────────────────────
+.npm_cache: &npm_cache
+  cache:
+    key:
+      files:
+        - package-lock.json
+    paths:
+      - node_modules/
+    policy: pull-push
+
+# ── Job 1: CI & Quality Gates ─────────────────────────────────────────────────
+validate-and-build:
+  stage: validate
+  image: node:20-alpine
+  <<: *npm_cache
+  timeout: 10 minutes
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'  # run on every MR
+    - if: '$CI_COMMIT_BRANCH == "main"'                   # run on push to main
+  script:
+    - npm ci
+    - npm run lint                   # tsc --noEmit — TypeScript strict typecheck
+    - npm run docs:generate          # documentation verification
+    - npm run build                  # production build
+    - test -d dist
+    - test -f dist/index.html
+    - echo "Production build succeeded with all assets intact."
+  artifacts:
+    paths:
+      - dist/
+    expire_in: 1 hour
+
+# ── Job 2: Auto-generate & commit Technical Docs ──────────────────────────────
+update-docs:
+  stage: docs
+  image: node:20-alpine
+  <<: *npm_cache
+  timeout: 5 minutes
+  rules:
+    # Run on direct push to main that touches src/ or scripts/
+    - if: '$CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push"'
+      changes:
+        - src/**/*
+        - scripts/**/*
+    # Allow manual trigger from GitLab UI (replaces workflow_dispatch)
+    - if: '$CI_PIPELINE_SOURCE == "web"'
+      when: manual
+  before_script:
+    - git config --global user.name "gitlab-ci-bot"
+    - git config --global user.email "gitlab-ci-bot@noreply.gitlab.com"
+    # Use the CI job token to authenticate push access
+    - git remote set-url origin "https://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git"
+  script:
+    - npm ci
+    - node scripts/generate-docs.mjs
+    - git add docs/
+    - |
+      if git diff --staged --quiet; then
+        echo "Documentation is already up-to-date."
+      else
+        git commit -m "docs(auto): synchronize technical documentation and module catalog [skip ci]"
+        git push origin HEAD:main
+      fi

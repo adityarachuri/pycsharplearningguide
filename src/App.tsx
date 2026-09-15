@@ -1,0 +1,498 @@
+import React, { useState, useEffect } from 'react';
+import { NavSectionId, AppTheme } from './types';
+import { Navbar } from './components/Navbar';
+import { Sidebar } from './components/Sidebar';
+import { SearchModal } from './components/SearchModal';
+import { DailyTeacherModal } from './components/DailyTeacherModal';
+import { BackgroundSyncDrawer } from './components/BackgroundSyncDrawer';
+import { InteractiveSandbox } from './components/InteractiveSandbox';
+import { InteractiveSandboxModal } from './components/InteractiveSandboxModal';
+import { Footer } from './components/Footer';
+import { FundamentalsView } from './views/FundamentalsView';
+import { ArchitectureView } from './views/ArchitectureView';
+import { DeepDivesView } from './views/DeepDivesView';
+import { BatteriesView } from './views/BatteriesView';
+import { DsaPythonView } from './views/DsaPythonView';
+import { WorkstationSetupView } from './views/WorkstationSetupView';
+import { ComparisonMatrixView } from './views/ComparisonMatrixView';
+import { AdvancedConceptsView } from './views/AdvancedConceptsView';
+import { WebAppProjectView } from './views/WebAppProjectView';
+import { AimlProjectView } from './views/AimlProjectView';
+import { UseCasesView } from './views/UseCasesView';
+import { GlossaryView } from './views/GlossaryView';
+import { AimlView } from './views/AimlView';
+import { TransitionView } from './views/TransitionView';
+import { ResearchersView } from './views/ResearchersView';
+import { FutureView } from './views/FutureView';
+import { CareerView } from './views/CareerView';
+import { ConclusionView } from './views/ConclusionView';
+import { dbService } from './services/dbIntegrationService';
+import {
+  CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
+  Terminal,
+  Sparkles,
+  BookOpen
+} from 'lucide-react';
+
+const SECTIONS_ORDER: { id: NavSectionId; name: string }[] = [
+  { id: 'fundamentals', name: '1. Fundamentals & Creator' },
+  { id: 'architecture', name: '2. Architecture Deep Dive' },
+  { id: 'deep-dives', name: '3. Core Deep Dives (10)' },
+  { id: 'libraries-batteries', name: '4. Libraries & Batteries' },
+  { id: 'dsa-python', name: '5. Data Structures & Algorithms' },
+  { id: 'workstation-setup', name: '6. Workstation Setup' },
+  { id: 'comparison-matrix', name: '7. C# vs Python Matrix' },
+  { id: 'advanced-concepts', name: '8. Production Lectures' },
+  { id: 'web-app-project', name: '9. Project: Full-Stack Web App' },
+  { id: 'aiml-project', name: '10. Project: Production AI/ML App' },
+  { id: 'use-cases', name: '11. Real-World Case Studies' },
+  { id: 'glossary', name: '12. Terminology Glossary' },
+  { id: 'aiml-context', name: '13. AI/ML Engineering Stack' },
+  { id: 'transition', name: '14. C# to Python Roadmap' },
+  { id: 'researchers', name: '15. Citations & Researchers' },
+  { id: 'future', name: '16. Future of Python' },
+  { id: 'career-compass', name: '17. Career Compass' },
+  { id: 'conclusion', name: '18. Synthesis & Certification' }
+];
+
+export default function App() {
+  const [activeSection, setActiveSection] = useState<NavSectionId>('fundamentals');
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isTeacherOpen, setIsTeacherOpen] = useState(false);
+  const [isSandboxOpen, setIsSandboxOpen] = useState(false);
+  const [sandboxPresetId, setSandboxPresetId] = useState<string>('comprehension');
+  const [sandboxCustomCode, setSandboxCustomCode] = useState<string | undefined>(undefined);
+  const [isSyncDrawerOpen, setIsSyncDrawerOpen] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [lastSyncTime, setLastSyncTime] = useState(new Date().toLocaleTimeString());
+
+  // Persistent progress & study notes via dbService repository
+  const [completedChapters, setCompletedChapters] = useState<string[]>(() => {
+    return dbService.getProgress();
+  });
+
+  // Persistent Theme: 'slate' (Deep Slate Dark Mode), 'idle' (Python IDLE Light Mode) or 'reading' (Warm Sepia)
+  const [theme, setTheme] = useState<AppTheme>(() => {
+    try {
+      const saved = localStorage.getItem('python_csharp_theme');
+      if (saved === 'idle' || saved === 'slate' || saved === 'reading') return saved as AppTheme;
+      return 'slate';
+    } catch {
+      return 'slate';
+    }
+  });
+
+  const [notes, setNotes] = useState<Record<string, string>>(() => {
+    return dbService.getNotes();
+  });
+
+  // Apply and synchronize theme preference with document and localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem('python_csharp_theme', theme);
+    } catch {}
+
+    // Reset classes
+    document.documentElement.classList.remove('theme-idle', 'theme-reading', 'dark');
+    document.body.classList.remove('theme-idle', 'theme-reading', 'bg-slate-950');
+
+    if (theme === 'idle') {
+      document.documentElement.classList.add('theme-idle');
+      document.documentElement.setAttribute('data-theme', 'idle');
+      document.body.classList.add('theme-idle');
+    } else if (theme === 'reading') {
+      document.documentElement.classList.add('theme-reading');
+      document.documentElement.setAttribute('data-theme', 'reading');
+      document.body.classList.add('theme-reading');
+    } else {
+      document.documentElement.classList.add('dark');
+      document.documentElement.setAttribute('data-theme', 'slate');
+      document.body.classList.add('bg-slate-950');
+    }
+  }, [theme]);
+
+  const handleToggleTheme = () => {
+    setTheme(prev => {
+      if (prev === 'slate') return 'idle';
+      if (prev === 'idle') return 'reading';
+      return 'slate';
+    });
+  };
+
+  // Save to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem('python_csharp_completed', JSON.stringify(completedChapters));
+    } catch {}
+  }, [completedChapters]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('python_csharp_notes', JSON.stringify(notes));
+    } catch {}
+  }, [notes]);
+
+  // Register background service worker
+  useEffect(() => {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker
+        .register('/service-worker.js')
+        .then(reg => {
+          console.log('[App] Background ServiceWorker registered with scope:', reg.scope);
+        })
+        .catch(err => {
+          console.warn('[App] ServiceWorker registration skipped:', err);
+        });
+    }
+
+    // Global keyboard shortcut: Cmd+K / Ctrl+K opens search
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setIsSearchOpen(prev => !prev);
+      }
+      if (e.key === 'Escape') {
+        setIsSearchOpen(false);
+        setIsTeacherOpen(false);
+        setIsSandboxOpen(false);
+        setIsSyncDrawerOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  // Periodic simulated sync heartbeat every 60s
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setLastSyncTime(new Date().toLocaleTimeString());
+    }, 60000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const handleToggleChapter = (chapterId: string) => {
+    setCompletedChapters(prev => {
+      const next = prev.includes(chapterId)
+        ? prev.filter(c => c !== chapterId)
+        : [...prev, chapterId];
+      dbService.saveProgress(next);
+      return next;
+    });
+  };
+
+  const handleSaveNote = (chapterId: string, note: string) => {
+    dbService.saveNote(chapterId, note);
+    setNotes(prev => ({ ...prev, [chapterId]: note }));
+  };
+
+  const handleTriggerSync = () => {
+    setIsSyncing(true);
+    dbService.syncStateWithBackend().finally(() => {
+      setIsSyncing(false);
+      setLastSyncTime(new Date().toLocaleTimeString());
+    });
+  };
+
+  // Previous & Next Chapter navigation
+  const currentIndex = SECTIONS_ORDER.findIndex(s => s.id === activeSection);
+  const prevSection = currentIndex > 0 ? SECTIONS_ORDER[currentIndex - 1] : null;
+  const nextSection = currentIndex < SECTIONS_ORDER.length - 1 ? SECTIONS_ORDER[currentIndex + 1] : null;
+
+  const isCurrentChapterCompleted = completedChapters.includes(activeSection);
+
+  // Render current chapter view
+  const renderView = () => {
+    switch (activeSection) {
+      case 'fundamentals':
+        return (
+          <FundamentalsView
+            onNavigate={id => {
+              setActiveSection(id);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+          />
+        );
+      case 'architecture':
+        return <ArchitectureView />;
+      case 'deep-dives':
+        return <DeepDivesView />;
+      case 'libraries-batteries':
+        return <BatteriesView />;
+      case 'dsa-python':
+        return (
+          <DsaPythonView
+            onOpenSandboxWithCode={() => {
+              setSandboxPresetId('heapq-priority-queue');
+              setIsSandboxOpen(true);
+            }}
+          />
+        );
+      case 'workstation-setup':
+        return <WorkstationSetupView />;
+      case 'comparison-matrix':
+        return (
+          <ComparisonMatrixView
+            onOpenSandboxWithCode={code => {
+              setSandboxCustomCode(code);
+              setIsSandboxOpen(true);
+            }}
+          />
+        );
+      case 'advanced-concepts':
+        return <AdvancedConceptsView />;
+      case 'web-app-project':
+        return <WebAppProjectView />;
+      case 'aiml-project':
+        return <AimlProjectView />;
+      case 'use-cases':
+        return <UseCasesView />;
+      case 'glossary':
+        return <GlossaryView />;
+      case 'aiml-context':
+        return <AimlView />;
+      case 'transition':
+        return <TransitionView />;
+      case 'researchers':
+        return <ResearchersView />;
+      case 'future':
+        return <FutureView />;
+      case 'career-compass':
+        return <CareerView />;
+      case 'conclusion':
+        return (
+          <ConclusionView
+            completedChapters={completedChapters}
+            onToggleChapter={handleToggleChapter}
+            totalChapters={SECTIONS_ORDER.length}
+            allSections={SECTIONS_ORDER}
+          />
+        );
+      default:
+        return <FundamentalsView />;
+    }
+  };
+
+  return (
+    <div
+      id="app-root-container"
+      className={`min-h-screen flex flex-col font-sans transition-colors duration-200 ${
+        theme === 'idle'
+          ? 'theme-idle bg-slate-50 text-slate-900 selection:bg-amber-200 selection:text-amber-900'
+          : theme === 'reading'
+          ? 'theme-reading bg-[#fdf6e3] text-[#302418] selection:bg-[#e6d5b8] selection:text-[#302418]'
+          : 'bg-slate-950 text-slate-100 selection:bg-amber-500 selection:text-slate-950'
+      }`}
+    >
+      {/* Top Navbar */}
+      <Navbar
+        activeSection={activeSection}
+        onOpenSearch={() => setIsSearchOpen(true)}
+        onOpenTeacher={() => setIsTeacherOpen(true)}
+        onOpenSandbox={() => setIsSandboxOpen(true)}
+        onNavigateToMindmap={() => {
+          setActiveSection('comparison-matrix');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        onNavigateToSection={id => {
+          setActiveSection(id);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        onOpenSyncDrawer={() => setIsSyncDrawerOpen(true)}
+        onToggleSidebar={() => setIsSidebarOpen(prev => !prev)}
+        onNavigateHome={() => {
+          setActiveSection('fundamentals');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        completedCount={completedChapters.length}
+        totalChapters={SECTIONS_ORDER.length}
+        theme={theme}
+        onToggleTheme={handleToggleTheme}
+      />
+
+      {/* Main Workspace Layout */}
+      <div className="flex flex-1 overflow-hidden">
+        {/* Sidebar */}
+        <Sidebar
+          activeSection={activeSection}
+          onSelectSection={id => {
+            setActiveSection(id);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+          isOpen={isSidebarOpen}
+          onClose={() => setIsSidebarOpen(false)}
+          completedChapters={completedChapters}
+        />
+
+        {/* Content Main Area */}
+        <main className="flex-1 overflow-y-auto px-4 md:px-8 py-6 max-w-7xl mx-auto w-full">
+          {/* Persistent Quick-Jump Bar for Hands-On Project Blueprints */}
+          <div className="mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-3 rounded-2xl border border-amber-500/30 bg-linear-to-r from-amber-500/10 via-purple-500/10 to-slate-900/80 px-4 py-3 text-xs shadow-sm">
+            <div className="flex items-center gap-2">
+              <span className="flex h-2 w-2 rounded-full bg-amber-400 animate-pulse" />
+              <span className="font-bold text-white font-mono uppercase tracking-wider text-[11px]">
+                III. Hands-On Project Blueprints:
+              </span>
+              <span className="hidden md:inline text-slate-300 text-xs">
+                Real workstation setups with video studios &amp; live simulators
+              </span>
+            </div>
+
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              <button
+                onClick={() => {
+                  setActiveSection('web-app-project');
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                className={`flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl font-mono text-xs font-semibold transition-all ${
+                  activeSection === 'web-app-project'
+                    ? 'bg-amber-500 text-slate-950 font-bold shadow-xs'
+                    : 'bg-slate-900/90 border border-amber-500/40 text-amber-300 hover:bg-amber-500/20'
+                }`}
+              >
+                <span>9. FastAPI Web App</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  setActiveSection('aiml-project');
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                className={`flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl font-mono text-xs font-semibold transition-all ${
+                  activeSection === 'aiml-project'
+                    ? 'bg-purple-500 text-white font-bold shadow-xs'
+                    : 'bg-slate-900/90 border border-purple-500/40 text-purple-300 hover:bg-purple-500/20'
+                }`}
+              >
+                <span>10. PyTorch RAG System</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Active Chapter View */}
+          {renderView()}
+
+          {/* Interactive Sandbox Embedded Section */}
+          <div className="mt-12">
+            <InteractiveSandbox
+              initialPresetId={sandboxPresetId}
+              onExpandToModal={() => setIsSandboxOpen(true)}
+            />
+          </div>
+
+          {/* Chapter Navigation Footer */}
+          <div className="mt-12 mb-8 flex flex-col items-stretch gap-4 border-t border-slate-800 pt-6 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-wrap items-center gap-3">
+              <button
+                onClick={() => handleToggleChapter(activeSection)}
+                className={`flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-semibold border transition-all ${
+                  isCurrentChapterCompleted
+                    ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300'
+                    : 'border-slate-700 bg-slate-900 text-slate-400 hover:text-white hover:border-slate-600'
+                }`}
+              >
+                <CheckCircle2
+                  className={`h-4 w-4 ${
+                    isCurrentChapterCompleted ? 'text-emerald-400' : 'text-slate-600'
+                  }`}
+                />
+                <span>
+                  {isCurrentChapterCompleted
+                    ? 'Chapter Mastered!'
+                    : 'Mark Chapter as Mastered'}
+                </span>
+              </button>
+
+              <button
+                onClick={() => setIsTeacherOpen(true)}
+                className="flex items-center gap-1.5 rounded-xl border border-amber-500/30 bg-amber-500/10 px-3.5 py-2 text-xs font-semibold text-amber-300 hover:bg-amber-500/20 transition-colors"
+              >
+                <Sparkles className="h-3.5 w-3.5 text-amber-400" />
+                <span>Daily Practice</span>
+              </button>
+            </div>
+
+            <div className="flex items-center gap-3">
+              {prevSection && (
+                <button
+                  onClick={() => {
+                    setActiveSection(prevSection.id);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                  className="flex flex-1 sm:flex-none items-center justify-center gap-1.5 rounded-xl border border-slate-800 bg-slate-900 px-4 py-2 text-xs font-semibold text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                  <span>Prev: {prevSection.name.split('.')[1]?.trim()}</span>
+                </button>
+              )}
+
+              {nextSection && (
+                <button
+                  onClick={() => {
+                    setActiveSection(nextSection.id);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                  className="flex flex-1 sm:flex-none items-center justify-center gap-1.5 rounded-xl bg-amber-500 px-4 py-2 text-xs font-bold text-slate-950 hover:bg-amber-400 shadow-md shadow-amber-500/20 transition-colors"
+                >
+                  <span>Next: {nextSection.name.split('.')[1]?.trim()}</span>
+                  <ChevronRight className="h-4 w-4" />
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Standard Disclaimer Footer */}
+          <Footer
+            onNavigate={id => {
+              setActiveSection(id);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            onOpenSyncDrawer={() => setIsSyncDrawerOpen(true)}
+            onOpenSandbox={() => setIsSandboxOpen(true)}
+          />
+        </main>
+      </div>
+
+      {/* Modals & Drawers */}
+      <SearchModal
+        isOpen={isSearchOpen}
+        onClose={() => setIsSearchOpen(false)}
+        onNavigate={id => {
+          setActiveSection(id);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+      />
+
+      <DailyTeacherModal
+        isOpen={isTeacherOpen}
+        onClose={() => setIsTeacherOpen(false)}
+        completedChapters={completedChapters}
+        onToggleChapter={handleToggleChapter}
+        notes={notes}
+        onSaveNote={handleSaveNote}
+        activeChapterId={activeSection}
+      />
+
+      <BackgroundSyncDrawer
+        isOpen={isSyncDrawerOpen}
+        onClose={() => setIsSyncDrawerOpen(false)}
+        lastSyncTime={lastSyncTime}
+        onTriggerSync={handleTriggerSync}
+        isSyncing={isSyncing}
+      />
+
+      {/* Interactive Sandbox Modal */}
+      <InteractiveSandboxModal
+        isOpen={isSandboxOpen}
+        onClose={() => {
+          setIsSandboxOpen(false);
+          setSandboxCustomCode(undefined);
+        }}
+        initialPresetId={sandboxPresetId}
+        customCode={sandboxCustomCode}
+      />
+    </div>
+  );
+}
