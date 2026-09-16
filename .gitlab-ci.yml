@@ -24,6 +24,8 @@ validate-and-build:
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'  # run on every MR
     - if: '$CI_COMMIT_BRANCH == "main"'                   # run on push to main
+  before_script:
+    - apk add --no-cache git
   script:
     - npm ci
     - npm run lint                   # tsc --noEmit — TypeScript strict typecheck
@@ -55,6 +57,8 @@ verify-docs:
     # Allow manual verification from GitLab UI
     - if: '$CI_PIPELINE_SOURCE == "web"'
       when: manual
+  before_script:
+    - apk add --no-cache git
   script:
     - npm ci
     - node scripts/generate-docs.mjs
