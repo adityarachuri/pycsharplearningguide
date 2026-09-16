@@ -18,7 +18,7 @@ stages:
 # ── Job 1: CI & Quality Gates ─────────────────────────────────────────────────
 validate-and-build:
   stage: validate
-  image: node:20-alpine
+  image: node:24-alpine
   <<: *npm_cache
   timeout: 10 minutes
   rules:
@@ -43,7 +43,7 @@ validate-and-build:
 # ── Job 2: Verify generated Technical Docs ──────────────────────────────────
 verify-docs:
   stage: docs
-  image: node:20-alpine
+  image: node:24-alpine
   <<: *npm_cache
   timeout: 5 minutes
   rules:
