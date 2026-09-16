@@ -108,7 +108,7 @@ export const SiteLogo: React.FC<SiteLogoProps> = ({
 
       {/* Typography Brand Lockup */}
       {showText && (
-        <div className="text-left">
+        <div className="hidden text-left sm:block">
           <div className="flex items-center gap-2">
             <span className={`${currentSize.text} font-extrabold text-white tracking-tight group-hover:text-amber-300 transition-colors`}>
               PyCSharp

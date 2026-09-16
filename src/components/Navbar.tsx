@@ -69,9 +69,8 @@ export const Navbar: React.FC<NavbarProps> = ({
           title="PyCSharp - Return to Homepage (Fundamentals & Zen of Python)"
           aria-label="PyCSharp Homepage"
         >
-          {/* On xs screens show only the icon emblem; show full logo from sm+ */}
-          <SiteLogo size="md" showText={false} className="sm:hidden" />
-          <SiteLogo size="md" showText={true} className="hidden sm:inline-flex" />
+          {/* Icon emblem always shown; brand text fades in from sm+ (handled inside SiteLogo) */}
+          <SiteLogo size="md" showText={true} />
         </button>
       </div>
 
