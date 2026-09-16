@@ -12,6 +12,7 @@ import {
   Loader2
 } from 'lucide-react';
 import { preloadSandbox, onSandboxReady, isSandboxReady, runInSandbox } from '../services/pyodideSandboxService';
+import { COPY_RESET_MS } from '../constants';
 
 interface PresetSnippet {
   id: string;
@@ -202,8 +203,6 @@ print("Deque (evicted oldest in O(1)):", list(sliding_window))
 print("Pair combinations of 3 services:", list(itertools.combinations(["API", "DB", "Cache"], 2)))`
   }
 ];
-
-const COPY_RESET_MS = 2000;
 
 interface ExecutionResult {
   stdout: string;

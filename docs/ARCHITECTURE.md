@@ -30,6 +30,15 @@ graph TD
 total. The authoritative, always-current list is [`docs/MODULES_CATALOG.md`](MODULES_CATALOG.md),
 generated directly from `src/views/` and verified for staleness in CI.
 
+**App shell**: the root layout (`App.tsx`) is height-constrained to the viewport
+(`h-screen overflow-hidden`), with the header and sidebar as non-scrolling siblings of a single
+internally-scrolling `<main>` region — not, as in earlier revisions, a page that scrolled as one
+long document. Chapter-navigation "scroll to top" calls target that `<main>` element directly
+(`mainContentRef.current.scrollTo(...)`) rather than `window.scrollTo`, since the window itself
+no longer scrolls. The "Overall Course Progress" indicator lives inside `<main>` as a
+`position: sticky` bar pinned to the top of that scrolling region, visible regardless of how far
+the user has scrolled into a chapter.
+
 ## 2. Directory Structure & Modular Separation
 
 - `/src/views/`: 33 modular views (28 numbered curriculum chapters + 5 practice/reference pages).
@@ -62,14 +71,15 @@ Exposes CPython's C struct memory layout:
 
 ### C. Relational Mindmap Visualizer (`MindmapVisualizer.tsx`)
 
-Interactive visual node topology mapping .NET paradigms to Python equivalents across 6 clusters:
+Interactive visual node topology mapping .NET paradigms to Python equivalents across 9 domain
+clusters (27 leaf concept nodes total): Types & Memory, Collections & LINQ, Flow & Errors, OOP &
+Protocols, Async & Concurrency, Tooling & Ecosystem, Functions, Testing & QA, and Web/Data/AI.
 
-1. Syntax & Typing (`var` / `dynamic` vs Duck Typing, Type Hints)
-2. Object Orientation (`class`, `interface` vs Protocol, Abstract Base Classes)
-3. Memory & GC (`Dispose` / `using` vs `with`, Reference Counting)
-4. Concurrency (`Task` / `async` vs `asyncio`, ThreadPool vs `ProcessPoolExecutor`)
-5. Data Manipulation (LINQ vs List Comprehensions, Generators)
-6. Ecosystem (`NuGet` / `csproj` vs `uv` / `pyproject.toml`)
+The radial canvas is a fixed 1050×720 virtual coordinate space, scaled at render time to exactly
+fill its container (measured via `ResizeObserver`, applied as a CSS `transform: scale()`) so the
+entire graph is always visible in one view with no scrollbar, at any viewport size. The existing
+zoom (0.7×–1.5×) and pan controls multiply on top of that auto-fit baseline rather than replacing
+it — "100%" means "fit to view," not "native pixel size."
 
 ## 4. Security & Compliance
 

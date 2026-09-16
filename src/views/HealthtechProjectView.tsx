@@ -3,8 +3,7 @@ import { Play, Terminal, FileCode2, Copy, Check, Layers, HeartPulse } from 'luci
 import { WorkstationVideoPlayer } from '../components/WorkstationVideoPlayer';
 import { CodeBlock } from '../components/CodeBlock';
 import { HEALTHTECH_STEPS, HEALTHTECH_ALL_FILES } from '../data/healthtechProjectData';
-
-const COPY_RESET_MS = 2000;
+import { COPY_RESET_MS } from '../constants';
 
 export function HealthtechProjectView(): ReactElement {
   const [activeSceneId, setActiveSceneId] = useState<number>(1);

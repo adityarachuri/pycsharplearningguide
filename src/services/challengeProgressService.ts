@@ -27,10 +27,6 @@ export function getAllChallengeProgress(): Record<string, ChallengeAttemptRecord
   return loadAll();
 }
 
-export function getChallengeProgress(challengeId: string): ChallengeAttemptRecord | null {
-  return loadAll()[challengeId] ?? null;
-}
-
 export function recordChallengeAttempt(
   challengeId: string,
   passedCount: number,

@@ -16,6 +16,7 @@ import {
   Download,
   X
 } from 'lucide-react';
+import { COPY_RESET_MS } from '../constants';
 
 interface MermaidViewerProps {
   chart: string;
@@ -28,7 +29,6 @@ const MIN_SCALE = 0.5;
 const MAX_SCALE = 3.0;
 const ZOOM_STEP = 0.2;
 const WHEEL_ZOOM_STEP = 0.15;
-const COPY_RESET_MS = 2000;
 
 let isMermaidInitialized = false;
 

@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Check, Copy, Code2 } from 'lucide-react';
-
-const COPY_RESET_MS = 2000;
+import { COPY_RESET_MS } from '../constants';
 
 interface CodeBlockProps {
   language: string;
@@ -24,11 +23,11 @@ export const CodeBlock: React.FC<CodeBlockProps> = ({
       setCopied(true);
       setTimeout(() => setCopied(false), COPY_RESET_MS);
     } catch {
-      // Fallback
+      // Clipboard API can reject (e.g. no permission/focus); copy button
+      // silently no-ops rather than surfacing an error for this non-critical action.
     }
   };
 
-  // High-contrast, clean syntax highlighting tokenizer for Python and C#
   const highlightCode = (rawCode: string, lang: string) => {
     const lines = rawCode.split('\n');
 

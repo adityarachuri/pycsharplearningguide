@@ -4,7 +4,6 @@ import { CONCLUSION_DATA } from '../data/conclusionData';
 import { ProgressDashboard } from '../components/ProgressDashboard';
 
 interface ConclusionViewProps {
-  completedChaptersCount?: number;
   completedChapters?: string[];
   onToggleChapter?: (chapterId: string) => void;
   totalChapters?: number;
@@ -12,18 +11,14 @@ interface ConclusionViewProps {
 }
 
 export const ConclusionView: React.FC<ConclusionViewProps> = ({
-  completedChaptersCount,
   completedChapters = ['fundamentals'],
   onToggleChapter,
   totalChapters = 28,
   allSections = []
 }) => {
   const [candidateName, setCandidateName] = useState('Senior .NET & Python Architect');
-  const [isGenerated, setIsGenerated] = useState(false);
 
-  const effectiveCompletedCount = completedChapters
-    ? completedChapters.length
-    : (completedChaptersCount ?? 1);
+  const effectiveCompletedCount = completedChapters.length;
 
   const verificationHash = 'SHA256: 7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069';
 
@@ -157,12 +152,6 @@ export const ConclusionView: React.FC<ConclusionViewProps> = ({
               aria-label="Your full name or title"
               className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:border-amber-500 focus:outline-none"
             />
-            <button
-              onClick={() => setIsGenerated(true)}
-              className="rounded-lg bg-amber-500 px-3.5 py-1.5 text-xs font-bold text-slate-950 hover:bg-amber-400 transition-colors"
-            >
-              Generate
-            </button>
           </div>
         </div>
 
@@ -171,10 +160,10 @@ export const ConclusionView: React.FC<ConclusionViewProps> = ({
           id="certificate-print-area"
           className="relative overflow-hidden rounded-2xl border-2 border-amber-500/40 bg-linear-to-b from-slate-950 via-slate-900 to-slate-950 p-8 text-center space-y-6 shadow-2xl"
         >
-          <div className="absolute -right-12 -top-12 h-36 w-36 rounded-full bg-amber-500/10 blur-2xl pointer-events-none" />
-          <div className="absolute -left-12 -bottom-12 h-36 w-36 rounded-full bg-purple-500/10 blur-2xl pointer-events-none" />
+          <div id="certificate-seal-amber" className="absolute -right-12 -top-12 h-36 w-36 rounded-full bg-amber-500/10 blur-2xl pointer-events-none" />
+          <div id="certificate-seal-purple" className="absolute -left-12 -bottom-12 h-36 w-36 rounded-full bg-purple-500/10 blur-2xl pointer-events-none" />
 
-          <div className="flex items-center justify-center gap-2">
+          <div id="certificate-header-band" className="flex items-center justify-center gap-2">
             <Code2 className="h-6 w-6 text-amber-400" />
             <span className="text-xs font-bold uppercase tracking-widest text-slate-400">
               Official Program Completion Certificate
@@ -185,7 +174,10 @@ export const ConclusionView: React.FC<ConclusionViewProps> = ({
             <div className="text-xs font-medium text-slate-400 uppercase tracking-wider">
               This certifies that
             </div>
-            <div className="mt-2 text-2xl md:text-3xl font-extrabold text-white tracking-tight">
+            <div
+              id="certificate-recipient-name"
+              className="mt-2 text-2xl md:text-3xl font-extrabold text-white tracking-tight"
+            >
               {candidateName || 'Senior Software Engineer'}
             </div>
             <div className="mt-2 text-xs md:text-sm text-slate-300 max-w-xl mx-auto leading-relaxed">

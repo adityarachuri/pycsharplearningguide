@@ -1,4 +1,4 @@
-import { lazy, Suspense, useState, useEffect, type ReactElement } from 'react';
+import { lazy, Suspense, useState, useEffect, useRef, type ReactElement } from 'react';
 import {
   CheckCircle2,
   ChevronLeft,
@@ -83,6 +83,10 @@ const SECTIONS_ORDER: { id: NavSectionId; name: string }[] = [
 
 export default function App(): ReactElement {
   const [activeSection, setActiveSection] = useState<NavSectionId>('home');
+  const mainContentRef = useRef<HTMLElement>(null);
+  const scrollContentToTop = () => {
+    mainContentRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+  };
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isTeacherOpen, setIsTeacherOpen] = useState(false);
@@ -250,7 +254,7 @@ export default function App(): ReactElement {
           <LandingView
             onNavigate={id => {
               setActiveSection(id);
-              window.scrollTo({ top: 0, behavior: 'smooth' });
+              scrollContentToTop();
             }}
           />
         );
@@ -267,7 +271,7 @@ export default function App(): ReactElement {
           <FundamentalsView
             onNavigate={id => {
               setActiveSection(id);
-              window.scrollTo({ top: 0, behavior: 'smooth' });
+              scrollContentToTop();
             }}
           />
         );
@@ -351,7 +355,7 @@ export default function App(): ReactElement {
           <LandingView
             onNavigate={id => {
               setActiveSection(id);
-              window.scrollTo({ top: 0, behavior: 'smooth' });
+              scrollContentToTop();
             }}
           />
         );
@@ -361,7 +365,7 @@ export default function App(): ReactElement {
   return (
     <div
       id="app-root-container"
-      className={`min-h-screen flex flex-col font-sans transition-colors duration-200 ${
+      className={`h-screen overflow-hidden flex flex-col font-sans transition-colors duration-200 ${
         theme === 'idle'
           ? 'theme-idle bg-[#f8fafc] text-[#0f172a] selection:bg-[#fde68a] selection:text-[#78350f]'
           : theme === 'reading'
@@ -384,17 +388,17 @@ export default function App(): ReactElement {
         onOpenSandbox={() => setIsSandboxOpen(true)}
         onNavigateToMindmap={() => {
           setActiveSection('comparison-matrix');
-          window.scrollTo({ top: 0, behavior: 'smooth' });
+          scrollContentToTop();
         }}
         onNavigateToSection={id => {
           setActiveSection(id);
-          window.scrollTo({ top: 0, behavior: 'smooth' });
+          scrollContentToTop();
         }}
         onOpenSyncDrawer={() => setIsSyncDrawerOpen(true)}
         onToggleSidebar={() => setIsSidebarOpen(prev => !prev)}
         onNavigateHome={() => {
           setActiveSection('home');
-          window.scrollTo({ top: 0, behavior: 'smooth' });
+          scrollContentToTop();
         }}
         completedCount={completedChapters.length}
         totalChapters={SECTIONS_ORDER.length}
@@ -409,7 +413,7 @@ export default function App(): ReactElement {
           activeSection={activeSection}
           onSelectSection={id => {
             setActiveSection(id);
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            scrollContentToTop();
           }}
           isOpen={isSidebarOpen}
           onClose={() => setIsSidebarOpen(false)}
@@ -417,7 +421,30 @@ export default function App(): ReactElement {
         />
 
         {/* Content Main Area */}
-        <main id="main-content" className="flex-1 overflow-y-auto px-4 md:px-8 py-6 max-w-7xl mx-auto w-full">
+        <main id="main-content" ref={mainContentRef} className="flex-1 overflow-y-auto w-full">
+          {/* Sticky Overall Course Progress bar — pinned to the top of the
+              scrollable content area, independent of the header/sidebar. */}
+          <div className="sticky top-0 z-20 border-b border-slate-800 bg-slate-950/95 backdrop-blur-md px-4 md:px-8 py-2.5">
+            <div className="max-w-7xl mx-auto w-full">
+              <div className="flex items-center justify-between text-xs text-slate-400 mb-1.5">
+                <span>Overall Course Progress</span>
+                <span className="font-semibold text-white">
+                  {completedChapters.length} / {SECTIONS_ORDER.length} chapters &middot;{' '}
+                  {Math.round((completedChapters.length / SECTIONS_ORDER.length) * 100)}%
+                </span>
+              </div>
+              <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-800">
+                <div
+                  className="h-full bg-linear-to-r from-amber-500 to-emerald-400 transition-all duration-500"
+                  style={{
+                    width: `${(completedChapters.length / SECTIONS_ORDER.length) * 100}%`
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="px-4 md:px-8 py-6 max-w-7xl mx-auto w-full">
           {/* Persistent Quick-Jump Bar for Hands-On Project Blueprints */}
           <div className="mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-3 rounded-2xl border border-amber-500/30 bg-linear-to-r from-amber-500/10 via-purple-500/10 to-slate-900/80 px-4 py-3 text-xs shadow-sm">
             <div className="flex items-center gap-2">
@@ -434,7 +461,7 @@ export default function App(): ReactElement {
               <button
                 onClick={() => {
                   setActiveSection('web-app-project');
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                  scrollContentToTop();
                 }}
                 className={`flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl font-mono text-xs font-semibold transition-all ${
                   activeSection === 'web-app-project'
@@ -448,7 +475,7 @@ export default function App(): ReactElement {
               <button
                 onClick={() => {
                   setActiveSection('aiml-project');
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                  scrollContentToTop();
                 }}
                 className={`flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl font-mono text-xs font-semibold transition-all ${
                   activeSection === 'aiml-project'
@@ -509,7 +536,7 @@ export default function App(): ReactElement {
                 <button
                   onClick={() => {
                     setActiveSection(prevSection.id);
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    scrollContentToTop();
                   }}
                   className="flex flex-1 sm:flex-none items-center justify-center gap-1.5 rounded-xl border border-slate-800 bg-slate-900 px-4 py-2 text-xs font-semibold text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
                 >
@@ -522,7 +549,7 @@ export default function App(): ReactElement {
                 <button
                   onClick={() => {
                     setActiveSection(nextSection.id);
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    scrollContentToTop();
                   }}
                   className="flex flex-1 sm:flex-none items-center justify-center gap-1.5 rounded-xl bg-amber-500 px-4 py-2 text-xs font-bold text-slate-950 hover:bg-amber-400 shadow-md shadow-amber-500/20 transition-colors"
                 >
@@ -537,11 +564,12 @@ export default function App(): ReactElement {
           <Footer
             onNavigate={id => {
               setActiveSection(id);
-              window.scrollTo({ top: 0, behavior: 'smooth' });
+              scrollContentToTop();
             }}
             onOpenSyncDrawer={() => setIsSyncDrawerOpen(true)}
             onOpenSandbox={() => setIsSandboxOpen(true)}
           />
+          </div>
         </main>
       </div>
 
@@ -551,7 +579,7 @@ export default function App(): ReactElement {
         onClose={() => setIsSearchOpen(false)}
         onNavigate={id => {
           setActiveSection(id);
-          window.scrollTo({ top: 0, behavior: 'smooth' });
+          scrollContentToTop();
         }}
       />
 

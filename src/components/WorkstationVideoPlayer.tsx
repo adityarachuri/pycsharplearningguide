@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Play,
   Pause,
@@ -15,6 +15,7 @@ import {
   Clock
 } from 'lucide-react';
 import { CodeBlock } from './CodeBlock';
+import { COPY_RESET_MS } from '../constants';
 
 interface WorkflowScene {
   id: number;
@@ -50,7 +51,6 @@ interface WorkstationVideoPlayerProps {
 }
 
 const SCENE_DURATION_MS = 6000;
-const COPY_RESET_MS = 2000;
 
 export function WorkstationVideoPlayer({
   projectName,

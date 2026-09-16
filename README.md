@@ -81,7 +81,7 @@ PyCSharp includes custom interactive simulations engineered with high visual pre
 - **Interactive GIL Concurrency Simulator**: Real-time simulation of OS threads contending for the CPython Global Interpreter Lock token, core utilization readouts, throughput counters, and zoomable thread state visualizers.
 - **PyObject Memory Anatomy Inspector**: Interactive memory struct explorer exposing `PyObject_HEAD`, 64-bit reference counter, type pointers, cyclic GC dual-linked list (`PyGC_Head`), memory addresses, and zoom/pan controls.
 - **Execution Pipeline Animator**: Step-by-step visualizer tracing Python code through Lexical Tokenizer, AST Parser, Bytecode Assembler (`ceval.c`), and execution outcomes.
-- **Relational C# to Python Mindmap**: Interactive graph visualizer mapping .NET mental paradigms to Python constructs with touch gestures, panning, zoom in/out, and SVG exports.
+- **Relational C# to Python Mindmap**: Interactive graph visualizer mapping .NET mental paradigms to Python constructs with touch gestures, panning, and zoom in/out. The full 27-node graph auto-fits its container at all times (the canvas is measured via `ResizeObserver` and scaled to match) — the whole mindmap is always visible in one view, with no scrollbar, regardless of screen size.
 - **In-Browser Python Sandbox**: Runs real CPython entirely client-side via [Pyodide](https://pyodide.org) (WebAssembly) in a dedicated Web Worker — no server, no subprocess, code never leaves the browser. See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md#runtime-security-boundary) for the security model.
 - **Coding Challenges Engine**: 16 original DSA and real-world exercises, each with hidden test cases evaluated against learner code inside the same Pyodide sandbox, progressive hints, and localStorage-persisted attempt history.
 
@@ -124,7 +124,7 @@ The Interactive Sandbox runs real Python via [Pyodide](https://pyodide.org) (CPy
 
 ## Usage
 
-Once `npm run dev` is running, open `http://127.0.0.1:3000` and use the sidebar to jump between the 28 curriculum chapters and 5 practice/reference pages. Each module is a standalone React view — chapter completion, notes, and theme preference persist to `localStorage` via `src/services/dbIntegrationService.ts`. Press `Ctrl+K` / `Cmd+K` to open the searchable command palette, or use the floating action button to open the Interactive Python Sandbox.
+Once `npm run dev` is running, open `http://127.0.0.1:3000` and use the sidebar to jump between the 28 curriculum chapters and 5 practice/reference pages. The header and sidebar are fixed in place — only the chapter content area scrolls, with an always-visible "Overall Course Progress" bar pinned to the top of it. Each module is a standalone React view — chapter completion, notes, and theme preference persist to `localStorage` via `src/services/dbIntegrationService.ts`. Press `Ctrl+K` / `Cmd+K` to open the searchable command palette (indexes every chapter and utility page), or use the floating action button to open the Interactive Python Sandbox. The final chapter includes a printable program-completion certificate — its print output is scoped to the certificate itself, styled independently of the on-screen dark theme.
 
 ---
 

@@ -48,10 +48,9 @@ interface ProgressDashboardProps {
 export const ProgressDashboard: React.FC<ProgressDashboardProps> = ({
   completedChapters = ['fundamentals'],
   onToggleChapter,
-  totalChapters = 13,
+  totalChapters = 28,
   allSections = []
 }) => {
-  // Study hours state
   const [studyLogs, setStudyLogs] = useState<Record<string, number>>(() =>
     getInitialStudyLogs()
   );
@@ -65,7 +64,6 @@ export const ProgressDashboard: React.FC<ProgressDashboardProps> = ({
     new Date().toISOString().split('T')[0]
   );
 
-  // Compute metrics
   const completedCount = completedChapters.length;
   const remainingCount = Math.max(0, totalChapters - completedCount);
   const completionPercentage = Math.round((completedCount / totalChapters) * 100);
@@ -73,13 +71,11 @@ export const ProgressDashboard: React.FC<ProgressDashboardProps> = ({
   const studyMetrics = useMemo(() => computeStudyMetrics(studyLogs), [studyLogs]);
   const heatmapWeeks = useMemo(() => generateHeatmapGrid(studyLogs), [studyLogs]);
 
-  // Data for Recharts Completed vs Remaining Donut Chart
   const pieData = useMemo(() => [
     { name: 'Completed Chapters', value: completedCount, color: '#10b981' },
     { name: 'Remaining Content', value: remainingCount, color: '#334155' }
   ], [completedCount, remainingCount]);
 
-  // Data for Recharts Curriculum Domain Stacked Bar Chart
   const domainData = useMemo(() => {
     return CURRICULUM_DOMAINS.map(d => {
       const completedInDomain = d.chapterIds.filter(id =>
@@ -96,7 +92,6 @@ export const ProgressDashboard: React.FC<ProgressDashboardProps> = ({
     });
   }, [completedChapters]);
 
-  // Data for Recharts Daily / Weekly Study Hours Chart
   const trendData = useMemo(() => {
     const today = new Date();
     if (timeframeView === 'daily') {
@@ -129,7 +124,6 @@ export const ProgressDashboard: React.FC<ProgressDashboardProps> = ({
     }
   }, [timeframeView, studyLogs, heatmapWeeks]);
 
-  // Handler to log hours for today or selected date
   const handleAddHours = (hoursToAdd: number, targetDate?: string) => {
     const dateKey = targetDate || new Date().toISOString().split('T')[0];
     const current = studyLogs[dateKey] || 0;
@@ -529,7 +523,6 @@ export const ProgressDashboard: React.FC<ProgressDashboardProps> = ({
                       const day = week.days[dIdx];
                       if (!day) return <div key={wIdx} className="h-6 rounded-md bg-transparent" />;
 
-                      // Color based on level
                       let bgClass = 'bg-slate-950 border border-slate-800/80 text-slate-700';
                       if (day.level === 1) bgClass = 'bg-amber-950/70 border border-amber-800/50 text-amber-300';
                       if (day.level === 2) bgClass = 'bg-amber-700 text-slate-950 font-bold';
@@ -732,25 +725,7 @@ export const ProgressDashboard: React.FC<ProgressDashboardProps> = ({
 
             {/* Scrollable module checklist */}
             <div className="max-h-71.25 overflow-y-auto pr-1 space-y-2">
-              {(allSections.length > 0
-                ? allSections
-                : [
-                    { id: 'fundamentals', name: '1. Fundamentals & Creator' },
-                    { id: 'architecture', name: '2. Architecture Deep Dive' },
-                    { id: 'deep-dives', name: '3. Core Deep Dives (10)' },
-                    { id: 'libraries-batteries', name: '4. Libraries & Batteries' },
-                    { id: 'comparison-matrix', name: '5. C# vs Python Matrix' },
-                    { id: 'advanced-concepts', name: '6. Production Lectures' },
-                    { id: 'use-cases', name: '7. Real-World Case Studies' },
-                    { id: 'glossary', name: '8. Terminology Glossary' },
-                    { id: 'aiml-context', name: '9. AI/ML Engineering Stack' },
-                    { id: 'transition', name: '10. C# to Python Roadmap' },
-                    { id: 'researchers', name: '11. Citations & Researchers' },
-                    { id: 'future', name: '12. Future of Python' },
-                    { id: 'career-compass', name: '13. Career Compass' },
-                    { id: 'conclusion', name: '14. Synthesis & Certification' }
-                  ]
-              ).map(section => {
+              {allSections.map(section => {
                 const isCompleted = completedChapters.includes(section.id);
                 return (
                   <button

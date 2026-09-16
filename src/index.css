@@ -26,10 +26,14 @@ html {
    the certificate collapse via `display: none`, which — unlike `visibility:
    hidden` — removes them from layout entirely, so the printed page doesn't
    trail off into blank pages for all the collapsed content's original height.
-   Also force light-background/dark-text on the certificate itself for print:
-   most browsers strip background colors by default when printing, which would
-   otherwise leave the certificate's white text on its normal dark gradient
-   background invisible on paper. */
+
+   The certificate's normal screen appearance (white text on a dark gradient)
+   would otherwise print as invisible white-on-white, since most browsers
+   strip background colors by default when printing — so this also replaces
+   it with a deliberate, print-safe "formal certificate" theme: a warm
+   parchment background, a double-line gold frame (the classic certificate
+   border style), a navy/gold accent band, and two small tinted corner seals
+   — rather than just flattening everything to plain black-on-white. */
 @media print {
   body :not(:has(#certificate-print-area)):not(#certificate-print-area, #certificate-print-area *) {
     display: none !important;
@@ -37,10 +41,13 @@ html {
 
   #certificate-print-area {
     margin: 0 auto;
-    background: #ffffff !important;
-    color: #0f172a !important;
+    background: #fffdf7 !important;
+    color: #1e293b !important;
     box-shadow: none !important;
-    border-color: #cbd5e1 !important;
+    border: 8px double #b45309 !important;
+    outline: 1px solid #1e3a8a !important;
+    outline-offset: -14px;
+    padding: 2.5rem !important;
   }
 
   #certificate-print-area * {
@@ -50,16 +57,55 @@ html {
   }
 
   #certificate-print-area .text-white,
-  #certificate-print-area .text-amber-400,
   #certificate-print-area .text-slate-200,
   #certificate-print-area .text-slate-300,
   #certificate-print-area .text-slate-400,
   #certificate-print-area .text-slate-500 {
-    color: #0f172a !important;
+    color: #1e293b !important;
+  }
+
+  #certificate-print-area .text-amber-400 {
+    color: #b45309 !important;
   }
 
   #certificate-print-area .text-emerald-400 {
     color: #047857 !important;
+  }
+
+  /* Recipient name: the certificate's single most important line, set in a
+     deep navy to stand out from the surrounding body copy. */
+  #certificate-print-area #certificate-recipient-name {
+    color: #1e3a8a !important;
+  }
+
+  /* Header label band: a navy strip behind the "Official Program Completion
+     Certificate" line, matching the gold/navy frame. */
+  #certificate-print-area #certificate-header-band {
+    background: #1e3a8a !important;
+    color: #fefce8 !important;
+    margin: -2.5rem -2.5rem 1.5rem -2.5rem;
+    padding: 0.85rem 2.5rem;
+  }
+  #certificate-print-area #certificate-header-band * {
+    color: #fefce8 !important;
+  }
+
+  /* Corner seals: the screen version's blurred glow dots become small,
+     solid-color decorative seals instead of being flattened away by the
+     blanket `background: transparent` rule above. Repositioned slightly
+     inward/downward from their screen-mode corners so the opaque header
+     band above doesn't slice through and discolor them. */
+  #certificate-print-area #certificate-seal-amber {
+    top: 4.5rem !important;
+    right: -3rem !important;
+    background: #fde68a !important;
+    opacity: 0.5 !important;
+    filter: none !important;
+  }
+  #certificate-print-area #certificate-seal-purple {
+    background: #ddd6fe !important;
+    opacity: 0.5 !important;
+    filter: none !important;
   }
 
   /* Ancestors of the certificate stay in the render tree (see the selector

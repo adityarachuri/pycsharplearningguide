@@ -807,3 +807,82 @@ substituted with strong automated equivalents) and decisions that are the user's
 visibility, typography preference), not engineering defects. If either of those decisions changes
 (e.g., the user wants a human screen-reader pass performed, or wants the typography enlarged), that
 is new scope, not a retraction of this determination.
+
+---
+
+## G. UI/UX Refinement & Regression Pass — 2026-09-16 (Third Session)
+
+A follow-up engagement addressing three user-reported UI issues (mindmap requiring scroll to view,
+plain certificate print styling, page scroll dragging the header/sidebar along with it), plus a
+full regression sweep to confirm none of the changes required to fix them broke anything covered by
+sections A–F above.
+
+### G.1 Changes made
+
+1. **Mindmap auto-fit**: `MindmapVisualizer.tsx` now measures its container via `ResizeObserver` and
+   scales the fixed 1050×720 canvas to fill it exactly (`transform: scale()`), so the full graph is
+   always visible with no scrollbar at any viewport size. The panel's aspect ratio was also changed
+   to `aspect-1050/720` to match the content's native shape, eliminating ~37% of previously wasted
+   vertical space.
+2. **Certificate print theme**: `ConclusionView.tsx` print styling redesigned from flat black-on-white
+   to a gold double-border frame, navy header band, parchment background, and dual corner seals,
+   scoped entirely to `@media print` via stable `id` attributes so the on-screen dark theme is
+   unaffected.
+3. **Fixed header/sidebar + sticky progress bar**: `App.tsx`'s root shell changed from
+   `min-h-screen` (whole page scrolls) to `h-screen overflow-hidden` (only `<main>` scrolls
+   internally). All 13 `window.scrollTo(...)` chapter-navigation calls were replaced with a
+   `scrollContentToTop()` helper targeting the new `mainContentRef`. The "Overall Course Progress"
+   bar was moved out of the sidebar footer and into a `position: sticky` bar pinned to the top of
+   `<main>`.
+
+### G.2 Regression verification
+
+- **Full 99-combination WCAG AA contrast re-scan** (33 pages × 3 themes, using the canvas-based
+  color parser from §D.7 above): **0 findings** — the theme-color fixes from the prior session held.
+- **Full 33-page heading-hierarchy re-scan**: **0 pages with skipped levels** — unaffected by this
+  round's layout changes.
+- **Fixed-layout verification**: header, sidebar, and the new sticky progress bar's bounding boxes
+  (`getBoundingClientRect()`) confirmed identical before and after scrolling `#main-content` to
+  800px, with `window.scrollY` staying at 0 throughout — the page-level scroll position never moves.
+- **Mindmap auto-fit verification**: measured the rendered canvas's true post-transform visual box
+  via `getBoundingClientRect()` (CSS `transform: scale()` does not affect `scrollWidth`/`scrollHeight`,
+  so those were not trustworthy here) — confirmed zero overflow and correct fit-to-container sizing
+  on both a 1440px desktop viewport and a 390px mobile viewport, and that zoom in/out/reset controls
+  still work correctly on top of the new auto-fit baseline.
+- **Pyodide sandbox lazy-load regression check** (the mechanism most at risk from the `#main-content`
+  internal-scroll change, since `InteractiveSandbox.tsx`'s `IntersectionObserver` depends on the
+  target's position relative to the viewport): confirmed **0 genuine Pyodide runtime-asset requests**
+  (`pyodide.asm.wasm`, `pyodide.asm.mjs`, `python_stdlib.zip`, `pyodide-lock.json`, the
+  `pyodideWorker` chunk) fire while the embedded sandbox is off-screen, and all 5 fire correctly once
+  it scrolls within range — the lazy-preload behavior survived the layout change unchanged. (Two
+  earlier attempts at this specific check gave false ambiguous results from test-script bugs, not
+  app defects: the first filtered by a URL substring that also matched the service module's own
+  filename, `pyodideSandboxService.ts`; the second scrolled `#main-content` all the way to its
+  `scrollHeight`, which overshoots past the sandbox because the page's `Footer` renders below it,
+  pushing total scroll height past the sandbox's position. An incremental scroll located the correct
+  trigger point.)
+- **CI pipeline replication**: ran `.gitlab-ci.yml`'s `validate-and-build` steps locally in order —
+  `npm run lint` (clean), `npm run test:coverage` (20/20 tests, 100% statements/branches/functions/
+  lines), `npm run docs:generate` followed by `git diff` on `docs/MODULES_CATALOG.md` (no drift —
+  the staleness check would pass), `npm run build` (succeeds, `dist/index.html` present).
+
+No new defects were found in this round; the three requested UI changes are implemented and verified,
+and nothing from the prior two sessions' fixes regressed.
+
+### G.3 Scope note on "proofread all content"
+
+Automated proofreading checks were run across all 28 chapters and 5 utility pages (TODO/FIXME/
+placeholder markers, duplicated whitespace, stale version strings, stale chapter-count references) —
+all clean, or explained as legitimate historical references (e.g., a chapter discussing an older
+Python version by design). A manual, line-by-line prose read of all 28 chapters' content for
+technical accuracy was **not** performed — that is outside what an automated pass in this environment
+can substitute for, and is disclosed here rather than implied as done.
+
+# 🟢 PRODUCTION READY (reaffirmed)
+
+All checks in sections A–F continue to pass unchanged, and the three UI issues reported at the start
+of this session are fixed and verified with the same evidence-based discipline. Per the engagement's
+standing constraint, no commit, push, or pull request was created at any point — `git log` reflects
+only pre-existing history plus commits made outside this session's control (see `AGENTS.md`/session
+notes for the git-state discovery made during this engagement); this document records verification
+evidence, not a commit action.

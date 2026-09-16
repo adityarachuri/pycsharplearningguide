@@ -284,8 +284,6 @@ const NAV_GROUPS: NavGroup[] = [
   }
 ];
 
-const TOTAL_CHAPTERS = NAV_GROUPS.reduce((sum, group) => sum + group.items.length, 0);
-
 export const Sidebar: React.FC<SidebarProps> = ({
   activeSection,
   onSelectSection,
@@ -319,7 +317,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {/* Navigation List */}
         <nav aria-label="Course navigation" className="flex-1 overflow-y-auto px-4 py-6 space-y-6">
           {/* Utility items: Home, Challenges, Infographics, pedagogy pages — not
-              part of the numbered curriculum, so excluded from TOTAL_CHAPTERS. */}
+              part of the numbered curriculum, so excluded from the Overall Course
+              Progress bar's chapter count (App.tsx, computed from SECTIONS_ORDER). */}
           <div className="space-y-1 rounded-2xl border border-slate-800 bg-slate-900/40 p-2">
             {UTILITY_NAV_ITEMS.map(item => {
               const Icon = item.icon;
@@ -443,24 +442,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
           );
         })}
         </nav>
-
-        {/* Sidebar Footer with Completion Rate */}
-        <div className="border-t border-slate-800 bg-slate-900/40 p-4">
-          <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
-            <span>Overall Course Progress</span>
-            <span className="font-semibold text-white">
-              {Math.round((completedChapters.length / TOTAL_CHAPTERS) * 100)}%
-            </span>
-          </div>
-          <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-800">
-            <div
-              className="h-full bg-linear-to-r from-amber-500 to-emerald-400 transition-all duration-500"
-              style={{
-                width: `${(completedChapters.length / TOTAL_CHAPTERS) * 100}%`
-              }}
-            />
-          </div>
-        </div>
       </aside>
     </>
   );

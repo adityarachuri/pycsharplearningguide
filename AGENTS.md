@@ -57,3 +57,8 @@ correctness gate in this repo.
   entirely inside the Pyodide Worker, which has no filesystem, network, or host process access.
 - Security headers/CSP are centralized in `vite.config.ts` (`SECURITY_HEADERS`) — keep any
   new external resource usage consistent with that policy rather than loosening it.
+- The app shell (`App.tsx`) is intentionally height-constrained (`h-screen overflow-hidden`) so
+  the header/sidebar stay fixed and only `<main>` scrolls internally. Don't revert the root
+  container to `min-h-screen`, and don't add new `window.scrollTo(...)` calls — use the existing
+  `scrollContentToTop()` helper (which scrolls `mainContentRef`) instead, since the window itself
+  no longer scrolls.

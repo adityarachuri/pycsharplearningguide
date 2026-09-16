@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import {
   BrainCircuit,
   Search,
@@ -25,6 +25,7 @@ import {
   Globe
 } from 'lucide-react';
 import { MINDMAP_DOMAINS, MINDMAP_NODES } from '../data/mindmapData';
+import { COPY_RESET_MS } from '../constants';
 
 interface MindmapVisualizerProps {
   onLaunchSandbox?: (code: string) => void;
@@ -36,7 +37,6 @@ type ViewMode = 'graph' | 'bridge';
 const MIN_ZOOM_LEVEL = 0.7;
 const MAX_ZOOM_LEVEL = 1.5;
 const ZOOM_STEP = 0.1;
-const COPY_RESET_MS = 2000;
 
 export const MindmapVisualizer: React.FC<MindmapVisualizerProps> = ({
   onLaunchSandbox,
@@ -51,15 +51,28 @@ export const MindmapVisualizer: React.FC<MindmapVisualizerProps> = ({
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
   const [hoveredNodeId, setHoveredNodeId] = useState<string | null>(null);
 
-  // SVG canvas container ref
+  // SVG canvas container ref, measured so the fixed-size virtual canvas
+  // below can always be scaled to fit inside it — no scrollbars, ever.
   const svgContainerRef = useRef<HTMLDivElement>(null);
+  const [containerSize, setContainerSize] = useState<{ width: number; height: number } | null>(null);
 
-  // Selected node object
+  useEffect(() => {
+    const node = svgContainerRef.current;
+    if (!node || typeof ResizeObserver === 'undefined') return;
+    const observer = new ResizeObserver(entries => {
+      const entry = entries[0];
+      if (entry) {
+        setContainerSize({ width: entry.contentRect.width, height: entry.contentRect.height });
+      }
+    });
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
+
   const selectedNode = useMemo(() => {
     return MINDMAP_NODES.find(n => n.id === selectedNodeId) || MINDMAP_NODES[0];
   }, [selectedNodeId]);
 
-  // Selected domain object
   const selectedDomain = useMemo(() => {
     return MINDMAP_DOMAINS.find(d => d.id === selectedNode.domainId) || MINDMAP_DOMAINS[0];
   }, [selectedNode]);
@@ -106,7 +119,6 @@ export const MindmapVisualizer: React.FC<MindmapVisualizerProps> = ({
     setSelectedNodeId(filteredNodes[nextIndex].id);
   };
 
-  // Domain icon helper
   const getDomainIcon = (iconName: string) => {
     switch (iconName) {
       case 'Cpu':
@@ -132,24 +144,20 @@ export const MindmapVisualizer: React.FC<MindmapVisualizerProps> = ({
     }
   };
 
-  // Tree graph geometry calculation:
-  // Center is (500, 360). 6 domain hubs are positioned in a radial or hexagonal layout around the center.
-  // Then each domain's nodes branch outward.
+  // Domain hubs are positioned radially around the center; each domain's
+  // nodes then branch outward from its hub.
   const graphLayout = useMemo(() => {
     const width = 1050;
     const height = 720;
     const centerX = width / 2;
     const centerY = height / 2;
 
-    // Center Root
     const root = { x: centerX, y: centerY, label: 'C# ⟷ Python Mental Nexus' };
 
-    // 6 Domain Positions arranged circularly around the center
     const domainPositions: Record<string, { x: number; y: number; angle: number }> = {};
     const domainRadius = 210;
 
     MINDMAP_DOMAINS.forEach((domain, idx) => {
-      // Offset starting angle so it distributes nicely
       const angle = (idx * (2 * Math.PI)) / MINDMAP_DOMAINS.length - Math.PI / 2;
       domainPositions[domain.id] = {
         x: centerX + Math.cos(angle) * (domainRadius * 1.05),
@@ -158,7 +166,6 @@ export const MindmapVisualizer: React.FC<MindmapVisualizerProps> = ({
       };
     });
 
-    // Node Positions clustered around their respective domain
     const nodePositions: Record<string, { x: number; y: number }> = {};
 
     MINDMAP_DOMAINS.forEach(domain => {
@@ -182,6 +189,22 @@ export const MindmapVisualizer: React.FC<MindmapVisualizerProps> = ({
 
     return { width, height, centerX, centerY, root, domainPositions, nodePositions };
   }, []);
+
+  // Scale the fixed 1050x720 virtual canvas down (or up) to exactly fill the
+  // measured container, so the entire mindmap is always visible in one view
+  // with no scrollbar — regardless of the container's actual width/height on
+  // a given screen. A small padding factor keeps the outermost nodes clear
+  // of the container's edge. The user's own zoom buttons multiply on top of
+  // this fit baseline (100% = "fit to view", not 100% of the raw 1050px).
+  const CANVAS_PADDING_FACTOR = 0.94;
+  const autoFitScale = useMemo(() => {
+    if (!containerSize || containerSize.width === 0 || containerSize.height === 0) return 1;
+    const scaleX = (containerSize.width / graphLayout.width) * CANVAS_PADDING_FACTOR;
+    const scaleY = (containerSize.height / graphLayout.height) * CANVAS_PADDING_FACTOR;
+    return Math.min(scaleX, scaleY);
+  }, [containerSize, graphLayout.width, graphLayout.height]);
+
+  const appliedScale = autoFitScale * zoomLevel;
 
   return (
     <div
@@ -306,7 +329,7 @@ export const MindmapVisualizer: React.FC<MindmapVisualizerProps> = ({
       {/* Main Canvas & Inspection Workspace */}
       <div className="grid grid-cols-1 xl:grid-cols-12">
         {/* Left/Top Interactive Graph / Bridge Canvas */}
-        <div className="xl:col-span-7 border-b xl:border-b-0 xl:border-r border-slate-800 bg-slate-950/40 relative flex flex-col min-h-120 lg:min-h-145">
+        <div className="xl:col-span-7 border-b xl:border-b-0 xl:border-r border-slate-800 bg-slate-950/40 relative flex flex-col aspect-1050/720 min-h-100 max-h-160">
           {/* Canvas Floating Controls */}
           {viewMode === 'graph' && (
             <div className="absolute top-3 right-3 z-10 flex items-center gap-1 bg-slate-900/90 p-1 rounded-xl border border-slate-800 backdrop-blur-md">
@@ -347,15 +370,19 @@ export const MindmapVisualizer: React.FC<MindmapVisualizerProps> = ({
             <span>Click any node to inspect</span>
           </div>
 
-          {/* MODE 1: RADIAL GRAPH MINDMAP VIEW */}
+          {/* MODE 1: RADIAL GRAPH MINDMAP VIEW — the 1050x720 canvas below is
+              scaled by `appliedScale` (auto-fit-to-container × the user's own
+              zoom multiplier) so the whole mindmap is always visible in one
+              view. `overflow-hidden` is intentional: nothing should ever need
+              to scroll here, since the canvas is always scaled to fit. */}
           {viewMode === 'graph' ? (
             <div
               ref={svgContainerRef}
-              className="flex-1 w-full h-full overflow-auto flex items-center justify-center p-4 select-none min-h-125"
+              className="flex-1 w-full h-full overflow-hidden flex items-center justify-center p-4 select-none"
             >
               <div
                 style={{
-                  transform: `scale(${zoomLevel})`,
+                  transform: `scale(${appliedScale})`,
                   transformOrigin: 'center center',
                   transition: 'transform 0.15s ease-out'
                 }}

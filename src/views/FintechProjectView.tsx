@@ -3,8 +3,7 @@ import { Play, Terminal, FileCode2, Copy, Check, Layers, Landmark } from 'lucide
 import { WorkstationVideoPlayer } from '../components/WorkstationVideoPlayer';
 import { CodeBlock } from '../components/CodeBlock';
 import { FINTECH_STEPS, FINTECH_ALL_FILES } from '../data/fintechProjectData';
-
-const COPY_RESET_MS = 2000;
+import { COPY_RESET_MS } from '../constants';
 
 export function FintechProjectView(): ReactElement {
   const [activeSceneId, setActiveSceneId] = useState<number>(1);
