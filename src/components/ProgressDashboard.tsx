@@ -33,6 +33,7 @@ import {
   CURRICULUM_DOMAINS,
   WeekHeatmapDay
 } from '../data/studyHoursData';
+import { useEscapeToClose } from '../hooks/useEscapeToClose';
 
 const LOG_NOTIFICATION_RESET_MS = 3500;
 const RESET_NOTIFICATION_MS = 3000;
@@ -58,6 +59,7 @@ export const ProgressDashboard: React.FC<ProgressDashboardProps> = ({
   const [logNotification, setLogNotification] = useState<string | null>(null);
   const [timeframeView, setTimeframeView] = useState<'daily' | 'weekly'>('daily');
   const [isLogModalOpen, setIsLogModalOpen] = useState(false);
+  useEscapeToClose(isLogModalOpen, () => setIsLogModalOpen(false));
   const [manualHours, setManualHours] = useState('1.5');
   const [manualDate, setManualDate] = useState(() =>
     new Date().toISOString().split('T')[0]
@@ -781,8 +783,17 @@ export const ProgressDashboard: React.FC<ProgressDashboardProps> = ({
 
       {/* Manual Study Log Modal */}
       {isLogModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4 backdrop-blur-sm animate-fadeIn">
-          <div className="w-full max-w-md rounded-2xl border border-slate-800 bg-slate-950 p-6 shadow-2xl space-y-5">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4 backdrop-blur-sm animate-fadeIn"
+          onClick={() => setIsLogModalOpen(false)}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Log Study Session"
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            className="w-full max-w-md rounded-2xl border border-slate-800 bg-slate-950 p-6 shadow-2xl space-y-5"
+          >
             <div className="flex items-center justify-between border-b border-slate-800 pb-3">
               <div className="flex items-center gap-2">
                 <Clock className="h-4 w-4 text-amber-400" />

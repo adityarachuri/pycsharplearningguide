@@ -17,14 +17,14 @@ export const COMPARISON_MATRIX_ITEMS: ComparisonItem[] = [
     category: 'syntax',
     csharpCode: `// C#: Explicit type or var (statically inferred at compile time)
 int age = 42;
-string name = "Aditya";
+string name = "Alex";
 var active = true;
 
 // Reassignment to different type causes compile-time error
 // age = "forty-two"; // Error CS0029`,
     pythonCode: `# Python: Dynamic binding to heap objects
 age = 42
-name = "Aditya"
+name = "Alex"
 active = True
 
 # Type annotations (optional, for static linters):
@@ -155,7 +155,7 @@ class UserRecord:
     email: str
 
 # Auto-generates __init__, __eq__, __repr__, __hash__
-u1 = UserRecord(1, "Aditya", "aditya@example.com")
+u1 = UserRecord(1, "Alex", "alex@example.com")
 
 # Equivalent of C# with-expression:
 u2 = replace(u1, name="New")`,

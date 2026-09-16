@@ -386,7 +386,7 @@ public async Task<UserDashboard> GetDashboardAsync(int userId)
 
 async def fetch_profile(user_id: int) -> dict:
     await asyncio.sleep(0.05)  # Simulating async network I/O
-    return {"id": user_id, "name": "Aditya"}
+    return {"id": user_id, "name": "Alex"}
 
 async def fetch_orders(user_id: int) -> list:
     await asyncio.sleep(0.08)  # Non-blocking I/O
@@ -507,7 +507,7 @@ class Repository(Protocol[T]):
 # Unaffiliated third-party class that happens to match the signature:
 class ExternalUserStore:
     def get_by_id(self, item_id: int) -> dict | None:
-        return {"id": item_id, "name": "Aditya"}
+        return {"id": item_id, "name": "Alex"}
     def save(self, entity: dict) -> None:
         pass
 

@@ -31,7 +31,7 @@ export const RESEARCH_PAPERS: ResearchPaper[] = [
     authors: ['Wes McKinney'],
     year: 2010,
     venueOrSource: 'Proceedings of the 9th Python in Science Conference (SciPy 2010)',
-    doiOrUrl: 'https://doi.org/10.25080/Majora-92bf1924-003',
+    doiOrUrl: 'https://doi.org/10.25080/Majora-92bf1922-00a',
     category: 'scientific',
     abstract: 'Introduces Pandas and the DataFrame data structure, addressing the need for high-performance, flexible data structures with integrated indexing, alignment, and relational group-by operations in Python for quantitative finance and analytics.',
     impactOnPython: 'Democratized tabular data processing; established Python as the dominant language for quantitative finance on Wall Street and data analytics worldwide.',

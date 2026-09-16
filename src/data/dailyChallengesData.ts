@@ -110,7 +110,7 @@ public static string FormatResponse(object res) => res switch
         case _:
             return "Unknown response payload"
 
-print(format_response({"status": 200, "data": "Aditya's Account"}))`,
+print(format_response({"status": 200, "data": "Alex's Account"}))`,
     explanation: 'Python `match/case` supports mapping patterns. It verifies that `response` is a dict, checks if "status" and "data" exist, and binds the values to local variables in a single expressive statement.'
   },
   {
@@ -172,7 +172,7 @@ async def load_user(user_id: int):
 
 async def get_profile(user_id: int):
     await asyncio.sleep(0.01)
-    return {"id": user_id, "name": "Aditya"}
+    return {"id": user_id, "name": "Alex"}
 
 async def get_permissions(user_id: int):
     await asyncio.sleep(0.01)

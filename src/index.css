@@ -4,6 +4,77 @@ html {
   font-size: 17px;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/* Certificate print isolation                                                */
+/* -------------------------------------------------------------------------- */
+/* window.print() prints the whole page by default. Scope it to just the
+   completion certificate (#certificate-print-area, set in ConclusionView.tsx):
+   collapse every element in the document EXCEPT the certificate's own ancestor
+   chain (so it stays reachable in the render tree) and its descendants (so its
+   content renders). Elements that are neither an ancestor nor a descendant of
+   the certificate collapse via `display: none`, which — unlike `visibility:
+   hidden` — removes them from layout entirely, so the printed page doesn't
+   trail off into blank pages for all the collapsed content's original height.
+   Also force light-background/dark-text on the certificate itself for print:
+   most browsers strip background colors by default when printing, which would
+   otherwise leave the certificate's white text on its normal dark gradient
+   background invisible on paper. */
+@media print {
+  body :not(:has(#certificate-print-area)):not(#certificate-print-area, #certificate-print-area *) {
+    display: none !important;
+  }
+
+  #certificate-print-area {
+    margin: 0 auto;
+    background: #ffffff !important;
+    color: #0f172a !important;
+    box-shadow: none !important;
+    border-color: #cbd5e1 !important;
+  }
+
+  #certificate-print-area * {
+    color: inherit !important;
+    background: transparent !important;
+    text-shadow: none !important;
+  }
+
+  #certificate-print-area .text-white,
+  #certificate-print-area .text-amber-400,
+  #certificate-print-area .text-slate-200,
+  #certificate-print-area .text-slate-300,
+  #certificate-print-area .text-slate-400,
+  #certificate-print-area .text-slate-500 {
+    color: #0f172a !important;
+  }
+
+  #certificate-print-area .text-emerald-400 {
+    color: #047857 !important;
+  }
+
+  /* Ancestors of the certificate stay in the render tree (see the selector
+     above) so the certificate itself can render, but their own decorative
+     dark backgrounds/borders/padding would otherwise still paint around it
+     and waste ink on a physical print. */
+  body :has(#certificate-print-area) {
+    background: #ffffff !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+}
+
 /* -------------------------------------------------------------------------- */
 /* Theme color tokens                                                         */
 /* -------------------------------------------------------------------------- */
@@ -21,15 +92,37 @@ html {
    of these Tailwind color classes, specifically so their fixed appearance
    isn't affected by this remap. */
 
+/* Dark theme's own `text-slate-500` (Tailwind's unmodified default,
+   #64748b) is the app's standard "muted uppercase label" color (used for
+   things like "INPUT"/"EXAMPLES"/"CONSTRAINTS" section headers and
+   timestamps) sitting on this theme's near-black card backgrounds — a
+   measured WCAG contrast audit found it lands at ~3.7-4.3:1 against those
+   backgrounds, just under the 4.5:1 AA threshold for normal text. Nudged
+   lighter here, scoped to dark mode only, rather than touching every
+   individual call site. */
+html.dark {
+  --color-slate-500: #7c93b3;
+}
+
 html.theme-idle,
 .theme-idle {
   color-scheme: light;
+  /* `text-white` (and bg-white/border-white/etc.) is a LITERAL Tailwind color,
+     not one of the slate/amber/... palette tokens remapped below — it reads
+     Tailwind's own separate `--color-white` theme variable. The dark theme
+     uses `text-white` for the overwhelming majority of headings (350+
+     usages across views/components), so leaving it unmapped made every
+     heading render pure white on this theme's near-white page background —
+     i.e. invisible. Remapping it here, the same way every other color below
+     is remapped, fixes that at the root instead of hand-editing hundreds of
+     call sites. */
+  --color-white: #0f172a;
   --color-slate-950: #ffffff;
   --color-slate-900: #f1f5f9;
   --color-slate-800: #e2e8f0;
   --color-slate-700: #cbd5e1;
   --color-slate-600: #94a3b8;
-  --color-slate-500: #64748b;
+  --color-slate-500: #55667e;
   --color-slate-400: #475569;
   --color-slate-300: #334155;
   --color-slate-200: #1e293b;
@@ -54,9 +147,13 @@ html.theme-idle,
   --color-purple-400: #7e22ce;
   --color-purple-300: #6b21a8;
   --color-purple-200: #6b21a8;
+  --color-blue-950: #eff6ff;
+  --color-blue-600: #1d4ed8;
   --color-blue-500: #1d4ed8;
   --color-blue-400: #1d4ed8;
   --color-blue-300: #1e40af;
+  --color-blue-200: #1e3a8a;
+  --color-amber-900: #b45309;
   --color-rose-950: #fff1f2;
   --color-rose-600: #be123c;
   --color-rose-500: #be123c;
@@ -222,12 +319,17 @@ html.theme-idle body,
 html.theme-reading,
 .theme-reading {
   color-scheme: light;
+  /* See the matching comment in .theme-idle above — `text-white` is not part
+     of the slate/amber/... palette remap below, so it must be remapped here
+     too or every heading stays pure white and disappears against this
+     theme's cream page background. */
+  --color-white: #302418;
   --color-slate-950: #fdf6e3;
   --color-slate-900: #f4e8d1;
   --color-slate-800: #ebd5b3;
   --color-slate-700: #d6bba0;
   --color-slate-600: #c2a483;
-  --color-slate-500: #8a735c;
+  --color-slate-500: #79624c;
   --color-slate-400: #66513d;
   --color-slate-300: #453322;
   --color-slate-200: #302418;
@@ -237,8 +339,8 @@ html.theme-reading,
   --color-amber-700: #b45309;
   --color-amber-600: #b45309;
   --color-amber-500: #b45309;
-  --color-amber-400: #b85900;
-  --color-amber-300: #b85900;
+  --color-amber-400: #9c4d00;
+  --color-amber-300: #9c4d00;
   --color-amber-200: #92400e;
   --color-emerald-950: #ecfdf5;
   --color-emerald-600: #047857;
@@ -252,9 +354,13 @@ html.theme-reading,
   --color-purple-400: #7b439c;
   --color-purple-300: #7b439c;
   --color-purple-200: #6b21a8;
+  --color-blue-950: #eff6ff;
+  --color-blue-600: #1d4ed8;
   --color-blue-500: #1d4ed8;
   --color-blue-400: #1d4ed8;
   --color-blue-300: #205b99;
+  --color-blue-200: #1c3a5c;
+  --color-amber-900: #b85900;
   --color-rose-950: #fff1f2;
   --color-rose-600: #be123c;
   --color-rose-500: #be123c;

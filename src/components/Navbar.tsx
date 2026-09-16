@@ -92,7 +92,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         {/* Daily Teacher Challenge Button */}
         <button
           onClick={onOpenTeacher}
-          className="flex items-center gap-1.5 rounded-lg border border-amber-500/30 bg-amber-500/10 px-2.5 py-1.5 text-xs font-semibold text-amber-300 hover:bg-amber-500/20 transition-colors"
+          className="hidden xl:flex items-center gap-1.5 rounded-lg border border-amber-500/30 bg-amber-500/10 px-2.5 py-1.5 text-xs font-semibold text-amber-300 hover:bg-amber-500/20 transition-colors"
           title="Open Daily Teacher & Practice"
         >
           <Sparkles className="h-3.5 w-3.5 text-amber-400 animate-pulse" />
@@ -116,7 +116,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             >
               <FolderGit2 className="h-3.5 w-3.5 text-amber-400" />
               <span className="hidden sm:inline font-bold">Projects</span>
-              <span className="hidden md:inline rounded bg-linear-to-r from-amber-500/30 to-purple-500/30 border border-amber-400/40 px-1.5 py-0.2 text-[9px] font-mono font-bold text-amber-300">
+              <span className="hidden lg:inline rounded bg-linear-to-r from-amber-500/30 to-purple-500/30 border border-amber-400/40 px-1.5 py-0.2 text-[9px] font-mono font-bold text-amber-300">
                 2 BLUEPRINTS
               </span>
               <ChevronDown className={`h-3 w-3 text-slate-400 transition-transform ${isProjectsOpen ? 'rotate-180' : ''}`} />
@@ -219,7 +219,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         {/* Interactive Python Sandbox */}
         <button
           onClick={onOpenSandbox}
-          className="hidden md:flex items-center gap-1.5 rounded-lg border border-slate-700 bg-slate-900 px-3 py-1.5 text-xs font-semibold text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
+          className="hidden xl:flex items-center gap-1.5 rounded-lg border border-slate-700 bg-slate-900 px-3 py-1.5 text-xs font-semibold text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
           title="Open Python Sandbox"
         >
           <Terminal className="h-3.5 w-3.5 text-emerald-400" />
@@ -229,7 +229,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         {/* Background Service Worker Status Pill */}
         <button
           onClick={onOpenSyncDrawer}
-          className="flex items-center gap-1.5 rounded-lg border border-emerald-500/30 bg-emerald-500/5 px-2.5 py-1.5 text-xs font-medium text-emerald-300 hover:bg-emerald-500/10 transition-colors"
+          className="hidden lg:flex items-center gap-1.5 rounded-lg border border-emerald-500/30 bg-emerald-500/5 px-2.5 py-1.5 text-xs font-medium text-emerald-300 hover:bg-emerald-500/10 transition-colors"
           title="Background Content Sync Status"
         >
           <span className="relative flex h-2 w-2">
@@ -294,7 +294,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         </button>
 
         {/* Mastery Progress Badge */}
-        <div className="hidden lg:flex items-center gap-2 rounded-lg border border-slate-800 bg-slate-900/60 px-3 py-1.5 text-xs text-slate-300">
+        <div className="hidden xl:flex items-center gap-2 rounded-lg border border-slate-800 bg-slate-900/60 px-3 py-1.5 text-xs text-slate-300">
           <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
           <span>
             <strong className="text-white">{completedCount}</strong>/{totalChapters}

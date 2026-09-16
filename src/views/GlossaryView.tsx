@@ -85,14 +85,14 @@ export const GlossaryView: React.FC = () => {
                     <span className="rounded bg-amber-500/10 px-2 py-0.5 text-[10px] font-bold uppercase text-amber-400 border border-amber-500/20">
                       {item.category}
                     </span>
-                    <h3 className="mt-1 text-lg font-bold text-white flex items-center gap-2">
+                    <h2 className="mt-1 text-lg font-bold text-white flex items-center gap-2">
                       {item.term}
                       {item.pronunciation && (
                         <span className="text-xs font-mono text-slate-400 font-normal">
                           [{item.pronunciation}]
                         </span>
                       )}
-                    </h3>
+                    </h2>
                   </div>
                 </div>
 

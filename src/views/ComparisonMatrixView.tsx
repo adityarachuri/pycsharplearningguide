@@ -46,7 +46,11 @@ export const ComparisonMatrixView: React.FC<ComparisonMatrixViewProps> = ({
             >
               <BrainCircuit className="h-4 w-4" />
               <span>Interactive Mindmap</span>
-              <span className="rounded-full bg-slate-900/80 px-1.5 py-0.2 text-[9px] font-mono text-amber-300">
+              <span
+                className={`rounded-full px-1.5 py-0.2 text-[9px] font-mono ${
+                  activeTab === 'mindmap' ? 'bg-black/20 text-[#ffffff]' : 'bg-slate-900/80 text-amber-300'
+                }`}
+              >
                 Visual
               </span>
             </button>
@@ -60,7 +64,11 @@ export const ComparisonMatrixView: React.FC<ComparisonMatrixViewProps> = ({
             >
               <Table className="h-4 w-4" />
               <span>Rosetta Stone Matrix</span>
-              <span className="rounded-full bg-slate-900/80 px-1.5 py-0.2 text-[9px] font-mono text-amber-300">
+              <span
+                className={`rounded-full px-1.5 py-0.2 text-[9px] font-mono ${
+                  activeTab === 'matrix' ? 'bg-black/20 text-[#ffffff]' : 'bg-slate-900/80 text-amber-300'
+                }`}
+              >
                 {COMPARISON_MATRIX_ITEMS.length}
               </span>
             </button>

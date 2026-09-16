@@ -1,7 +1,6 @@
 # PyCSharp – Comprehensive Prompt Book
 > **A complete prompt engineering and architecture playbook for building the PyCSharp Polyglot Platform.**  
-> *Author & Maintainer:* Aditya Rachuri ([adityarachuri@outlook.com](mailto:adityarachuri@outlook.com))  
-> *GitHub Repository:* [https://github.com/adityarachuri/pycsharp](https://github.com/adityarachuri/pycsharp)
+> *Repository:* [https://gitlab.com/adityarachuri/pycsharplearningguide](https://gitlab.com/adityarachuri/pycsharplearningguide)
 
 ---
 
@@ -245,13 +244,7 @@ Workflows:
    - Automatically runs `node scripts/generate-docs.mjs` on code changes.
    - Commits and pushes synchronized module catalogs.
 3. Repository Governance:
-   - `.github/CODEOWNERS`: Global code ownership assigned to Aditya Rachuri (`adityarachuri@outlook.com`).
+   - `.github/CODEOWNERS`: Global code ownership defined per repository policy.
    - `LICENSE`: MIT License.
    - `README.md`: Exhaustive architectural documentation with live badges.
 ```
-
----
-
-**PyCSharp Code Owner:** Aditya Rachuri  
-**Email:** adityarachuri@outlook.com  
-**GitHub:** https://github.com/adityarachuri  

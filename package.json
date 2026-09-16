@@ -2,12 +2,11 @@
   "name": "pycsharp",
   "version": "1.0.0",
   "description": "PyCSharp: Polyglot Systems & Technical Rosetta Stone - Learning Python from a C# developer's perspective",
-  "author": "Aditya Rachuri <adityarachuri@outlook.com>",
   "license": "MIT",
-  "homepage": "https://gitlab.com/adityarachuri/pycsharp#readme",
+  "homepage": "https://gitlab.com/adityarachuri/pycsharplearningguide#readme",
   "repository": {
     "type": "git",
-    "url": "https://gitlab.com/adityarachuri/pycsharp.git"
+    "url": "https://gitlab.com/adityarachuri/pycsharplearningguide.git"
   },
   "private": true,
   "type": "module",
@@ -21,7 +20,10 @@
     "test:coverage": "vitest run --coverage",
     "test": "npm run lint && npm run test:coverage && npm run build",
     "docs:generate": "node scripts/generate-docs.mjs",
-    "generate:icons": "node scripts/generate-pwa-icons.cjs"
+    "generate:icons": "node scripts/generate-pwa-icons.cjs",
+    "postinstall": "node scripts/copy-pyodide-runtime.mjs",
+    "predev": "node scripts/copy-pyodide-runtime.mjs",
+    "prebuild": "node scripts/copy-pyodide-runtime.mjs"
   },
   "engines": {
     "node": ">=20"
@@ -31,6 +33,7 @@
     "@vitejs/plugin-react": "^5.0.4",
     "lucide-react": "^0.546.0",
     "mermaid": "^11.17.2",
+    "pyodide": "^314.0.7",
     "react": "^19.0.1",
     "react-dom": "^19.0.1",
     "recharts": "^3.10.1"

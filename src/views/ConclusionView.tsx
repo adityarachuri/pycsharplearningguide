@@ -15,7 +15,7 @@ export const ConclusionView: React.FC<ConclusionViewProps> = ({
   completedChaptersCount,
   completedChapters = ['fundamentals'],
   onToggleChapter,
-  totalChapters = 13,
+  totalChapters = 28,
   allSections = []
 }) => {
   const [candidateName, setCandidateName] = useState('Senior .NET & Python Architect');
@@ -33,7 +33,7 @@ export const ConclusionView: React.FC<ConclusionViewProps> = ({
       <div className="rounded-2xl border border-slate-800 bg-linear-to-b from-slate-900 via-slate-900/60 to-slate-950 p-6 md:p-8">
         <div className="flex flex-wrap items-center gap-2">
           <span className="rounded-md border border-amber-500/30 bg-amber-500/10 px-2.5 py-1 text-xs font-bold uppercase tracking-wider text-amber-400">
-            Chapter 13
+            Chapter 28
           </span>
           <span className="text-xs text-slate-400">Synthesis & Capstone</span>
         </div>
@@ -144,7 +144,7 @@ export const ConclusionView: React.FC<ConclusionViewProps> = ({
               Polyglot Systems Architect Certificate of Completion
             </h2>
             <p className="text-xs text-slate-400">
-              Verify your transition mastery across all 13 core modules ({effectiveCompletedCount}/{totalChapters} completed).
+              Verify your transition mastery across all {totalChapters} core modules ({effectiveCompletedCount}/{totalChapters} completed).
             </p>
           </div>
 
@@ -167,7 +167,10 @@ export const ConclusionView: React.FC<ConclusionViewProps> = ({
         </div>
 
         {/* Certificate Card */}
-        <div className="relative overflow-hidden rounded-2xl border-2 border-amber-500/40 bg-linear-to-b from-slate-950 via-slate-900 to-slate-950 p-8 text-center space-y-6 shadow-2xl">
+        <div
+          id="certificate-print-area"
+          className="relative overflow-hidden rounded-2xl border-2 border-amber-500/40 bg-linear-to-b from-slate-950 via-slate-900 to-slate-950 p-8 text-center space-y-6 shadow-2xl"
+        >
           <div className="absolute -right-12 -top-12 h-36 w-36 rounded-full bg-amber-500/10 blur-2xl pointer-events-none" />
           <div className="absolute -left-12 -bottom-12 h-36 w-36 rounded-full bg-purple-500/10 blur-2xl pointer-events-none" />
 
@@ -186,14 +189,14 @@ export const ConclusionView: React.FC<ConclusionViewProps> = ({
               {candidateName || 'Senior Software Engineer'}
             </div>
             <div className="mt-2 text-xs md:text-sm text-slate-300 max-w-xl mx-auto leading-relaxed">
-              has completed the comprehensive architectural curriculum, successfully mapping C# .NET CLR principles to idiomatic Python 3.13 systems architecture, AI/ML engineering, and production clean architecture.
+              has completed the comprehensive architectural curriculum, successfully mapping C# .NET CLR principles to idiomatic Python 3.14 systems architecture, AI/ML engineering, and production clean architecture.
             </div>
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-6 border-t border-b border-slate-800/80 py-4 text-xs text-slate-400">
             <div>
               <span className="block text-[10px] uppercase text-slate-500">Curriculum Scope</span>
-              <strong className="text-white">13 Master Modules</strong>
+              <strong className="text-white">{totalChapters} Master Modules</strong>
             </div>
             <div>
               <span className="block text-[10px] uppercase text-slate-500">Issued On</span>
@@ -209,7 +212,7 @@ export const ConclusionView: React.FC<ConclusionViewProps> = ({
             {verificationHash}
           </div>
 
-          <div className="flex items-center justify-center gap-3 pt-2">
+          <div className="print:hidden flex items-center justify-center gap-3 pt-2">
             <button
               onClick={() => window.print()}
               className="flex items-center gap-1.5 rounded-lg border border-slate-700 bg-slate-900 px-3 py-1.5 text-xs font-semibold text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"

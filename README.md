@@ -3,13 +3,12 @@
 > **Polyglot Systems & Technical Rosetta Stone**  
 > *Learning Python from a C# developer's perspective.*
 
-[![CI & Quality Gates](https://gitlab.com/adityarachuri/pycsharp/badges/main/pipeline.svg)](https://gitlab.com/adityarachuri/pycsharp/-/pipelines)
+[![CI & Quality Gates](https://gitlab.com/adityarachuri/pycsharplearningguide/badges/main/pipeline.svg)](https://gitlab.com/adityarachuri/pycsharplearningguide/-/pipelines)
 [![License: MIT](https://img.shields.io/badge/License-MIT-amber.svg)](LICENSE)
 [![React 19](https://img.shields.io/badge/React-19.0.1-61dafb.svg)](https://react.dev)
 [![TypeScript Strict](https://img.shields.io/badge/TypeScript-5.x_Strict-3178c6.svg)](https://www.typescriptlang.org)
 [![Tailwind CSS v4](https://img.shields.io/badge/Tailwind-v4.1-38bdf8.svg)](https://tailwindcss.com)
 [![PWA Ready](https://img.shields.io/badge/PWA-Offline_First-10b981.svg)](public/manifest.json)
-[![Code Owner](https://img.shields.io/badge/Code_Owner-adityarachuri%40outlook.com-blue.svg)](CODEOWNERS)
 
 ---
 
@@ -36,24 +35,42 @@ Rather than treating Python as a beginner scripting language, PyCSharp deconstru
 
 ## 📚 Curriculum & Architectural Modules
 
-The platform is structured into **18 comprehensive, production-grade views**:
+The platform is structured into **28 numbered curriculum chapters** across 7 thematic groups, plus
+**5 standalone practice/reference pages** (Home, Coding Challenges, Infographics, and two pedagogy
+experiences) — **33 views in total**. All 33 correspond 1:1 to a file in `src/views/` (see
+[`docs/MODULES_CATALOG.md`](docs/MODULES_CATALOG.md), which is generated directly from that directory
+and cannot drift out of sync — it's checked for staleness in CI).
 
-1. **Foundations, History & Creator's Ethos**: Guido van Rossum's origins at CWI, ABC language heritage, PEP 20 Zen of Python, and philosophical differences from Anders Hejlsberg's C# designs.
-2. **CPython vs. CLR Runtime Internals**: Deep dive into the stack evaluation loop, frame evaluation (`PyEval_EvalFrameDefault`), bytecode disassembly (`dis`), and opcode dispatch.
-3. **Core Language Deep Dives**: 10 essential systems deep dives covering Generators (`yield` vs `IEnumerable<T>`), Context Managers (`__enter__`/`__exit__` vs `IDisposable`), Decorators vs C# Attributes, and Dunder methods.
-4. **Batteries Included Standard Library**: Comprehensive 1-to-1 comparison of standard libraries (`collections`, `itertools`, `functools`, `concurrent.futures`, `dataclasses`, `pathlib`, `json`).
-5. **Data Structures & Algorithmic Performance**: Time and space complexity trade-offs between `list` (amortized dynamic arrays), `dict` (compact hash tables with collision probe), `set`, and C# collections (`List<T>`, `Dictionary<TKey, TValue>`).
-6. **Workstation Setup & Enterprise Toolchain**: Modern Python development ecosystem configured with `uv`, `Ruff` (linter/formatter in Rust), `Pyright`, `.devcontainer`, and VS Code settings.
-7. **Side-by-Side Rosetta Stone Matrix**: Searchable dictionary matching every C# idiom, pattern, LINQ query, async flow, and exception pattern to idiomatic Python equivalents.
-8. **Advanced Concepts & Metaprogramming**: Metaclasses, `__new__` vs `__init__`, descriptor protocol, structural pattern matching (PEP 634), and async event loops (`asyncio`).
-9. **Real-World Architectural Use Cases**: Microservices (FastAPI vs ASP.NET Core Minimal APIs), distributed job queues (Celery vs MassTransit/Hangfire), and CLI tooling.
-10. **Technical Glossary & Disambiguation**: Exhaustive cross-language terminology disambiguating Pythonisms from .NET terminology.
-11. **AI, Machine Learning & Data Engineering**: The Python AI ecosystem (NumPy, PyTorch, Hugging Face, LangChain) vs .NET ML.NET and Semantic Kernel.
-12. **Transition Strategy & Enterprise Migration**: A structured 30-day playbook for .NET engineering organizations onboarding Python microservices and data pipelines.
-13. **Researchers, PEP Citations & References**: Annotated directory of foundational PEPs (Python Enhancement Proposals), design notes, and academic benchmark papers.
-14. **Future Horizons: Python 3.13 & Beyond**: Free-threaded Python without GIL (PEP 703), Tier-2 JIT compiler (PEP 744), subinterpreters (PEP 554/684), and modern performance milestones.
-15. **Career & Polyglot Architect Positioning**: Strategic leadership guidance on positioning polyglot dual-stack C# and Python expertise in enterprise technology leadership.
-16. **Interactive Synthesis & Final Assessment**: Comprehensive knowledge certification with interactive code challenges and competency tracking.
+**I. Foundations & Architecture** — 1. Fundamentals & Creator · 2. Architecture Deep Dive (CPython vs
+CLR, GIL & Bytecode) · 3. Core Deep Dives (10 features: generators, context managers, decorators,
+dunder methods) · 4. Libraries & Batteries (standard library) · 5. Data Structures & Algorithms ·
+6. Workstation Setup (uv, Ruff, Pyright, Docker, WSL2)
+
+**II. Synthesis & Comparative Pedagogy** — 7. Matrix & Mindmap (Rosetta Stone + relational visualizer)
+· 8. Production Lectures (Clean Architecture, Pydantic, ASGI, pytest)
+
+**III. Hands-On Project Blueprints** — 9. Full-Stack Web App (FastAPI, SQLAlchemy 2.0, Alembic,
+Docker) · 10. Production AI/ML App (local RAG, PyTorch, ChromaDB, SSE)
+
+**IV. Industry Vertical Blueprints** — 11–12. FinTech (business context + technical implementation) ·
+13–14. HealthTech (business context + technical implementation)
+
+**V. Engineering & Systems Practice** — 15. Standard Library Deep Dive · 16. Web & API Frameworks ·
+17. Testing, Packaging & Deployment · 18. Python Internals & CPython
+
+**VI. Reference & AI/ML Frontier** — 19. Real-World Case Studies · 20. Terminology Glossary ·
+21. Python for AI/ML Fundamentals · 22. AI/ML Engineering Stack · 23. Deep Learning: Engineer to
+Researcher (neural network foundations, CNN/RNN/Transformer architectures, and a full comparison of
+the ML Engineer and ML Researcher career tracks) · 24. C# to Python Roadmap
+
+**VII. Industry Realities & Destiny** — 25. Citations & Researchers · 26. Future & Possibilities
+(PEP 703, Tier-2 JIT) · 27. Career Compass · 28. Synthesis & Conclusion
+
+**Standalone practice & reference pages** — Home (landing overview), Coding Challenges (16 original
+DSA/real-world exercises with hidden tests, run against a real Python sandbox), Infographics
+(Mermaid-diagram visual references), Learn Python Like a Language, and Python as Art (two alternative
+pedagogy experiences using language/art analogies, each with an explicit "analogy, not technical
+equivalence" disclaimer).
 
 ---
 
@@ -65,7 +82,8 @@ PyCSharp includes custom interactive simulations engineered with high visual pre
 - **PyObject Memory Anatomy Inspector**: Interactive memory struct explorer exposing `PyObject_HEAD`, 64-bit reference counter, type pointers, cyclic GC dual-linked list (`PyGC_Head`), memory addresses, and zoom/pan controls.
 - **Execution Pipeline Animator**: Step-by-step visualizer tracing Python code through Lexical Tokenizer, AST Parser, Bytecode Assembler (`ceval.c`), and execution outcomes.
 - **Relational C# to Python Mindmap**: Interactive graph visualizer mapping .NET mental paradigms to Python constructs with touch gestures, panning, zoom in/out, and SVG exports.
-- **Local Python Execution Sandbox**: Optional local development endpoint for testing syntax and exploring built-in functions. It is disabled by default and must never be exposed directly in production.
+- **In-Browser Python Sandbox**: Runs real CPython entirely client-side via [Pyodide](https://pyodide.org) (WebAssembly) in a dedicated Web Worker — no server, no subprocess, code never leaves the browser. See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md#runtime-security-boundary) for the security model.
+- **Coding Challenges Engine**: 16 original DSA and real-world exercises, each with hidden test cases evaluated against learner code inside the same Pyodide sandbox, progressive hints, and localStorage-persisted attempt history.
 
 ---
 
@@ -90,25 +108,23 @@ PyCSharp includes custom interactive simulations engineered with high visual pre
 
 ```bash
 # Clone the repository
-git clone https://github.com/adityarachuri/pycsharp.git
-cd pycsharp
+git clone https://gitlab.com/adityarachuri/pycsharplearningguide.git
+cd pycsharplearningguide
 
 # Install dependencies
 npm install
 
 # Start local development server (binds to http://127.0.0.1:3000)
 npm run dev
-
-# Enable the optional local Python executor in a separate PowerShell session
-$env:ENABLE_PYTHON_EXECUTION = "true"
-npm run dev
 ```
+
+The Interactive Sandbox runs real Python via [Pyodide](https://pyodide.org) (CPython compiled to WebAssembly) entirely in your browser — no setup or environment variable needed. The first run downloads and caches the runtime (~13 MB, one time).
 
 ---
 
 ## Usage
 
-Once `npm run dev` is running, open `http://127.0.0.1:3000` and use the sidebar to jump between the 18 curriculum modules. Each module is a standalone React view — chapter completion, notes, and theme preference persist to `localStorage` via `src/services/dbIntegrationService.ts`. Press `Ctrl+K` / `Cmd+K` to open the searchable command palette, or use the floating action button to open the Interactive Python Sandbox.
+Once `npm run dev` is running, open `http://127.0.0.1:3000` and use the sidebar to jump between the 28 curriculum chapters and 5 practice/reference pages. Each module is a standalone React view — chapter completion, notes, and theme preference persist to `localStorage` via `src/services/dbIntegrationService.ts`. Press `Ctrl+K` / `Cmd+K` to open the searchable command palette, or use the floating action button to open the Interactive Python Sandbox.
 
 ---
 
@@ -118,9 +134,10 @@ The Vite dev/preview server exposes a small set of local-only endpoints (see `vi
 
 | Endpoint | Method | Description |
 | :--- | :--- | :--- |
-| `/api/execute-python` | `POST` | Runs a short Python snippet in a sandboxed subprocess. Disabled unless `ENABLE_PYTHON_EXECUTION=true` is set; never enable in a shared/production deployment. |
 | `/api/db/status` | `GET` | Returns a simulated backend-database handshake payload (driver, schema version, compatible adapters). |
 | `/api/db/sync` | `POST` | Accepts a JSON payload and echoes back a simulated sync acknowledgement; no data leaves the browser. |
+
+Python code execution is **not** a server endpoint. The Interactive Sandbox runs real CPython client-side via Pyodide (WebAssembly) inside a dedicated Web Worker — see [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md#runtime-security-boundary) for the security model.
 
 These endpoints only exist in local dev/preview via Vite middleware — there is no deployed backend.
 
@@ -171,12 +188,10 @@ This is primarily a personal learning-content project, but fixes and clarificati
 
 ---
 
-## 👤 Code Owner & Maintainer
+## 👤 Project Information
 
-- **Author & Maintainer**: Aditya Rachuri  
-- **Email**: [adityarachuri@outlook.com](mailto:adityarachuri@outlook.com)  
-- **GitHub**: [@adityarachuri](https://github.com/adityarachuri)  
-- **Repository**: [https://gitlab.com/adityarachuri/pycsharp](https://gitlab.com/adityarachuri/pycsharp)
+- **Repository**: [https://gitlab.com/adityarachuri/pycsharplearningguide](https://gitlab.com/adityarachuri/pycsharplearningguide)
+- **Issues & Security Reports**: via the repository&rsquo;s issue tracker
 
 ---
 

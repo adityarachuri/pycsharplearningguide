@@ -19,7 +19,10 @@ import {
   Boxes,
   Zap,
   Terminal,
-  Filter
+  Filter,
+  FunctionSquare,
+  ShieldCheck,
+  Globe
 } from 'lucide-react';
 import { MINDMAP_DOMAINS, MINDMAP_NODES } from '../data/mindmapData';
 
@@ -118,6 +121,12 @@ export const MindmapVisualizer: React.FC<MindmapVisualizerProps> = ({
         return <Zap className="h-4 w-4" />;
       case 'Terminal':
         return <Terminal className="h-4 w-4" />;
+      case 'FunctionSquare':
+        return <FunctionSquare className="h-4 w-4" />;
+      case 'ShieldCheck':
+        return <ShieldCheck className="h-4 w-4" />;
+      case 'Globe':
+        return <Globe className="h-4 w-4" />;
       default:
         return <BrainCircuit className="h-4 w-4" />;
     }

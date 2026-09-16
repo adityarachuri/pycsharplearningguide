@@ -1,7 +1,6 @@
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
-import { execFile, spawn } from 'child_process';
 import { defineConfig, Plugin } from 'vite';
 
 const SECURITY_HEADERS: Record<string, string> = {
@@ -57,126 +56,22 @@ function securityHeadersPlugin(): Plugin {
 }
 
 function apiBackendPlugin(): Plugin {
-  const maxBodyBytes = 50_000;
-  const maxConcurrentExecutions = 2;
-  let activeExecutions = 0;
-
   const sendJson = (res: any, statusCode: number, payload: unknown) => {
     res.statusCode = statusCode;
     res.setHeader('Content-Type', 'application/json');
     res.end(JSON.stringify(payload));
   };
 
+  // Note: Python code execution is NOT handled here. The Interactive Sandbox
+  // runs real CPython entirely client-side via Pyodide (WebAssembly) in a
+  // dedicated Worker — see src/services/pyodideSandboxService.ts and
+  // src/workers/pyodideWorker.ts. There is deliberately no server-side code
+  // execution endpoint: spawning a subprocess for untrusted learner code in
+  // this dev server's own process would be exactly the anti-pattern this
+  // platform's security requirements rule out.
+
   const handleApiRoutes = (req: any, res: any, next: () => void) => {
-    // 1. Python Execution Sandbox Engine
-    if (req.url === '/api/execute-python' && req.method === 'POST') {
-      if (process.env.ENABLE_PYTHON_EXECUTION !== 'true') {
-        sendJson(res, 503, { error: 'Python execution is disabled. Use an isolated execution service in deployment.' });
-        return;
-      }
-
-      if (req.headers['content-type'] !== 'application/json') {
-        sendJson(res, 415, { error: 'Content-Type must be application/json' });
-        return;
-      }
-
-      if (activeExecutions >= maxConcurrentExecutions) {
-        sendJson(res, 429, { error: 'Too many executions in progress' });
-        return;
-      }
-
-      let body = '';
-      req.on('data', (chunk: Buffer) => {
-        body += chunk.toString();
-        if (Buffer.byteLength(body) > maxBodyBytes) req.destroy();
-      });
-      req.on('end', () => {
-        try {
-          const payload = JSON.parse(body || '{}');
-          const code = typeof payload.code === 'string' ? payload.code : '';
-          if (!code.trim() || Buffer.byteLength(code) > 40_000) {
-            sendJson(res, 400, { error: 'Code must be a non-empty string no larger than 40000 bytes' });
-            return;
-          }
-
-          activeExecutions += 1;
-          const startTime = Date.now();
-          const pythonCmd = /^win/.test(process.platform) ? 'python' : 'python3';
-          const proc = spawn(pythonCmd, ['-I', '-u', '-c', code], {
-            detached: process.platform !== 'win32',
-            env: { PATH: process.env.PATH, SystemRoot: process.env.SystemRoot, TEMP: process.env.TEMP, TMP: process.env.TMP }
-          });
-          let stdout = '';
-          let stderr = '';
-          let finished = false;
-          const finish = () => {
-            if (finished) return false;
-            finished = true;
-            activeExecutions -= 1;
-            return true;
-          };
-
-          const timer = setTimeout(() => {
-            if (!finish()) return;
-            if (process.platform === 'win32' && proc.pid) {
-              execFile('taskkill', ['/pid', String(proc.pid), '/t', '/f']);
-            } else {
-              proc.kill('SIGKILL');
-            }
-            sendJson(res, 200, {
-                success: false,
-                stdout,
-                stderr: stderr + '\n[Execution timed out after 4000ms: CPU/infinite loop safeguard triggered]',
-                exitCode: 124,
-                durationMs: Date.now() - startTime,
-                timedOut: true,
-                runtime: 'CPython 3.10 Linux'
-              });
-          }, 4000);
-
-          proc.stdout.on('data', (d: Buffer) => {
-            if (stdout.length < 30000) stdout += d.toString();
-          });
-
-          proc.stderr.on('data', (d: Buffer) => {
-            if (stderr.length < 10000) stderr += d.toString();
-          });
-
-          proc.on('close', (code: number | null) => {
-            if (!finish()) return;
-            clearTimeout(timer);
-            sendJson(res, 200, {
-                success: code === 0,
-                stdout,
-                stderr,
-                exitCode: code ?? 0,
-                durationMs: Date.now() - startTime,
-                timedOut: false,
-                runtime: 'CPython 3.10 Linux'
-              });
-          });
-
-          proc.on('error', (err: Error) => {
-            if (!finish()) return;
-            clearTimeout(timer);
-            sendJson(res, 500, {
-                success: false,
-                stdout: '',
-                stderr: `Process spawn error: ${err.message}`,
-                exitCode: 1,
-                durationMs: Date.now() - startTime,
-                timedOut: false,
-                runtime: 'CPython 3.10 Linux'
-              });
-          });
-        } catch (e: any) {
-          sendJson(res, 400, { error: 'Invalid JSON payload' });
-        }
-      });
-      return;
-    }
-
-    // 2. Future Backend Database Integration & Health Handshake Endpoint
+    // 1. Future Backend Database Integration & Health Handshake Endpoint
     if (req.url === '/api/db/status' && req.method === 'GET') {
       res.statusCode = 200;
       res.setHeader('Content-Type', 'application/json');
@@ -252,6 +147,12 @@ export default defineConfig(() => {
     },
     optimizeDeps: {
       include: ['react', 'react-dom'],
+    },
+    worker: {
+      // Required for the Pyodide sandbox worker (src/workers/pyodideWorker.ts):
+      // pyodide.mjs internally code-splits, which Rollup can only support for
+      // 'es'-format worker bundles, not Vite's default 'iife'.
+      format: 'es' as const,
     },
     build: {
       // Mermaid's advanced diagram engines are lazy-loaded chapter assets, not initial app code.

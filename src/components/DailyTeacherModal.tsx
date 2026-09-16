@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Sparkles, X, BookOpen, Lightbulb, Check } from 'lucide-react';
 import { DAILY_CHALLENGES } from '../data/dailyChallengesData';
 import { CodeBlock } from './CodeBlock';
+import { useEscapeToClose } from '../hooks/useEscapeToClose';
 
 const NOTE_SAVED_RESET_MS = 2000;
 
@@ -38,11 +39,22 @@ export const DailyTeacherModal: React.FC<DailyTeacherModalProps> = ({
     setTimeout(() => setNoteSaved(false), NOTE_SAVED_RESET_MS);
   };
 
+  useEscapeToClose(isOpen, onClose);
+
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
-      <div className="flex h-[90vh] w-full max-w-4xl flex-col rounded-2xl border border-slate-800 bg-slate-950 shadow-2xl overflow-hidden">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Daily Teacher & Practice"
+    >
+      <div
+        onClick={e => e.stopPropagation()}
+        className="flex h-[90vh] w-full max-w-4xl flex-col rounded-2xl border border-slate-800 bg-slate-950 shadow-2xl overflow-hidden"
+      >
         {/* Header */}
         <div className="flex items-center justify-between border-b border-slate-800 bg-slate-900/90 px-6 py-4">
           <div className="flex items-center gap-3">

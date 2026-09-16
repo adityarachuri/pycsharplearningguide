@@ -39,7 +39,7 @@ export const UseCasesView: React.FC = () => {
                   : 'bg-slate-950 text-slate-400 hover:bg-slate-800 hover:text-slate-200 border border-slate-800'
               }`}
             >
-              <span className="rounded bg-slate-800 px-1.5 py-0.5 text-[10px] font-mono">
+              <span className="rounded bg-slate-800 text-slate-300 px-1.5 py-0.5 text-[10px] font-mono">
                 {uc.companyOrDomain.split('&')[0].trim()}
               </span>
               <span className="line-clamp-1">{uc.title.split('&')[0].trim()}</span>

@@ -91,6 +91,39 @@ export const MINDMAP_DOMAINS: MindmapDomain[] = [
     accentBg: 'bg-orange-500/10',
     textColor: 'text-orange-400',
     iconName: 'Terminal'
+  },
+  {
+    id: 'functions',
+    name: 'Functions, Closures & Decorators',
+    shortName: 'Functions',
+    description: 'Delegates & lambda expressions vs first-class functions, closures and decorator syntax',
+    color: '#22d3ee', // cyan-400
+    accentBorder: 'border-cyan-500/40',
+    accentBg: 'bg-cyan-500/10',
+    textColor: 'text-cyan-400',
+    iconName: 'FunctionSquare'
+  },
+  {
+    id: 'testing',
+    name: 'Testing & Quality Assurance',
+    shortName: 'Testing & QA',
+    description: 'xUnit/Moq/NSubstitute vs pytest fixtures, unittest.mock and static type checking',
+    color: '#4ade80', // green-400
+    accentBorder: 'border-green-500/40',
+    accentBg: 'bg-green-500/10',
+    textColor: 'text-green-400',
+    iconName: 'ShieldCheck'
+  },
+  {
+    id: 'web-data-ai',
+    name: 'Web, Data & AI Ecosystem',
+    shortName: 'Web & Data/AI',
+    description: 'ASP.NET Core & EF Core vs FastAPI/Django/SQLAlchemy, and ML.NET vs PyTorch/scikit-learn',
+    color: '#f472b6', // pink-400
+    accentBorder: 'border-pink-500/40',
+    accentBg: 'bg-pink-500/10',
+    textColor: 'text-pink-400',
+    iconName: 'Globe'
   }
 ];
 
@@ -696,5 +729,287 @@ print("3. Static Type Engine: Pyright (Microsoft)")`,
     gotcha: 'Without a static type checker configured in your CI/CD pipeline, type annotations are never validated during deployment.',
     difficulty: 'Fundamental',
     tags: ['Tooling', 'Ruff', 'Pyright', 'Roslyn']
+  },
+
+  // DOMAIN: FUNCTIONS, CLOSURES & DECORATORS
+  {
+    id: 'node-first-class-functions',
+    domainId: 'functions',
+    title: 'First-Class Functions vs Delegates',
+    csharpConcept: '`Func<T,TResult>` / `Action<T>` delegates and lambda expressions',
+    pythonConcept: 'Functions are ordinary objects — pass, store, and return them like any value',
+    cognitiveShift: 'C# needs a delegate type to treat a function as a value. In Python every function already IS a first-class object — no wrapper type required.',
+    csharpCode: `Func<int, int, int> add = (a, b) => a + b;
+int Apply(Func<int, int, int> op, int x, int y) => op(x, y);
+Console.WriteLine(Apply(add, 2, 3)); // 5`,
+    pythonCode: `add = lambda a, b: a + b
+
+def apply(op, x, y):
+    return op(x, y)
+
+print(apply(add, 2, 3))  # 5`,
+    sandboxCode: `def apply(op, x, y):
+    return op(x, y)
+
+print(apply(lambda a, b: a + b, 2, 3))
+print(apply(max, 2, 3))
+print(apply(lambda a, b: f"{a}-{b}", "py", "cs"))`,
+    gotcha: 'A `lambda` body must be a single expression — no statements, no assignments. Reach for a named `def` the moment logic needs more than one line.',
+    difficulty: 'Fundamental',
+    tags: ['Functions', 'Lambda', 'Delegates']
+  },
+  {
+    id: 'node-closures',
+    domainId: 'functions',
+    title: 'Closures & Captured Scope',
+    csharpConcept: 'Lambda expressions capturing outer local variables by reference',
+    pythonConcept: 'Nested functions capturing enclosing-scope names, `nonlocal` for rebinding',
+    cognitiveShift: 'Both languages close over variables, not snapshots — but Python requires an explicit `nonlocal` keyword to *rebind* (not just read) a captured name from an inner function.',
+    csharpCode: `Func<int> MakeCounter()
+{
+    int count = 0;
+    return () => ++count; // captured by reference
+}
+var counter = MakeCounter();
+Console.WriteLine(counter()); // 1`,
+    pythonCode: `def make_counter():
+    count = 0
+    def increment():
+        nonlocal count  # required to REBIND, not just read
+        count += 1
+        return count
+    return increment
+
+counter = make_counter()
+print(counter())  # 1`,
+    sandboxCode: `def make_counter():
+    count = 0
+    def increment():
+        nonlocal count
+        count += 1
+        return count
+    return increment
+
+c1 = make_counter()
+c2 = make_counter()
+print(c1(), c1(), c1())  # 1 2 3 — c1's own closure state
+print(c2())              # 1 — independent closure`,
+    gotcha: 'Forgetting `nonlocal` makes `count += 1` create a brand-new LOCAL variable inside the inner function, raising `UnboundLocalError` instead of mutating the outer one.',
+    difficulty: 'Intermediate',
+    tags: ['Closures', 'Scope', 'nonlocal']
+  },
+  {
+    id: 'node-decorators-mindmap',
+    domainId: 'functions',
+    title: 'Decorators as Higher-Order Functions',
+    csharpConcept: 'Attributes + AOP interceptors (Castle DynamicProxy, source generators)',
+    pythonConcept: '`@decorator` syntax — a function that wraps another function',
+    cognitiveShift: 'A C# attribute is inert metadata until something reflects on it. A Python decorator runs immediately at import time and can genuinely replace the function it decorates.',
+    csharpCode: `[Obsolete("Use NewMethod instead")]
+public void OldMethod() { }
+// Attribute is metadata — needs reflection/AOP to add behavior`,
+    pythonCode: `def deprecated(func):
+    def wrapper(*args, **kwargs):
+        print(f"Warning: {func.__name__} is deprecated")
+        return func(*args, **kwargs)
+    return wrapper
+
+@deprecated
+def old_method():
+    pass
+
+old_method()  # prints warning, then runs`,
+    sandboxCode: `def deprecated(func):
+    def wrapper(*args, **kwargs):
+        print(f"Warning: {func.__name__} is deprecated")
+        return func(*args, **kwargs)
+    return wrapper
+
+@deprecated
+def old_method():
+    print("doing the old thing")
+
+old_method()`,
+    gotcha: 'Forgetting `@functools.wraps(func)` inside the wrapper silently replaces the original function’s `__name__` and docstring, breaking introspection and some testing/logging tools.',
+    difficulty: 'Intermediate',
+    tags: ['Decorators', 'Higher-Order Functions', 'Metaprogramming']
+  },
+
+  // DOMAIN: TESTING & QUALITY ASSURANCE
+  {
+    id: 'node-test-frameworks',
+    domainId: 'testing',
+    title: 'Test Framework & Assertion Style',
+    csharpConcept: 'xUnit `[Fact]`/`[Theory]` with `Assert.Equal(expected, actual)`',
+    pythonConcept: 'pytest plain `assert` statements — no special assertion API needed',
+    cognitiveShift: 'pytest rewrites plain `assert` expressions at collection time to produce rich failure diffs, so you never need a dedicated `Assert.*` API the way xUnit/NUnit require.',
+    csharpCode: `[Fact]
+public void Sum_AddsTwoNumbers()
+{
+    var result = Calculator.Add(2, 3);
+    Assert.Equal(5, result);
+}`,
+    pythonCode: `def test_sum_adds_two_numbers():
+    result = calculator.add(2, 3)
+    assert result == 5  # plain assert — pytest rewrites it for rich diffs`,
+    sandboxCode: `def add(a, b):
+    return a + b
+
+def test_add():
+    assert add(2, 3) == 5
+    assert add(-1, 1) == 0
+
+test_add()
+print("All assertions passed")`,
+    gotcha: 'Running Python with the `-O` (optimize) flag strips ALL `assert` statements from the bytecode — never rely on production code paths executing an `assert` for anything safety-critical.',
+    difficulty: 'Fundamental',
+    tags: ['Testing', 'pytest', 'xUnit']
+  },
+  {
+    id: 'node-mocking-mindmap',
+    domainId: 'testing',
+    title: 'Mocking Dependencies',
+    csharpConcept: 'Moq/NSubstitute creating a fake behind an injected interface',
+    pythonConcept: '`unittest.mock.patch()` replacing an object at its import path',
+    cognitiveShift: 'C# mocking substitutes an interface implementation. Python mocking substitutes whatever object lives at a specific import path — no interface required, but the path must match exactly.',
+    csharpCode: `var mockGateway = new Mock<IPaymentGateway>();
+mockGateway.Setup(g => g.Charge(100)).Returns(true);
+var service = new Checkout(mockGateway.Object);`,
+    pythonCode: `from unittest.mock import patch
+
+@patch("checkout_service.payment_gateway.charge")
+def test_checkout(mock_charge):
+    mock_charge.return_value = True
+    result = checkout_service.complete(100)
+    assert result is True`,
+    sandboxCode: `from unittest.mock import MagicMock
+
+gateway = MagicMock()
+gateway.charge.return_value = True
+
+def checkout(gw, amount):
+    return gw.charge(amount)
+
+print(checkout(gateway, 100))
+gateway.charge.assert_called_once_with(100)
+print("Mock verified")`,
+    gotcha: 'Patching a function at its DEFINING module instead of where it’s IMPORTED and called silently does nothing — the calling code already bound a separate reference to the un-patched original.',
+    difficulty: 'Intermediate',
+    tags: ['Testing', 'Mocking', 'unittest.mock']
+  },
+  {
+    id: 'node-type-checking-mindmap',
+    domainId: 'testing',
+    title: 'Static Type Checking',
+    csharpConcept: 'Compiler-enforced static typing — mismatches fail the build',
+    pythonConcept: 'Pyright/mypy analyze type hints separately — never enforced at runtime',
+    cognitiveShift: 'A Python type error caught by Pyright is a *linter finding*, not a build failure — the exact same file runs fine even if the type checker is never invoked.',
+    csharpCode: `int Add(int a, int b) => a + b;
+Add("2", "3"); // Compile Error CS1503 — build fails`,
+    pythonCode: `def add(a: int, b: int) -> int:
+    return a + b
+
+add("2", "3")  # Pyright/mypy flags this — but it RUNS anyway`,
+    sandboxCode: `def add(a: int, b: int) -> int:
+    return a + b
+
+# Type hints are NOT enforced at runtime — this executes without error
+print(add("2", "3"))  # "23" — string concatenation, not addition!`,
+    gotcha: 'Type hints are pure documentation to the interpreter — always run a type checker (Pyright/mypy) as an explicit CI step; the interpreter itself will never catch a type mismatch.',
+    difficulty: 'Fundamental',
+    tags: ['Typing', 'Pyright', 'mypy', 'Static Analysis']
+  },
+
+  // DOMAIN: WEB, DATA & AI ECOSYSTEM
+  {
+    id: 'node-web-request-lifecycle',
+    domainId: 'web-data-ai',
+    title: 'Web Request Lifecycle',
+    csharpConcept: 'ASP.NET Core middleware pipeline + model binding to a typed DTO',
+    pythonConcept: 'FastAPI dependency injection + Pydantic request validation',
+    cognitiveShift: 'Both frameworks validate the incoming request against a typed model before your handler runs — FastAPI just derives that model from ordinary Python type hints instead of a dedicated attributed class.',
+    csharpCode: `[HttpPost("/orders")]
+public IActionResult Create(CreateOrderRequest request)
+{
+    // [ApiController] already validated request via data annotations
+    return Ok(orderService.Create(request));
+}`,
+    pythonCode: `@app.post("/orders")
+def create_order(request: CreateOrderRequest):
+    # FastAPI already validated request via Pydantic before this runs
+    return order_service.create(request)`,
+    sandboxCode: `# Simulated request validation, the way Pydantic/FastAPI do it
+def validate_order(payload: dict) -> dict:
+    if "amount" not in payload or payload["amount"] <= 0:
+        raise ValueError("amount must be positive")
+    return payload
+
+print(validate_order({"amount": 49.99}))
+try:
+    validate_order({"amount": -5})
+except ValueError as e:
+    print("Rejected:", e)`,
+    gotcha: 'FastAPI’s automatic type coercion (a `"42"` JSON string becomes `int 42`) is more permissive by default than ASP.NET Core’s stricter model binder — verify coercion behavior for anything precision-sensitive.',
+    difficulty: 'Intermediate',
+    tags: ['Web', 'FastAPI', 'ASP.NET Core']
+  },
+  {
+    id: 'node-dataframe-linq',
+    domainId: 'web-data-ai',
+    title: 'DataFrames vs LINQ Collections',
+    csharpConcept: 'LINQ over `IEnumerable<T>` — row-oriented, one delegate call per element',
+    pythonConcept: 'pandas DataFrame — column-oriented, vectorized C operations',
+    cognitiveShift: 'LINQ models a table as a sequence of row objects. pandas models it as a dict of typed columns — a `groupby().mean()` is one vectorized pass over a column, not N row-by-row delegate calls.',
+    csharpCode: `var avgBySymbol = trades
+    .GroupBy(t => t.Symbol)
+    .Select(g => new { g.Key, Avg = g.Average(t => t.Price) });`,
+    pythonCode: `import pandas as pd
+avg_by_symbol = df.groupby("symbol")["price"].mean()  # vectorized, columnar`,
+    sandboxCode: `# Illustrating the columnar mental model without pandas installed
+trades = [
+    {"symbol": "MSFT", "price": 410.2},
+    {"symbol": "MSFT", "price": 411.0},
+    {"symbol": "AAPL", "price": 189.5},
+]
+by_symbol: dict[str, list[float]] = {}
+for t in trades:
+    by_symbol.setdefault(t["symbol"], []).append(t["price"])
+
+for symbol, prices in by_symbol.items():
+    print(symbol, "avg:", sum(prices) / len(prices))`,
+    gotcha: 'Iterating a DataFrame with `.iterrows()` out of `foreach` habit reconstructs a boxed Python object per row — dramatically slower than any vectorized column operation.',
+    difficulty: 'Intermediate',
+    tags: ['Data', 'pandas', 'LINQ']
+  },
+  {
+    id: 'node-ml-training-loop',
+    domainId: 'web-data-ai',
+    title: 'ML Training Loop Anatomy',
+    csharpConcept: 'ML.NET `MLContext` pipeline: `.Fit()` / `.Transform()`',
+    pythonConcept: 'scikit-learn/PyTorch: forward pass → loss → backward pass → optimizer step',
+    cognitiveShift: 'ML.NET wraps training behind one `.Fit()` call. PyTorch exposes every step of the loop explicitly — you write the gradient-descent iteration yourself, trading conciseness for full control.',
+    csharpCode: `var pipeline = mlContext.Transforms
+    .Concatenate("Features", "SepalLength", "SepalWidth")
+    .Append(mlContext.MulticlassClassification.Trainers.SdcaMaximumEntropy());
+var model = pipeline.Fit(trainingData); // training is one call`,
+    pythonCode: `for epoch in range(epochs):
+    predictions = model(inputs)          # forward pass
+    loss = loss_fn(predictions, targets)
+    loss.backward()                      # compute gradients
+    optimizer.step()                     # apply gradient update
+    optimizer.zero_grad()`,
+    sandboxCode: `# Simplified gradient descent, no ML framework required
+def loss_fn(w, x, y):
+    return (w * x - y) ** 2
+
+w, x, y, lr = 0.0, 2.0, 10.0, 0.05
+for epoch in range(5):
+    loss = loss_fn(w, x, y)
+    grad = 2 * (w * x - y) * x  # d(loss)/dw
+    w -= lr * grad
+    print(f"epoch {epoch}: w={w:.3f} loss={loss:.3f}")`,
+    gotcha: 'Forgetting `optimizer.zero_grad()` accumulates gradients across iterations instead of resetting them — PyTorch does NOT clear gradients automatically between steps.',
+    difficulty: 'Architectural',
+    tags: ['AI/ML', 'PyTorch', 'ML.NET']
   }
 ];

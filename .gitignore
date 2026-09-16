@@ -23,3 +23,7 @@ secrets.yml
 
 # SnakeFlow
 .snakeflow/
+
+# Pyodide runtime — vendored from node_modules/pyodide by
+# scripts/copy-pyodide-runtime.mjs, not committed (regenerated on install)
+public/pyodide/

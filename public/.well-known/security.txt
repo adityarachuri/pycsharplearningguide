@@ -1,6 +1,4 @@
 # RFC 9116 Security Contact Information
-Contact: mailto:adityarachuri@outlook.com
+Contact: https://gitlab.com/adityarachuri/pycsharplearningguide/-/issues
 Expires: 2027-12-31T23:59:59.000Z
 Preferred-Languages: en
-Policy: https://ais-dev-wlljr2gglbabk65rggnigg-325037169721.asia-southeast1.run.app/
-Acknowledgments: https://ais-dev-wlljr2gglbabk65rggnigg-325037169721.asia-southeast1.run.app/

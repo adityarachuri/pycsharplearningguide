@@ -157,7 +157,7 @@ export const CodeBlock: React.FC<CodeBlockProps> = ({
   };
 
   const getLanguageLabel = () => {
-    if (language === 'python') return 'Python 3.13';
+    if (language === 'python') return 'Python 3.14';
     if (language === 'csharp') return 'C# 12 / .NET 8';
     return 'Output';
   };

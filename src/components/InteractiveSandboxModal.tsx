@@ -1,6 +1,7 @@
 import React from 'react';
 import { X, Terminal } from 'lucide-react';
 import { InteractiveSandbox } from './InteractiveSandbox';
+import { useEscapeToClose } from '../hooks/useEscapeToClose';
 
 interface InteractiveSandboxModalProps {
   isOpen: boolean;
@@ -15,16 +16,22 @@ export const InteractiveSandboxModal: React.FC<InteractiveSandboxModalProps> = (
   initialPresetId = 'comprehension',
   customCode
 }) => {
+  useEscapeToClose(isOpen, onClose);
+
   if (!isOpen) return null;
 
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-3 sm:p-6 backdrop-blur-md transition-opacity"
+      onClick={onClose}
       role="dialog"
       aria-modal="true"
       aria-labelledby="sandbox-modal-title"
     >
-      <div className="relative flex h-full max-h-[88vh] w-full max-w-6xl flex-col rounded-2xl border border-slate-700/80 bg-slate-950 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+      <div
+        onClick={e => e.stopPropagation()}
+        className="relative flex h-full max-h-[88vh] w-full max-w-6xl flex-col rounded-2xl border border-slate-700/80 bg-slate-950 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+      >
         {/* Modal Top Chrome */}
         <div className="flex items-center justify-between border-b border-slate-800 bg-slate-900/90 px-6 py-3.5">
           <div className="flex items-center gap-3">
@@ -35,7 +42,7 @@ export const InteractiveSandboxModal: React.FC<InteractiveSandboxModalProps> = (
               <h2 id="sandbox-modal-title" className="text-sm font-bold text-white flex items-center gap-2">
                 Live CPython Interactive Terminal & Execution Engine
                 <span className="rounded-full bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.2 text-[10px] font-mono text-emerald-400">
-                  CPython 3.10.12
+                  CPython 3.14 (WASM)
                 </span>
               </h2>
               <p className="text-[11px] text-slate-400">

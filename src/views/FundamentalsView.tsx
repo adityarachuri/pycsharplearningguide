@@ -69,7 +69,7 @@ export const FundamentalsView: React.FC<FundamentalsViewProps> = ({ onNavigate }
               Polyglot Systems &amp; Technical Rosetta Stone
             </span>
           </div>
-          <span className="rounded-full bg-slate-800/80 border border-slate-700/60 px-3 py-1 text-xs text-amber-300 font-medium">
+          <span className="rounded-full bg-slate-800/80 border border-slate-700/60 px-3 py-1 text-xs text-amber-200 font-medium">
             Learning Python from a C# developer's perspective
           </span>
         </div>

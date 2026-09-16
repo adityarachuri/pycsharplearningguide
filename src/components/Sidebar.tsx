@@ -18,7 +18,19 @@ import {
   CheckCircle2,
   X,
   Globe,
-  Sparkles
+  Sparkles,
+  Sigma,
+  Package,
+  Server,
+  ShieldCheck,
+  Landmark,
+  HeartPulse,
+  Home,
+  Image,
+  Code2,
+  Languages,
+  Music,
+  Network
 } from 'lucide-react';
 import { NavSectionId } from '../types';
 
@@ -40,6 +52,14 @@ interface NavGroup {
     badge?: string;
   }[];
 }
+
+const UTILITY_NAV_ITEMS: NavGroup['items'] = [
+  { id: 'home', label: 'Home', sublabel: 'Start here — platform overview', icon: Home },
+  { id: 'challenges', label: 'Coding Challenges', sublabel: 'Original exercises with a real Python sandbox', icon: Code2, badge: 'Practice' },
+  { id: 'infographics', label: 'Infographics', sublabel: 'Visual references for key mechanics', icon: Image },
+  { id: 'pedagogy-language', label: 'Learn Python Like a Language', sublabel: 'Vocabulary, grammar & conversation analogies', icon: Languages },
+  { id: 'pedagogy-art', label: 'Python as Art', sublabel: 'Code, poetry & music analogies', icon: Music }
+];
 
 const NAV_GROUPS: NavGroup[] = [
   {
@@ -125,65 +145,146 @@ const NAV_GROUPS: NavGroup[] = [
     ]
   },
   {
-    label: 'IV. Reference & AI/ML Frontier',
+    label: 'IV. Industry Vertical Blueprints',
+    items: [
+      {
+        id: 'fintech-domain',
+        label: '11. FinTech: Business Context',
+        sublabel: 'Payments, fraud scoring, ledgers & compliance',
+        icon: Landmark,
+        badge: 'New'
+      },
+      {
+        id: 'fintech-project',
+        label: '12. FinTech: Technical Implementation',
+        sublabel: 'Idempotent charges, ONNX fraud scoring, reconciliation',
+        icon: Landmark,
+        badge: 'Video Studio'
+      },
+      {
+        id: 'healthtech-domain',
+        label: '13. HealthTech: Business Context',
+        sublabel: 'FHIR, de-identification, HIPAA audit trails',
+        icon: HeartPulse,
+        badge: 'New'
+      },
+      {
+        id: 'healthtech-project',
+        label: '14. HealthTech: Technical Implementation',
+        sublabel: 'FHIR API, Safe Harbor, audit middleware',
+        icon: HeartPulse,
+        badge: 'Video Studio'
+      }
+    ]
+  },
+  {
+    label: 'V. Engineering & Systems Practice',
+    items: [
+      {
+        id: 'stdlib-deep-dive',
+        label: '15. Standard Library Deep Dive',
+        sublabel: 'itertools, dataclasses, pathlib, asyncio',
+        icon: Package,
+        badge: 'New'
+      },
+      {
+        id: 'web-frameworks',
+        label: '16. Web & API Frameworks',
+        sublabel: 'FastAPI, ASGI, SQLAlchemy vs ASP.NET Core',
+        icon: Server,
+        badge: 'New'
+      },
+      {
+        id: 'testing-deployment',
+        label: '17. Testing, Packaging & Deployment',
+        sublabel: 'pytest, mocking, uv, Docker multi-stage',
+        icon: ShieldCheck,
+        badge: 'New'
+      },
+      {
+        id: 'python-internals',
+        label: '18. Python Internals & CPython',
+        sublabel: 'Bytecode, import system, descriptors, GC',
+        icon: Cpu,
+        badge: 'New'
+      }
+    ]
+  },
+  {
+    label: 'VI. Reference & AI/ML Frontier',
     items: [
       {
         id: 'use-cases',
-        label: '11. Real-World Case Studies',
+        label: '19. Real-World Case Studies',
         sublabel: 'FinTech, Big Data, GenAI, Science',
         icon: Briefcase
       },
       {
         id: 'glossary',
-        label: '12. Terminology Glossary',
+        label: '20. Terminology Glossary',
         sublabel: 'Dunder, EAFP, Walrus, MRO, uv',
         icon: HelpCircle
       },
       {
+        id: 'aiml-fundamentals',
+        label: '21. Python for AI/ML Fundamentals',
+        sublabel: 'NumPy, Pandas, vectorization & broadcasting',
+        icon: Sigma
+      },
+      {
         id: 'aiml-context',
-        label: '13. AI/ML Engineering Stack',
+        label: '22. AI/ML Engineering Stack',
         sublabel: 'PyTorch, CUDA, vLLM, Qdrant & .NET',
         icon: BrainCircuit,
         badge: 'AI Stack'
       },
       {
+        id: 'deep-learning',
+        label: '23. Deep Learning: Engineer to Researcher',
+        sublabel: 'Neural nets, Transformers, career spectrum',
+        icon: Network,
+        badge: 'New'
+      },
+      {
         id: 'transition',
-        label: '14. C# to Python Roadmap',
+        label: '24. C# to Python Roadmap',
         sublabel: '6 phases, tooling & 10 pitfalls',
         icon: Compass
       }
     ]
   },
   {
-    label: 'V. Industry Realities & Destiny',
+    label: 'VII. Industry Realities & Destiny',
     items: [
       {
         id: 'researchers',
-        label: '15. Citations & Researchers',
+        label: '25. Citations & Researchers',
         sublabel: 'Seminal papers by Guido, Travis, Wes',
         icon: FileText
       },
       {
         id: 'future',
-        label: '16. Future & Possibilities',
+        label: '26. Future & Possibilities',
         sublabel: 'PEP 703 No-GIL, Tier-2 JIT & Wasm',
         icon: Rocket
       },
       {
         id: 'career-compass',
-        label: '17. Career Compass (India)',
+        label: '27. Career Compass (India)',
         sublabel: 'Salaries, GCCs, startups & strategy',
         icon: TrendingUp
       },
       {
         id: 'conclusion',
-        label: '18. Synthesis & Conclusion',
+        label: '28. Synthesis & Conclusion',
         sublabel: 'The Polyglot Systems Architect',
         icon: Award
       }
     ]
   }
 ];
+
+const TOTAL_CHAPTERS = NAV_GROUPS.reduce((sum, group) => sum + group.items.length, 0);
 
 export const Sidebar: React.FC<SidebarProps> = ({
   activeSection,
@@ -216,7 +317,49 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
 
         {/* Navigation List */}
-        <div className="flex-1 overflow-y-auto px-4 py-6 space-y-6">
+        <nav aria-label="Course navigation" className="flex-1 overflow-y-auto px-4 py-6 space-y-6">
+          {/* Utility items: Home, Challenges, Infographics, pedagogy pages — not
+              part of the numbered curriculum, so excluded from TOTAL_CHAPTERS. */}
+          <div className="space-y-1 rounded-2xl border border-slate-800 bg-slate-900/40 p-2">
+            {UTILITY_NAV_ITEMS.map(item => {
+              const Icon = item.icon;
+              const isActive = activeSection === item.id;
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => {
+                    onSelectSection(item.id);
+                    onClose();
+                  }}
+                  className={`group flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left transition-all ${
+                    isActive
+                      ? 'bg-amber-500/10 text-amber-300 font-semibold border border-amber-500/30'
+                      : 'text-slate-400 hover:bg-slate-900 hover:text-slate-200'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <Icon
+                      className={`h-4 w-4 shrink-0 transition-colors ${
+                        isActive ? 'text-amber-400' : 'text-slate-500 group-hover:text-slate-300'
+                      }`}
+                    />
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs">{item.label}</span>
+                        {item.badge && (
+                          <span className="rounded bg-slate-800 px-1.5 py-0.2 text-[9px] font-bold uppercase text-amber-400">
+                            {item.badge}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-[11px] text-slate-500 line-clamp-1">{item.sublabel}</p>
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+
           {NAV_GROUPS.map((group, groupIdx) => {
             const isProjectsGroup = group.label.includes('Hands-On');
 
@@ -299,21 +442,21 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </div>
           );
         })}
-        </div>
+        </nav>
 
         {/* Sidebar Footer with Completion Rate */}
         <div className="border-t border-slate-800 bg-slate-900/40 p-4">
           <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
             <span>Overall Course Progress</span>
             <span className="font-semibold text-white">
-              {Math.round((completedChapters.length / 13) * 100)}%
+              {Math.round((completedChapters.length / TOTAL_CHAPTERS) * 100)}%
             </span>
           </div>
           <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-800">
             <div
               className="h-full bg-linear-to-r from-amber-500 to-emerald-400 transition-all duration-500"
               style={{
-                width: `${(completedChapters.length / 13) * 100}%`
+                width: `${(completedChapters.length / TOTAL_CHAPTERS) * 100}%`
               }}
             />
           </div>

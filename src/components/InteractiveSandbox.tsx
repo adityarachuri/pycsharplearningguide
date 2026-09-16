@@ -8,8 +8,10 @@ import {
   Check,
   Clock,
   Trash2,
-  Maximize2
+  Maximize2,
+  Loader2
 } from 'lucide-react';
+import { preloadSandbox, onSandboxReady, isSandboxReady, runInSandbox } from '../services/pyodideSandboxService';
 
 interface PresetSnippet {
   id: string;
@@ -201,7 +203,6 @@ print("Pair combinations of 3 services:", list(itertools.combinations(["API", "D
   }
 ];
 
-const CLIENT_FALLBACK_DELAY_MS = 180;
 const COPY_RESET_MS = 2000;
 
 interface ExecutionResult {
@@ -210,7 +211,6 @@ interface ExecutionResult {
   exitCode: number;
   durationMs: number;
   runtime: string;
-  isFallback?: boolean;
 }
 
 export const InteractiveSandbox: React.FC<{
@@ -229,8 +229,42 @@ export const InteractiveSandbox: React.FC<{
   const [code, setCode] = useState<string>(customCode || initial.code);
   const [result, setResult] = useState<ExecutionResult | null>(null);
   const [isRunning, setIsRunning] = useState<boolean>(false);
+  const [runtimeReady, setRuntimeReady] = useState<boolean>(isSandboxReady());
   const [copied, setCopied] = useState<boolean>(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    onSandboxReady(() => setRuntimeReady(true));
+
+    // Inside the full-screen modal, opening it IS the user's intent to run
+    // code — preload immediately. Embedded inline on every chapter page,
+    // the ~4MB Pyodide runtime would otherwise start downloading on every
+    // single page view even for readers who never touch the sandbox, so
+    // defer it until the sandbox actually scrolls into view instead.
+    if (isModalView) {
+      preloadSandbox();
+      return;
+    }
+
+    const node = containerRef.current;
+    if (!node || typeof IntersectionObserver === 'undefined') {
+      preloadSandbox();
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      entries => {
+        if (entries.some(entry => entry.isIntersecting)) {
+          preloadSandbox();
+          observer.disconnect();
+        }
+      },
+      { rootMargin: '400px' }
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [isModalView]);
 
   // When customCode or initialPresetId changes, update state
   useEffect(() => {
@@ -257,72 +291,21 @@ export const InteractiveSandbox: React.FC<{
     if (isRunning) return;
     setIsRunning(true);
 
-    const startTime = Date.now();
+    // Real CPython, compiled to WebAssembly, executed entirely in a
+    // dedicated Worker (see src/services/pyodideSandboxService.ts) — no
+    // server round-trip, no host filesystem or network access from the
+    // executed code, and a hard timeout that terminates the worker if the
+    // code hangs. This is genuine execution, not a simulation.
+    const outcome = await runInSandbox(code);
 
-    try {
-      // 1. Try real Python execution via local backend endpoint
-      const response = await fetch('/api/execute-python', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code })
-      });
-
-      if (response.ok || response.status === 500 || response.status === 400) {
-        const data = await response.json();
-        setResult({
-          stdout: data.stdout || '',
-          stderr: data.stderr || data.error || '',
-          exitCode: data.exitCode ?? (response.ok ? 0 : 1),
-          durationMs: data.durationMs || (Date.now() - startTime),
-          runtime: data.runtime || 'CPython 3.10'
-        });
-        setIsRunning(false);
-        return;
-      }
-    } catch {
-      // Fall through to client-side emulation if network call fails entirely (e.g. CORS/NetworkError)
-    }
-
-    // 2. Client-side evaluation fallback if server endpoint is unreachable
-    setTimeout(() => {
-      const duration = Date.now() - startTime;
-      let simulatedOut = '';
-      let simulatedErr = '';
-
-      try {
-        // Evaluate print statements safely
-        const lines = code.split('\n');
-        const printOutputs: string[] = [];
-
-        lines.forEach(line => {
-          const trimmed = line.trim();
-          if (trimmed.startsWith('print(') && trimmed.endsWith(')')) {
-            const inner = trimmed.substring(6, trimmed.length - 1);
-            // Simple string literals or expressions
-            printOutputs.push(inner.replace(/^['"]|['"]$/g, ''));
-          }
-        });
-
-        if (printOutputs.length > 0) {
-          simulatedOut = printOutputs.join('\n');
-        } else {
-          simulatedOut = `(Executed successfully with exit code 0)\nReturn: None`;
-        }
-      } catch (err) {
-        const message = err instanceof Error ? err.message : 'invalid token';
-        simulatedErr = `SyntaxError: ${message}`;
-      }
-
-      setResult({
-        stdout: simulatedOut,
-        stderr: simulatedErr,
-        exitCode: simulatedErr ? 1 : 0,
-        durationMs: duration,
-        runtime: 'CPython Evaluator (Client Emulation)',
-        isFallback: true
-      });
-      setIsRunning(false);
-    }, CLIENT_FALLBACK_DELAY_MS);
+    setResult({
+      stdout: outcome.stdout,
+      stderr: outcome.stderr,
+      exitCode: outcome.success ? 0 : 1,
+      durationMs: outcome.durationMs,
+      runtime: outcome.timedOut ? 'CPython (WebAssembly) — Timed Out' : 'CPython 3.14 (Pyodide / WebAssembly)'
+    });
+    setIsRunning(false);
   };
 
   const handleReset = () => {
@@ -349,20 +332,20 @@ export const InteractiveSandbox: React.FC<{
   };
 
   return (
-    <div className={`rounded-2xl border border-slate-800 bg-slate-950 p-5 shadow-2xl ${isModalView ? 'h-full flex flex-col' : ''}`}>
+    <div ref={containerRef} className={`rounded-2xl border border-slate-800 bg-slate-950 p-5 shadow-2xl ${isModalView ? 'h-full flex flex-col' : ''}`}>
       {/* Sandbox Header */}
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-slate-800 pb-4">
         <div>
           <div className="flex items-center gap-2">
             <Terminal className="h-5 w-5 text-amber-400" />
-            <h3 className="text-base font-bold text-white">Interactive CPython 3.10 Sandbox</h3>
+            <h2 className="text-base font-bold text-white">Interactive CPython 3.14 Sandbox</h2>
             <span className="rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-semibold text-emerald-400 border border-emerald-500/20 flex items-center gap-1">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
               Live Kernel
             </span>
           </div>
           <p className="mt-1 text-xs text-slate-400">
-            Edit and run real Python code directly in your browser. Dispatches to unbuffered CPython with safety timeouts.
+            Edit and run real Python code directly in your browser via Pyodide (CPython compiled to WebAssembly) — no server, no account, nothing leaves your device.
           </p>
         </div>
 
@@ -375,7 +358,7 @@ export const InteractiveSandbox: React.FC<{
                 const p = PRESET_SNIPPETS.find(item => item.id === e.target.value);
                 if (p) handleSelectPreset(p);
               }}
-              className="appearance-none rounded-xl border border-slate-700 bg-slate-900 py-1.5 pl-3 pr-8 text-xs font-medium text-slate-200 hover:border-amber-500/50 focus:border-amber-500 focus:outline-hidden transition-colors"
+              className="w-[150px] sm:w-auto max-w-[60vw] sm:max-w-none truncate appearance-none rounded-xl border border-slate-700 bg-slate-900 py-1.5 pl-3 pr-8 text-xs font-medium text-slate-200 hover:border-amber-500/50 focus:border-amber-500 focus:outline-hidden transition-colors"
             >
               {PRESET_SNIPPETS.map(p => (
                 <option key={p.id} value={p.id} className="bg-slate-900 text-white">
@@ -423,15 +406,31 @@ export const InteractiveSandbox: React.FC<{
             onClick={handleRunCode}
             disabled={isRunning}
             className="flex items-center gap-1.5 rounded-xl bg-linear-to-r from-amber-500 to-yellow-500 px-4 py-1.5 text-xs font-bold text-slate-950 hover:from-amber-400 hover:to-yellow-400 shadow-md shadow-amber-500/20 disabled:opacity-50 transition-all cursor-pointer"
-            title="Execute Code (⌘+Enter / Ctrl+Enter)"
+            title={
+              runtimeReady
+                ? 'Execute Code (⌘+Enter / Ctrl+Enter)'
+                : 'Python runtime is still loading — first run will wait for it automatically'
+            }
           >
-            <Play className={`h-3.5 w-3.5 fill-current ${isRunning ? 'animate-spin' : ''}`} />
-            <span>{isRunning ? 'Executing...' : 'Run Code'}</span>
+            {isRunning ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <Play className="h-3.5 w-3.5 fill-current" />
+            )}
+            <span>
+              {isRunning ? 'Executing...' : runtimeReady ? 'Run Code' : 'Run Code (loading runtime...)'}
+            </span>
             <kbd className="hidden sm:inline-block rounded bg-amber-600/30 px-1 py-0.2 text-[10px] text-amber-900 font-mono font-bold">
               ⌘↵
             </kbd>
           </button>
         </div>
+        {!runtimeReady && (
+          <p className="mt-2 text-[11px] text-slate-500 flex items-center gap-1.5">
+            <Loader2 className="h-3 w-3 animate-spin" />
+            Downloading the in-browser Python runtime (first visit only, then cached)&hellip;
+          </p>
+        )}
       </div>
 
       {/* Editor and Terminal Canvas */}
@@ -454,6 +453,7 @@ export const InteractiveSandbox: React.FC<{
             onChange={e => setCode(e.target.value)}
             onKeyDown={handleKeyDown}
             spellCheck={false}
+            aria-label="Python code editor"
             className="w-full flex-1 min-h-65 p-4 bg-transparent font-mono text-xs text-amber-200/90 leading-relaxed resize-none focus:outline-hidden"
             placeholder="# Write Python 3 code here..."
           />

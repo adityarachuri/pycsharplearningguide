@@ -7,22 +7,14 @@
 ```mermaid
 graph TD
     Client[Browser Client / PWA] --> Routing[SPA View Switcher]
-    Routing --> Mod1[Foundations & History]
-    Routing --> Mod2[CPython vs CLR Internals]
-    Routing --> Mod3[10 Core Deep Dives]
-    Routing --> Mod4[Batteries Included]
-    Routing --> Mod5[DSA & Algorithms]
-    Routing --> Mod6[Workstation Toolchain]
-    Routing --> Mod7[Rosetta Stone Matrix]
-    Routing --> Mod8[Advanced Metaprogramming]
-    Routing --> Mod9[Real-World Use Cases]
-    Routing --> Mod10[Glossary & Disambiguation]
-    Routing --> Mod11[AI/ML PyTorch & NumPy]
-    Routing --> Mod12[Transition Playbook]
-    Routing --> Mod13[Researchers & Citations]
-    Routing --> Mod14[Future Python 3.13 / PEP 703]
-    Routing --> Mod15[Career & Leadership]
-    Routing --> Mod16[Conclusion & Certification]
+    Routing --> Group1[I. Foundations & Architecture - 6 chapters]
+    Routing --> Group2[II. Synthesis & Comparative Pedagogy - 2 chapters]
+    Routing --> Group3[III. Hands-On Project Blueprints - 2 chapters]
+    Routing --> Group4[IV. Industry Vertical Blueprints - 4 chapters]
+    Routing --> Group5[V. Engineering & Systems Practice - 4 chapters]
+    Routing --> Group6[VI. Reference & AI/ML Frontier - 6 chapters]
+    Routing --> Group7[VII. Industry Realities & Destiny - 4 chapters]
+    Routing --> Utility[Practice & Reference Pages - 5 pages]
 
     Routing --> Simulators[Interactive Simulators]
     Simulators --> GIL[GIL Concurrency Engine]
@@ -30,11 +22,17 @@ graph TD
     Simulators --> AST[Pipeline Execution Animator]
     Simulators --> Mindmap[Relational Topology Map]
     Simulators --> REPL[In-Browser Python Sandbox]
+    Simulators --> Challenges[Coding Challenge Engine + Hidden Tests]
 ```
+
+28 numbered curriculum chapters (7 groups above) plus 5 standalone practice/reference pages
+(Home, Coding Challenges, Infographics, Learn Python Like a Language, Python as Art) — 33 views
+total. The authoritative, always-current list is [`docs/MODULES_CATALOG.md`](MODULES_CATALOG.md),
+generated directly from `src/views/` and verified for staleness in CI.
 
 ## 2. Directory Structure & Modular Separation
 
-- `/src/views/`: 18 modular curriculum views.
+- `/src/views/`: 33 modular views (28 numbered curriculum chapters + 5 practice/reference pages).
 - `/src/components/`: Reusable, interactive visualizers, simulation canvases, navigation bars, modals, and search components.
 - `/src/data/`: Structured TypeScript datasets containing curriculum schemas, code comparisons, questions, and benchmark metrics.
 - `/src/services/`: Client-side persistence, background synchronization, and offline storage managers.
@@ -77,15 +75,23 @@ Interactive visual node topology mapping .NET paradigms to Python equivalents ac
 
 - **Content Security Policy**: Restricts scripts, connections, frames, object plugins, and browser capabilities to the same origin. Fonts are bundled or loaded only by explicit application markup.
 - **HTTP Strict Transport Security (HSTS)**: 2-year duration with subdomains and preload enabled.
-- **RFC 9116**: Verified security contact declared at `/.well-known/security.txt` pointing to `mailto:adityarachuri@outlook.com`.
+- **RFC 9116**: Security contact declared at `/.well-known/security.txt`.
 - **PWA Capabilities**: Service Worker precaches core static resources and employs Stale-While-Revalidate caching for resilient offline functionality. API requests are never cached.
 - **Quality Gates**: Vitest/V8 enforces 100% statement, branch, function, and line coverage for the persistence service. UI, service-worker, and Vite middleware behavior require browser or integration coverage before being included in a whole-application threshold.
 
 ### Runtime Security Boundary
 
-The optional `/api/execute-python` development endpoint is disabled unless `ENABLE_PYTHON_EXECUTION=true`. It is not a security sandbox: it must run only on loopback or behind a separately isolated, authenticated execution service with OS/container restrictions, resource quotas, and network policy.
+The Interactive Sandbox executes learner-submitted Python entirely client-side via **Pyodide** (CPython compiled to WebAssembly), running inside a dedicated Web Worker (`src/workers/pyodideWorker.ts`), orchestrated by `src/services/pyodideSandboxService.ts`. There is no server-side code execution endpoint at all — code never leaves the browser.
+
+This design satisfies the sandbox's security requirements structurally rather than by policy:
+
+- **No host filesystem, server secrets, or internal services are reachable** — the Worker has no access to them; it isn't a server process at all.
+- **No arbitrary network access from executed code** — Pyodide's WASI-based environment has no real sockets; the page's own CSP (`connect-src 'self' ...`) further restricts what the origin itself can reach.
+- **No other users' data is reachable** — execution is entirely local to the visitor's own browser tab.
+- **Resource limits**: a 10-second wall-clock timeout is enforced by the main thread calling `Worker.terminate()` — the only reliable way to stop a synchronous infinite loop, since Pyodide has no cooperative interrupt for one. Output is capped at 20,000 characters per stream.
+- **Runtime files are self-hosted** (`public/pyodide/`, vendored by `scripts/copy-pyodide-runtime.mjs`), not loaded from a third-party CDN, keeping the site's strict same-origin CSP intact.
+
+The formerly-present `/api/execute-python` dev-server endpoint (which spawned a real Python subprocess) has been removed entirely — it was gated behind an opt-in environment variable but represented exactly the "execute untrusted code in the application's own process" anti-pattern this design now avoids structurally.
 
 ---
-**Maintained by:** [Aditya Rachuri](mailto:adityarachuri@outlook.com)
-
-**Repository:** [GitLab repository](https://gitlab.com/adityarachuri/pycsharp)
+**Repository:** [GitLab repository](https://gitlab.com/adityarachuri/pycsharplearningguide)

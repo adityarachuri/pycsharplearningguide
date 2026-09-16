@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShieldCheck, ExternalLink, Cpu, Terminal, Database, Lock } from 'lucide-react';
+import { ShieldCheck, ExternalLink, Cpu, Terminal, Database, Lock, Monitor } from 'lucide-react';
 import { NavSectionId } from '../types';
 import { SiteLogo } from './SiteLogo';
 
@@ -25,7 +25,7 @@ export const Footer: React.FC<FooterProps> = ({
           <div className="lg:col-span-2 space-y-4">
             <SiteLogo size="md" showText={true} />
             <p className="text-xs text-slate-400 leading-relaxed max-w-md">
-              The premier interactive technical guide and Rosetta Stone for senior .NET and C# software engineers mastering CPython internals, dynamic execution, GIL mechanics, and modern high-throughput Python 3.13 systems.
+              The premier interactive technical guide and Rosetta Stone for senior .NET and C# software engineers mastering CPython internals, dynamic execution, GIL mechanics, and modern high-throughput Python 3.14 systems.
             </p>
 
             <div className="flex items-center gap-3 pt-2">
@@ -192,17 +192,6 @@ export const Footer: React.FC<FooterProps> = ({
                 </a>
               </li>
               <li>
-                <a
-                  href="/sitemap.xml"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-1 hover:text-blue-400 transition-colors"
-                >
-                  <span>XML Sitemap</span>
-                  <ExternalLink className="h-3 w-3" />
-                </a>
-              </li>
-              <li>
                 <button
                   onClick={() => onNavigate('researchers')}
                   className="hover:text-blue-400 transition-colors text-left"
@@ -231,6 +220,20 @@ export const Footer: React.FC<FooterProps> = ({
           <p className="text-slate-400 text-[11px] leading-relaxed">
             <strong>Warranty & Code Performance:</strong> All benchmark metrics, opcode disassembly snippets, architectural diagrams, and code artifacts are provided &ldquo;as is&rdquo; for analytical and instructive purposes without warranty of any kind, express or implied. Real-world execution performance, memory overhead, and concurrency throughput vary based on operating system kernel parameters, hardware cache topologies, CPU vector instruction extensions (AVX-512/NEON), and compiler optimization flags.
           </p>
+          <p className="text-slate-400 text-[11px] leading-relaxed">
+            <strong>Educational Use Only:</strong> Content is provided for learning purposes and reflects the author team&rsquo;s best understanding at time of writing. Python and .NET evolve continuously &mdash; always cross-check version-specific behavior, security guidance, and library APIs against official documentation before relying on them in production systems.
+          </p>
+          <p className="text-slate-400 text-[11px] leading-relaxed">
+            <strong>Not Professional Advice:</strong> Chapters illustrating regulated-industry engineering patterns (for example FinTech payment/fraud-scoring architecture or HealthTech FHIR/HIPAA data handling) are architectural teaching examples only. They are not legal, compliance, financial, medical, or security-certification advice, and do not represent an audited or certified implementation of any regulation (HIPAA, PCI DSS, SOX, or otherwise). Building a real regulated system requires qualified legal, compliance, and security professionals.
+          </p>
+        </div>
+
+        {/* Optimal Viewing Environment Advisory */}
+        <div className="mt-4 flex items-start gap-3 rounded-2xl border border-slate-800/80 bg-slate-900/40 p-5 md:p-6 text-[11px] leading-relaxed">
+          <Monitor className="h-4 w-4 text-amber-400 shrink-0 mt-0.5" />
+          <p className="text-slate-400">
+            <strong className="text-slate-200">Optimal Viewing Environment:</strong> This platform&rsquo;s interactive visualizers, side-by-side architectural comparisons, and dense technical diagrams are designed and best experienced on a laptop or desktop display at a minimum resolution of 1366&times;768 or higher. The interface remains fully functional on tablet and mobile devices, but some visualizations are more effectively explored on a larger viewport.
+          </p>
         </div>
 
         {/* Copyright & Versioning Bar */}
@@ -238,22 +241,10 @@ export const Footer: React.FC<FooterProps> = ({
           <div className="flex flex-wrap items-center gap-2">
             <span>© {currentYear} <strong>PyCSharp</strong> (Polyglot Systems &amp; Technical Rosetta Stone).</span>
             <span className="text-slate-500">•</span>
-            <span>Created by <a href="https://github.com/adityarachuri" target="_blank" rel="noreferrer" className="text-amber-400 hover:underline font-medium">Aditya Rachuri</a></span>
-            <span className="text-slate-500">•</span>
-            <span className="font-mono text-[11px] text-slate-400">adityarachuri@outlook.com</span>
-            <span className="text-slate-500">•</span>
             <span className="font-mono text-[11px] text-amber-400">v2.5.0-prod</span>
           </div>
 
           <div className="flex items-center gap-4 text-[11px]">
-            <a
-              href="https://github.com/adityarachuri"
-              target="_blank"
-              rel="noreferrer"
-              className="text-slate-400 hover:text-white transition-colors"
-            >
-              GitHub Profile
-            </a>
             <span className="flex items-center gap-1.5 text-emerald-400 font-mono">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
               PWA Offline Capable

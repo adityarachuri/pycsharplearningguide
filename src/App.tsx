@@ -15,7 +15,12 @@ import { InteractiveSandbox } from './components/InteractiveSandbox';
 import { InteractiveSandboxModal } from './components/InteractiveSandboxModal';
 import { Footer } from './components/Footer';
 import { dbService } from './services/dbIntegrationService';
+import { LandingView } from './views/LandingView';
 
+const InfographicsView = lazy(() => import('./views/InfographicsView').then(module => ({ default: module.InfographicsView })));
+const ChallengesHubView = lazy(() => import('./views/ChallengesHubView').then(module => ({ default: module.ChallengesHubView })));
+const LanguageAnalogyView = lazy(() => import('./views/LanguageAnalogyView').then(module => ({ default: module.LanguageAnalogyView })));
+const ArtPedagogyView = lazy(() => import('./views/ArtPedagogyView').then(module => ({ default: module.ArtPedagogyView })));
 const FundamentalsView = lazy(() => import('./views/FundamentalsView').then(module => ({ default: module.FundamentalsView })));
 const ArchitectureView = lazy(() => import('./views/ArchitectureView').then(module => ({ default: module.ArchitectureView })));
 const DeepDivesView = lazy(() => import('./views/DeepDivesView').then(module => ({ default: module.DeepDivesView })));
@@ -26,9 +31,19 @@ const ComparisonMatrixView = lazy(() => import('./views/ComparisonMatrixView').t
 const AdvancedConceptsView = lazy(() => import('./views/AdvancedConceptsView').then(module => ({ default: module.AdvancedConceptsView })));
 const WebAppProjectView = lazy(() => import('./views/WebAppProjectView').then(module => ({ default: module.WebAppProjectView })));
 const AimlProjectView = lazy(() => import('./views/AimlProjectView').then(module => ({ default: module.AimlProjectView })));
+const FintechDomainView = lazy(() => import('./views/FintechDomainView').then(module => ({ default: module.FintechDomainView })));
+const FintechProjectView = lazy(() => import('./views/FintechProjectView').then(module => ({ default: module.FintechProjectView })));
+const HealthtechDomainView = lazy(() => import('./views/HealthtechDomainView').then(module => ({ default: module.HealthtechDomainView })));
+const HealthtechProjectView = lazy(() => import('./views/HealthtechProjectView').then(module => ({ default: module.HealthtechProjectView })));
+const StdlibDeepDiveView = lazy(() => import('./views/StdlibDeepDiveView').then(module => ({ default: module.StdlibDeepDiveView })));
+const WebFrameworksView = lazy(() => import('./views/WebFrameworksView').then(module => ({ default: module.WebFrameworksView })));
+const TestingDeploymentView = lazy(() => import('./views/TestingDeploymentView').then(module => ({ default: module.TestingDeploymentView })));
+const PythonInternalsView = lazy(() => import('./views/PythonInternalsView').then(module => ({ default: module.PythonInternalsView })));
 const UseCasesView = lazy(() => import('./views/UseCasesView').then(module => ({ default: module.UseCasesView })));
 const GlossaryView = lazy(() => import('./views/GlossaryView').then(module => ({ default: module.GlossaryView })));
+const AimlFundamentalsView = lazy(() => import('./views/AimlFundamentalsView').then(module => ({ default: module.AimlFundamentalsView })));
 const AimlView = lazy(() => import('./views/AimlView').then(module => ({ default: module.AimlView })));
+const DeepLearningView = lazy(() => import('./views/DeepLearningView').then(module => ({ default: module.DeepLearningView })));
 const TransitionView = lazy(() => import('./views/TransitionView').then(module => ({ default: module.TransitionView })));
 const ResearchersView = lazy(() => import('./views/ResearchersView').then(module => ({ default: module.ResearchersView })));
 const FutureView = lazy(() => import('./views/FutureView').then(module => ({ default: module.FutureView })));
@@ -46,18 +61,28 @@ const SECTIONS_ORDER: { id: NavSectionId; name: string }[] = [
   { id: 'advanced-concepts', name: '8. Production Lectures' },
   { id: 'web-app-project', name: '9. Project: Full-Stack Web App' },
   { id: 'aiml-project', name: '10. Project: Production AI/ML App' },
-  { id: 'use-cases', name: '11. Real-World Case Studies' },
-  { id: 'glossary', name: '12. Terminology Glossary' },
-  { id: 'aiml-context', name: '13. AI/ML Engineering Stack' },
-  { id: 'transition', name: '14. C# to Python Roadmap' },
-  { id: 'researchers', name: '15. Citations & Researchers' },
-  { id: 'future', name: '16. Future of Python' },
-  { id: 'career-compass', name: '17. Career Compass' },
-  { id: 'conclusion', name: '18. Synthesis & Certification' }
+  { id: 'fintech-domain', name: '11. FinTech: Business Context' },
+  { id: 'fintech-project', name: '12. FinTech: Technical Implementation' },
+  { id: 'healthtech-domain', name: '13. HealthTech: Business Context' },
+  { id: 'healthtech-project', name: '14. HealthTech: Technical Implementation' },
+  { id: 'stdlib-deep-dive', name: '15. Standard Library Deep Dive' },
+  { id: 'web-frameworks', name: '16. Web & API Frameworks' },
+  { id: 'testing-deployment', name: '17. Testing, Packaging & Deployment' },
+  { id: 'python-internals', name: '18. Python Internals & CPython' },
+  { id: 'use-cases', name: '19. Real-World Case Studies' },
+  { id: 'glossary', name: '20. Terminology Glossary' },
+  { id: 'aiml-fundamentals', name: '21. Python for AI/ML Fundamentals' },
+  { id: 'aiml-context', name: '22. AI/ML Engineering Stack' },
+  { id: 'deep-learning', name: '23. Deep Learning: Engineer to Researcher' },
+  { id: 'transition', name: '24. C# to Python Roadmap' },
+  { id: 'researchers', name: '25. Citations & Researchers' },
+  { id: 'future', name: '26. Future of Python' },
+  { id: 'career-compass', name: '27. Career Compass' },
+  { id: 'conclusion', name: '28. Synthesis & Certification' }
 ];
 
 export default function App(): ReactElement {
-  const [activeSection, setActiveSection] = useState<NavSectionId>('fundamentals');
+  const [activeSection, setActiveSection] = useState<NavSectionId>('home');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isTeacherOpen, setIsTeacherOpen] = useState(false);
@@ -220,6 +245,23 @@ export default function App(): ReactElement {
   // Render current chapter view
   const renderView = () => {
     switch (activeSection) {
+      case 'home':
+        return (
+          <LandingView
+            onNavigate={id => {
+              setActiveSection(id);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+          />
+        );
+      case 'infographics':
+        return <InfographicsView />;
+      case 'challenges':
+        return <ChallengesHubView />;
+      case 'pedagogy-language':
+        return <LanguageAnalogyView />;
+      case 'pedagogy-art':
+        return <ArtPedagogyView />;
       case 'fundamentals':
         return (
           <FundamentalsView
@@ -261,12 +303,32 @@ export default function App(): ReactElement {
         return <WebAppProjectView />;
       case 'aiml-project':
         return <AimlProjectView />;
+      case 'fintech-domain':
+        return <FintechDomainView />;
+      case 'fintech-project':
+        return <FintechProjectView />;
+      case 'healthtech-domain':
+        return <HealthtechDomainView />;
+      case 'healthtech-project':
+        return <HealthtechProjectView />;
+      case 'stdlib-deep-dive':
+        return <StdlibDeepDiveView />;
+      case 'web-frameworks':
+        return <WebFrameworksView />;
+      case 'testing-deployment':
+        return <TestingDeploymentView />;
+      case 'python-internals':
+        return <PythonInternalsView />;
       case 'use-cases':
         return <UseCasesView />;
       case 'glossary':
         return <GlossaryView />;
+      case 'aiml-fundamentals':
+        return <AimlFundamentalsView />;
       case 'aiml-context':
         return <AimlView />;
+      case 'deep-learning':
+        return <DeepLearningView />;
       case 'transition':
         return <TransitionView />;
       case 'researchers':
@@ -285,7 +347,14 @@ export default function App(): ReactElement {
           />
         );
       default:
-        return <FundamentalsView />;
+        return (
+          <LandingView
+            onNavigate={id => {
+              setActiveSection(id);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+          />
+        );
     }
   };
 
@@ -300,6 +369,13 @@ export default function App(): ReactElement {
           : 'bg-slate-950 text-slate-100 selection:bg-amber-500 selection:text-slate-950'
       }`}
     >
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:rounded-lg focus:bg-amber-500 focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-slate-950"
+      >
+        Skip to main content
+      </a>
+
       {/* Top Navbar */}
       <Navbar
         activeSection={activeSection}
@@ -317,7 +393,7 @@ export default function App(): ReactElement {
         onOpenSyncDrawer={() => setIsSyncDrawerOpen(true)}
         onToggleSidebar={() => setIsSidebarOpen(prev => !prev)}
         onNavigateHome={() => {
-          setActiveSection('fundamentals');
+          setActiveSection('home');
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }}
         completedCount={completedChapters.length}
@@ -341,7 +417,7 @@ export default function App(): ReactElement {
         />
 
         {/* Content Main Area */}
-        <main className="flex-1 overflow-y-auto px-4 md:px-8 py-6 max-w-7xl mx-auto w-full">
+        <main id="main-content" className="flex-1 overflow-y-auto px-4 md:px-8 py-6 max-w-7xl mx-auto w-full">
           {/* Persistent Quick-Jump Bar for Hands-On Project Blueprints */}
           <div className="mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-3 rounded-2xl border border-amber-500/30 bg-linear-to-r from-amber-500/10 via-purple-500/10 to-slate-900/80 px-4 py-3 text-xs shadow-sm">
             <div className="flex items-center gap-2">

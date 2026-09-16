@@ -489,9 +489,9 @@ export function WorkstationVideoPlayer({
           <span className={`rounded-md border px-2 py-0.5 text-xs font-bold uppercase tracking-wider font-mono ${colorClasses.badge}`}>
             .NET / C# Architectural Parallel
           </span>
-          <h4 className="text-sm font-bold text-white">
+          <h3 className="text-sm font-bold text-white">
             {currentScene.csharpParallel.concept}
-          </h4>
+          </h3>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

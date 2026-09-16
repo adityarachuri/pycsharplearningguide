@@ -122,7 +122,7 @@ class UserRegisterRequest(BaseModel):
         return v
 
 # Automatically validates incoming HTTP payloads:
-payload = {"email": "dev@company.com", "username": "aditya_r", "birth_date": "1995-04-12"}
+payload = {"email": "dev@company.com", "username": "jsmith", "birth_date": "1995-04-12"}
 user = UserRegisterRequest.model_validate(payload)
 print(user.email)  # Strongly-typed accessor`
         }
@@ -332,7 +332,7 @@ from typing import Generator
 # Fixture acts as setup + teardown
 @pytest.fixture
 def mock_db() -> Generator[dict, None, None]:
-    db = {"users": [{"id": 1, "name": "Aditya"}]}
+    db = {"users": [{"id": 1, "name": "Alex"}]}
     print("\\n[Setup] DB initialized")
     yield db  # Test executes with this value
     print("\\n[Teardown] DB cleared")
