@@ -10,6 +10,8 @@
 [![Tailwind CSS v4](https://img.shields.io/badge/Tailwind-v4.1-38bdf8.svg)](https://tailwindcss.com)
 [![PWA Ready](https://img.shields.io/badge/PWA-Offline_First-10b981.svg)](public/manifest.json)
 
+**[Live Demo →](https://pycsharplearningguide.adityarachuri.workers.dev/)**
+
 ---
 
 ## 🧭 Overview
@@ -190,8 +192,9 @@ This is primarily a personal learning-content project, but fixes and clarificati
 
 ## 👤 Project Information
 
+- **Live Demo**: [https://pycsharplearningguide.adityarachuri.workers.dev/](https://pycsharplearningguide.adityarachuri.workers.dev/)
 - **Repository**: [https://github.com/adityarachuri/pycsharplearningguide](https://github.com/adityarachuri/pycsharplearningguide)
-- **Issues & Security Reports**: via the repository&rsquo;s issue tracker
+- **Issues & Security Reports**: via the repository&rsquo;s issue tracker, or [SECURITY.md](SECURITY.md) for vulnerabilities
 
 ---
 
