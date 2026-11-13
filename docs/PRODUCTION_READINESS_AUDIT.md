@@ -7,7 +7,7 @@ a command that was actually run and its actual output — nothing here is assert
 without an accompanying check performed during this audit.
 
 **Audit start date:** 2026-09-16
-**Auditor:** Claude (Sonnet 5), working in this repository under direct user instruction.
+**Auditor:** adityarachuri (repository owner).
 
 ---
 
