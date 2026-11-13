@@ -37,6 +37,11 @@ function ensureMermaidConfigured() {
   mermaid.initialize({
     startOnLoad: false,
     theme: 'dark',
+    // mermaid v12 defaults to the ELK layout engine and the "neo" look, both of
+    // which relayout/recolor existing diagrams. Pinning the pre-v12 defaults
+    // keeps every diagram's appearance identical to before the upgrade.
+    layout: 'dagre',
+    look: 'classic',
     securityLevel: 'strict',
     fontFamily: 'ui-sans-serif, system-ui, -apple-system, sans-serif',
     themeVariables: {
