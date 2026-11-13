@@ -32,7 +32,7 @@
     "@tailwindcss/vite": "^4.1.14",
     "@vitejs/plugin-react": "^5.0.4",
     "lucide-react": "^0.546.0",
-    "mermaid": "^11.17.2",
+    "mermaid": "^12.3.0",
     "pyodide": "^314.0.7",
     "react": "^19.0.1",
     "react-dom": "^19.0.1",
