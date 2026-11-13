@@ -12,7 +12,8 @@ const SECURITY_HEADERS: Record<string, string> = {
   'Referrer-Policy': 'strict-origin-when-cross-origin',
   // Permissions Policy: Restrict sensitive browser APIs
   'Permissions-Policy': 'camera=(), microphone=(), geolocation=(), payment=(), usb=(), screen-wake-lock=(), accelerometer=(), gyroscope=(), magnetometer=(), display-capture=(), browsing-topics=()',
-  // Keep browser capabilities local to the app. The Python executor is server-side and opt-in.
+  // Keep browser capabilities local to the app. Python code execution runs entirely
+  // client-side in a Pyodide Web Worker — there is no server-side execution endpoint.
   'Content-Security-Policy': "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com; worker-src 'self' blob:; frame-ancestors 'self'; form-action 'self'; base-uri 'self'; object-src 'none';",
   // Modern XSS Protection Header
   'X-XSS-Protection': '1; mode=block',

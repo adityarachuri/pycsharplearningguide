@@ -3,7 +3,7 @@
 > **Polyglot Systems & Technical Rosetta Stone**  
 > *Learning Python from a C# developer's perspective.*
 
-[![CI & Quality Gates](https://gitlab.com/adityarachuri/pycsharplearningguide/badges/main/pipeline.svg)](https://gitlab.com/adityarachuri/pycsharplearningguide/-/pipelines)
+[![CI & Quality Gates](https://github.com/adityarachuri/pycsharplearningguide/actions/workflows/ci.yml/badge.svg)](https://github.com/adityarachuri/pycsharplearningguide/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-amber.svg)](LICENSE)
 [![React 19](https://img.shields.io/badge/React-19.0.1-61dafb.svg)](https://react.dev)
 [![TypeScript Strict](https://img.shields.io/badge/TypeScript-5.x_Strict-3178c6.svg)](https://www.typescriptlang.org)
@@ -108,7 +108,7 @@ PyCSharp includes custom interactive simulations engineered with high visual pre
 
 ```bash
 # Clone the repository
-git clone https://gitlab.com/adityarachuri/pycsharplearningguide.git
+git clone https://github.com/adityarachuri/pycsharplearningguide.git
 cd pycsharplearningguide
 
 # Install dependencies
@@ -190,7 +190,7 @@ This is primarily a personal learning-content project, but fixes and clarificati
 
 ## 👤 Project Information
 
-- **Repository**: [https://gitlab.com/adityarachuri/pycsharplearningguide](https://gitlab.com/adityarachuri/pycsharplearningguide)
+- **Repository**: [https://github.com/adityarachuri/pycsharplearningguide](https://github.com/adityarachuri/pycsharplearningguide)
 - **Issues & Security Reports**: via the repository&rsquo;s issue tracker
 
 ---

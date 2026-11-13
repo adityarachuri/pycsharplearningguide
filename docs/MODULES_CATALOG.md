@@ -104,4 +104,4 @@
 | `workstationData` | `src/data/workstationData.ts` | Technical Reference |
 
 ---
-**Repository:** https://gitlab.com/adityarachuri/pycsharplearningguide
+**Repository:** https://github.com/adityarachuri/pycsharplearningguide

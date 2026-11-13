@@ -1,4 +1,4 @@
 # RFC 9116 Security Contact Information
-Contact: https://gitlab.com/adityarachuri/pycsharplearningguide/-/issues
+Contact: https://github.com/adityarachuri/pycsharplearningguide/issues
 Expires: 2027-12-31T23:59:59.000Z
 Preferred-Languages: en

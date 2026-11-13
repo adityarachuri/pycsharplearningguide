@@ -104,4 +104,4 @@ This design satisfies the sandbox's security requirements structurally rather th
 The formerly-present `/api/execute-python` dev-server endpoint (which spawned a real Python subprocess) has been removed entirely — it was gated behind an opt-in environment variable but represented exactly the "execute untrusted code in the application's own process" anti-pattern this design now avoids structurally.
 
 ---
-**Repository:** [GitLab repository](https://gitlab.com/adityarachuri/pycsharplearningguide)
+**Repository:** [GitHub repository](https://github.com/adityarachuri/pycsharplearningguide)

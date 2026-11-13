@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "description": "PyCSharp: Polyglot Systems & Technical Rosetta Stone - Learning Python from a C# developer's perspective",
   "license": "MIT",
-  "homepage": "https://gitlab.com/adityarachuri/pycsharplearningguide#readme",
+  "homepage": "https://github.com/adityarachuri/pycsharplearningguide#readme",
   "repository": {
     "type": "git",
-    "url": "https://gitlab.com/adityarachuri/pycsharplearningguide.git"
+    "url": "https://github.com/adityarachuri/pycsharplearningguide.git"
   },
   "private": true,
   "type": "module",

@@ -46,7 +46,7 @@ ${components.map(c => `| \`${c.replace('.tsx', '')}\` | \`src/components/${c}\` 
 ${dataFiles.map(d => `| \`${d.replace('.ts', '')}\` | \`src/data/${d}\` | Technical Reference |`).join('\n')}
 
 ---
-**Repository:** https://gitlab.com/adityarachuri/pycsharplearningguide
+**Repository:** https://github.com/adityarachuri/pycsharplearningguide
 `;
 
 fs.writeFileSync(path.join(docsDir, 'MODULES_CATALOG.md'), catalogContent, 'utf-8');

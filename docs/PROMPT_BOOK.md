@@ -1,6 +1,6 @@
 # PyCSharp – Comprehensive Prompt Book
 > **A complete prompt engineering and architecture playbook for building the PyCSharp Polyglot Platform.**  
-> *Repository:* [https://gitlab.com/adityarachuri/pycsharplearningguide](https://gitlab.com/adityarachuri/pycsharplearningguide)
+> *Repository:* [https://github.com/adityarachuri/pycsharplearningguide](https://github.com/adityarachuri/pycsharplearningguide)
 
 ---
 

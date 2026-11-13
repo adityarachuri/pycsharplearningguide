@@ -1,0 +1,52 @@
+# PyCSharp — GitHub Actions CI Pipeline
+# Replaces: .gitlab-ci.yml (reverted when the canonical remote moved back to GitHub)
+
+name: CI & Quality Gates
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  validate-and-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - name: Typecheck (tsc --noEmit)
+        run: npm run lint
+
+      - name: Unit tests with coverage gate
+        run: npm run test:coverage
+
+      - name: Regenerate docs and verify no drift
+        run: |
+          npm run docs:generate
+          git diff --exit-code -- docs/MODULES_CATALOG.md
+
+      - name: Production build
+        run: npm run build
+
+      - name: Verify build output
+        run: |
+          test -d dist
+          test -f dist/index.html
+          echo "Production build succeeded with all assets intact."
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: production-build
+          path: |
+            dist/
+            coverage/
+          retention-days: 1
